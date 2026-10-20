@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { db, t } from "@/db";
+import { deploymentOrigins, resolveAppUrl } from "./env";
 
 /**
  * Staff authentication (Better Auth, email + password, database sessions).
@@ -11,7 +12,8 @@ import { db, t } from "@/db";
  */
 export const auth = betterAuth({
   appName: "Hot Rock Hove",
-  baseURL: process.env.APP_URL,
+  baseURL: resolveAppUrl(),
+  trustedOrigins: deploymentOrigins(),
   secret: process.env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, {
     provider: "pg",

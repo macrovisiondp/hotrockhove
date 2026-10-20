@@ -100,6 +100,15 @@ test("emails escape submitted content", () => {
   assert.ok(!html.includes("<script>"));
 });
 
+test("site address falls back to Vercel's variables", async () => {
+  const { resolveAppUrl, deploymentOrigins } = await import("../../src/lib/env");
+  assert.equal(resolveAppUrl({ APP_URL: "https://hotrockhove.com/" }), "https://hotrockhove.com");
+  assert.equal(resolveAppUrl({ VERCEL_ENV: "production", VERCEL_PROJECT_PRODUCTION_URL: "hotrockhove.com" }), "https://hotrockhove.com");
+  assert.equal(resolveAppUrl({ VERCEL_ENV: "preview", VERCEL_BRANCH_URL: "app-git-x.vercel.app", VERCEL_URL: "app-abc.vercel.app" }), "https://app-git-x.vercel.app");
+  assert.equal(resolveAppUrl({}), "http://localhost:3000");
+  assert.deepEqual(deploymentOrigins({ VERCEL_BRANCH_URL: "b.vercel.app", VERCEL_URL: "d.vercel.app" }), ["https://b.vercel.app", "https://d.vercel.app"]);
+});
+
 test("S3 public URLs: bucket URL by default, CDN when set, keys URL-encoded per segment", async () => {
   const { s3PublicBase, s3PublicUrl, s3ObjectKey } = await import("../../src/lib/storage");
   const base = { ...DEFAULTS.storage, provider: "s3" as const, s3: { ...DEFAULTS.storage.s3, bucket: "hotrock-media", region: "eu-west-2" } };

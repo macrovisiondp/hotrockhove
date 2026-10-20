@@ -38,11 +38,30 @@ const schema = z.object({
 
 export type Env = z.infer<typeof schema>;
 
+/**
+ * Public origin of this deployment: APP_URL when set, otherwise derived from
+ * Vercel's system variables (production domain, branch alias, or deployment URL).
+ */
+export function resolveAppUrl(e: Record<string, string | undefined> = process.env): string {
+  const explicit = e.APP_URL?.trim();
+  if (explicit) return explicit.replace(/\/+$/, "");
+  if (e.VERCEL_ENV === "production" && e.VERCEL_PROJECT_PRODUCTION_URL) return `https://${e.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (e.VERCEL_BRANCH_URL) return `https://${e.VERCEL_BRANCH_URL}`;
+  if (e.VERCEL_URL) return `https://${e.VERCEL_URL}`;
+  return "http://localhost:3000";
+}
+
+/** Every origin this deployment answers on (for sign-in origin checks). */
+export function deploymentOrigins(e: Record<string, string | undefined> = process.env): string[] {
+  const hosts = [e.VERCEL_URL, e.VERCEL_BRANCH_URL, e.VERCEL_PROJECT_PRODUCTION_URL].filter(Boolean).map((h) => `https://${h}`);
+  return [...new Set([resolveAppUrl(e), ...hosts])];
+}
+
 let cached: Env | undefined;
 
 export function env(): Env {
   if (cached) return cached;
-  const parsed = schema.safeParse(process.env);
+  const parsed = schema.safeParse({ ...process.env, APP_URL: resolveAppUrl() });
   if (!parsed.success) {
     const fields = parsed.error.issues.map((i) => i.path.join(".")).join(", ");
     throw new Error(`Invalid or missing environment variables: ${fields}`);
