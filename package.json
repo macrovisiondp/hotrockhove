@@ -1,0 +1,50 @@
+{
+  "name": "hotrockhove",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/migrate.ts",
+    "db:seed": "tsx --conditions=react-server --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/seed.ts",
+    "admin:create": "tsx --conditions=react-server --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/create-admin.ts",
+    "media:import": "tsx --conditions=react-server --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/import-media.ts",
+    "test": "tsx --conditions=react-server --test tests/unit/*.test.ts",
+    "test:e2e": "playwright test",
+    "cache:clear": "node -e \"require('fs').rmSync('.next/dev/cache/fetch-cache',{recursive:true,force:true});require('fs').rmSync('.next/cache/fetch-cache',{recursive:true,force:true})\""
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.20.5",
+    "@types/nodemailer": "^8.0.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.2",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.10",
+    "@phosphor-icons/react": "^2.1.10",
+    "better-auth": "^1.7.12",
+    "cloudinary": "^2.11.0",
+    "drizzle-orm": "^0.45.4",
+    "next": "^16.4.2",
+    "nodemailer": "^10.1.7",
+    "postgres": "^3.4.9",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "resend": "^6.34.1",
+    "server-only": "^0.0.1",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.7"
+  }
+}

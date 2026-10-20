@@ -1,0 +1,566 @@
+import Link from "next/link";
+import { ArrowRight, MapPin } from "@phosphor-icons/react/dist/ssr";
+import type { PublicMedia, PublicMenuCategory } from "@/domain/content";
+import type { FormField } from "@/domain/forms/fields";
+import type { BookTarget } from "@/domain/links";
+import { resolveHref } from "@/domain/links";
+import { NEWSLETTER_CONSENT } from "@/domain/newsletter";
+import type { Cta, Section, SectionOf } from "@/domain/sections";
+import type { BusinessSettings, FeatureSettings } from "@/lib/settings";
+import { formatAddress, groupHours, telHref } from "@/lib/settings";
+import { submitFormAction, subscribeAction } from "@/app/(site)/actions";
+import { GalleryGrid } from "./gallery-grid";
+import { HeroVideo } from "./hero-video";
+import { MediaImage, MediaVideo, cloudinaryTransform } from "./media";
+import { MenuNav } from "./menu-nav";
+import { NewsletterForm } from "./newsletter-form";
+import { PublicForm } from "./public-form";
+import { ReviewsEmbed } from "./reviews-embed";
+import { RichText } from "./rich-text";
+
+export type Offer = {
+  id: string;
+  title: string;
+  tagline: string;
+  body: string;
+  priceText: string;
+  promoCode: string;
+  stage: string;
+};
+
+export type SectionContext = {
+  media: Map<string, PublicMedia>;
+  book: BookTarget;
+  business: BusinessSettings;
+  features: FeatureSettings;
+  privacyHref: string | null;
+  turnstileSiteKey: string | null;
+  menu: PublicMenuCategory[];
+  offers: Offer[];
+  forms: Record<string, { name: string; fields: FormField[]; submitLabel: string }>;
+};
+
+const wrap = "mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-10";
+
+function CtaLink({ cta, ctx, variant }: { cta: Cta; ctx: SectionContext; variant: "primary" | "ghost" }) {
+  if (!cta.label || !cta.href) return null;
+  const { href, external } = resolveHref(cta.href, ctx.book);
+  return (
+    <Link href={href} {...(external ? { target: "_blank", rel: "noopener" } : {})} className={`btn btn-${variant}`}>
+      {cta.label}
+    </Link>
+  );
+}
+
+function Heading({ eyebrow, heading, className = "", as: As = "h2" }: { eyebrow?: string; heading: string; className?: string; as?: "h1" | "h2" }) {
+  if (!heading && !eyebrow) return null;
+  return (
+    <div className={className}>
+      {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
+      {heading && <As className="display text-4xl text-bone sm:text-5xl lg:text-[3.6rem]">{heading}</As>}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+
+function Hero({ s, ctx, first }: { s: SectionOf<"hero">; ctx: SectionContext; first: boolean }) {
+  const img = s.mediaId ? ctx.media.get(s.mediaId) : undefined;
+  const vid = s.videoId ? ctx.media.get(s.videoId) : undefined;
+  const hasMedia = Boolean(img || vid);
+  const H = first ? "h1" : "h2";
+  if (!hasMedia) {
+    return (
+      <section className={`${wrap} pb-12 pt-32 lg:pb-16 lg:pt-40`}>
+        {s.eyebrow && <p className="eyebrow mb-5">{s.eyebrow}</p>}
+        <H className="display max-w-4xl text-5xl text-bone sm:text-6xl lg:text-7xl">{s.heading}</H>
+        {s.body && <p className="mt-6 max-w-[60ch] text-lg leading-relaxed text-stone">{s.body}</p>}
+        <div className="mt-9 flex flex-wrap gap-3">
+          <CtaLink cta={s.primaryCta} ctx={ctx} variant="primary" />
+          <CtaLink cta={s.secondaryCta} ctx={ctx} variant="ghost" />
+        </div>
+      </section>
+    );
+  }
+  return (
+    <section className="relative isolate flex min-h-[88dvh] items-end overflow-hidden lg:min-h-[94dvh]">
+      <div className="absolute inset-0 -z-10">
+        {img && <MediaImage media={img} sizes="100vw" priority={first} />}
+        {vid && <HeroVideo src={cloudinaryTransform(vid.url, "q_auto,vc_auto,w_1600")} poster={vid.posterUrl ?? img?.url ?? null} type={vid.mimeType} />}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(11_10_9/0.55)_0%,rgb(11_10_9/0.1)_35%,rgb(11_10_9/0.55)_70%,rgb(11_10_9/0.96)_100%)]" />
+      </div>
+      <div className={`${wrap} pb-16 pt-40 lg:pb-24`}>
+        <div className="max-w-3xl animate-rise">
+          {s.eyebrow && <p className="eyebrow mb-5">{s.eyebrow}</p>}
+          <H className="display text-5xl text-bone sm:text-6xl lg:text-[5.2rem]">{s.heading}</H>
+          {s.body && <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-bone/85">{s.body}</p>}
+          <div className="mt-9 flex flex-wrap gap-3">
+            <CtaLink cta={s.primaryCta} ctx={ctx} variant="primary" />
+            <CtaLink cta={s.secondaryCta} ctx={ctx} variant="ghost" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Story({ s, ctx }: { s: SectionOf<"story">; ctx: SectionContext }) {
+  const img = s.mediaId ? ctx.media.get(s.mediaId) : undefined;
+  const imageFirst = s.imageSide === "left";
+  return (
+    <section className={`${wrap} py-24 lg:py-36`}>
+      <div className={`grid items-start gap-12 lg:gap-20 ${img ? "lg:grid-cols-[5fr_6fr]" : ""}`}>
+        {img && (
+          <div className={`${imageFirst ? "" : "lg:order-2"} lg:sticky lg:top-32`}>
+            <div className="reveal relative aspect-[4/5] overflow-hidden bg-ink-900">
+              <MediaImage media={img} sizes="(min-width: 1024px) 42vw, 100vw" />
+            </div>
+          </div>
+        )}
+        <div className={`max-w-[62ch] ${imageFirst ? "" : "lg:order-1"} lg:pt-8`}>
+          <Heading eyebrow={s.eyebrow} heading={s.heading} />
+          <RichText text={s.body} className="mt-8 text-[1.06rem] leading-[1.8] text-stone" />
+          {s.signature && (
+            <div className="mt-10 border-t border-ink-700 pt-6">
+              <p className="display text-3xl italic text-bone">{s.signature}</p>
+              {s.signatureRole && <p className="mt-1 text-sm text-mute">{s.signatureRole}</p>}
+            </div>
+          )}
+          {s.cta.label && (
+            <div className="mt-10">
+              <CtaLink cta={s.cta} ctx={ctx} variant="ghost" />
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TextBlock({ s }: { s: SectionOf<"text"> }) {
+  const center = s.align === "center";
+  return (
+    <section className={`${wrap} py-20 lg:py-28`}>
+      <div className={`max-w-[68ch] ${center ? "mx-auto text-center" : ""}`}>
+        <Heading eyebrow={s.eyebrow} heading={s.heading} />
+        <RichText text={s.body} className={`${s.heading ? "mt-8" : ""} text-[1.06rem] leading-[1.8] text-stone`} />
+      </div>
+    </section>
+  );
+}
+
+function Quote({ s }: { s: SectionOf<"quote"> }) {
+  return (
+    <section className="border-y border-ink-800 bg-ink-900">
+      <figure className={`${wrap} py-20 text-center lg:py-28`}>
+        <div className="mx-auto mb-8 h-px w-16 bg-bronze" aria-hidden />
+        <blockquote className="display mx-auto max-w-4xl text-4xl italic leading-[1.15] text-bone sm:text-5xl lg:text-6xl">{s.quote}</blockquote>
+        {s.attribution && <figcaption className="mt-8 text-sm uppercase tracking-[0.2em] text-mute">{s.attribution}</figcaption>}
+      </figure>
+    </section>
+  );
+}
+
+function VideoFeature({ s, ctx }: { s: SectionOf<"video">; ctx: SectionContext }) {
+  const found = s.videoId ? ctx.media.get(s.videoId) : undefined;
+  if (!found) return null;
+  const poster = s.mediaId ? ctx.media.get(s.mediaId) : undefined;
+  const vid = poster && !found.posterUrl ? { ...found, posterUrl: poster.url } : found;
+  const portrait = (vid.height ?? 0) > (vid.width ?? 0);
+  return (
+    <section className={`${wrap} py-24 lg:py-32`}>
+      <div className={`grid items-center gap-10 lg:gap-16 ${portrait ? "lg:grid-cols-[1fr_minmax(0,420px)]" : ""}`}>
+        <div className={portrait ? "" : "max-w-3xl"}>
+          <Heading eyebrow={s.eyebrow} heading={s.heading} />
+          {s.body && <RichText text={s.body} className="mt-6 text-[1.06rem] leading-[1.8] text-stone" />}
+        </div>
+        <div className={`reveal overflow-hidden bg-ink-900 ${portrait ? "aspect-[9/16] w-full" : "mt-10 aspect-video lg:mt-14"}`}>
+          <MediaVideo media={vid} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PriceRow({ name, price, description }: { name: string; price: string; description: string }) {
+  return (
+    <div>
+      <div className="flex items-baseline gap-3">
+        <h4 className="display text-[1.45rem] leading-tight text-bone">{name}</h4>
+        <span aria-hidden className="mb-1.5 min-w-6 flex-1 border-b border-dotted border-ink-600" />
+        <span className="shrink-0 font-medium tabular-nums text-bronze">{price}</span>
+      </div>
+      {description && <p className="mt-1.5 max-w-[56ch] text-[0.95rem] leading-relaxed text-stone">{description}</p>}
+    </div>
+  );
+}
+
+function MenuHighlights({ s, ctx }: { s: SectionOf<"menuHighlights">; ctx: SectionContext }) {
+  const featured = ctx.menu.flatMap((c) => c.items.filter((i) => i.featured));
+  if (featured.length === 0) return null;
+  const withImage = featured.find((i) => i.imageId && ctx.media.get(i.imageId));
+  const img = withImage?.imageId ? ctx.media.get(withImage.imageId) : undefined;
+  return (
+    <section className="bg-ink-900 py-24 lg:py-32">
+      <div className={`${wrap} grid gap-14 lg:grid-cols-[1fr_1.2fr] lg:gap-20`}>
+        <div>
+          <Heading eyebrow={s.eyebrow} heading={s.heading} />
+          {s.body && <p className="mt-6 max-w-[48ch] leading-relaxed text-stone">{s.body}</p>}
+          {img && (
+            <div className="reveal relative mt-10 hidden aspect-[4/3] overflow-hidden lg:block">
+              <MediaImage media={img} sizes="40vw" />
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col justify-center">
+          <div className="space-y-8">
+            {featured.slice(0, 6).map((i) => (
+              <PriceRow key={i.id} name={i.name} price={i.priceText} description={i.description} />
+            ))}
+          </div>
+          {s.cta.label && (
+            <div className="mt-12">
+              <CtaLink cta={s.cta} ctx={ctx} variant="primary" />
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FullMenu({ s, ctx, first }: { s: SectionOf<"menu">; ctx: SectionContext; first: boolean }) {
+  const H = first ? "h1" : "h2";
+  return (
+    <section className={`${wrap} pb-24 ${first ? "pt-32 lg:pt-40" : "pt-20"}`}>
+      <header className="mb-12 max-w-3xl">
+        {s.eyebrow && <p className="eyebrow mb-4">{s.eyebrow}</p>}
+        <H className="display text-5xl text-bone sm:text-6xl lg:text-7xl">{s.heading || "Menu"}</H>
+        {s.body && <RichText text={s.body} className="mt-6 text-lg leading-relaxed text-stone" />}
+      </header>
+      {ctx.menu.length === 0 ? (
+        <p className="text-stone">The menu is being updated. Please call us for today&apos;s dishes.</p>
+      ) : (
+        <>
+          <MenuNav categories={ctx.menu.map((c) => ({ id: c.id, name: c.name }))} />
+          <div className="mt-4">
+            {ctx.menu.map((c) => (
+              <section key={c.id} id={`cat-${c.id}`} aria-labelledby={`cat-h-${c.id}`} className="scroll-mt-[150px] border-b border-ink-800 py-14 last:border-b-0 lg:py-20">
+                <div className="grid gap-10 lg:grid-cols-[minmax(0,300px)_1fr] lg:gap-16">
+                  <div>
+                    <h3 id={`cat-h-${c.id}`} className="text-sm font-semibold uppercase tracking-[0.24em] text-bronze">
+                      {c.name}
+                    </h3>
+                    {c.note && <p className="mt-3 text-[0.95rem] leading-relaxed text-stone">{c.note}</p>}
+                  </div>
+                  <div className="grid gap-x-14 gap-y-9 md:grid-cols-2">
+                    {c.items.map((i) => (
+                      <PriceRow key={i.id} name={i.name} price={i.priceText} description={i.description} />
+                    ))}
+                  </div>
+                </div>
+              </section>
+            ))}
+          </div>
+          <p className="mt-10 max-w-[70ch] text-sm leading-relaxed text-mute">
+            Please tell your server about any allergies or dietary requirements before ordering.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}
+
+function Offers({ s, ctx }: { s: SectionOf<"offers">; ctx: SectionContext }) {
+  const current = ctx.offers.filter((o) => o.stage !== "upcoming");
+  const upcoming = ctx.offers.filter((o) => o.stage === "upcoming");
+  if (ctx.offers.length === 0) return null;
+  return (
+    <section className={`${wrap} py-24 lg:py-32`}>
+      <Heading eyebrow={s.eyebrow} heading={s.heading} className="max-w-3xl" />
+      {s.body && <RichText text={s.body} className="mt-6 max-w-[62ch] leading-relaxed text-stone" />}
+      <div className="mt-14 grid gap-px bg-ink-700 md:grid-cols-2">
+        {current.map((o) => (
+          <article key={o.id} className="flex flex-col bg-ink-950 p-8 lg:p-10">
+            <h3 className="display text-3xl text-bone lg:text-4xl">{o.title}</h3>
+            {o.tagline && <p className="mt-2 text-bronze">{o.tagline}</p>}
+            {o.body && <RichText text={o.body} className="mt-5 flex-1 leading-relaxed text-stone" />}
+            {(o.priceText || o.promoCode) && <div className="mt-8 flex flex-wrap items-end justify-between gap-4 border-t border-ink-800 pt-6">
+              {o.priceText ? <p className="display text-4xl text-bone">{o.priceText}</p> : <span />}
+              {o.promoCode && (
+                <p className="text-sm text-stone">
+                  Code <span className="ml-1 border border-bronze/60 px-2 py-1 font-semibold tracking-[0.14em] text-bone">{o.promoCode}</span>
+                </p>
+              )}
+            </div>}
+          </article>
+        ))}
+      </div>
+      {upcoming.length > 0 && (
+        <div className="mt-14">
+          <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-mute">Coming soon</h3>
+          <ul className="mt-5 flex flex-wrap gap-3">
+            {upcoming.map((o) => (
+              <li key={o.id} className="border border-ink-700 px-4 py-2 text-stone">
+                {o.title}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function Gallery({ s, ctx, first }: { s: SectionOf<"gallery">; ctx: SectionContext; first: boolean }) {
+  const items = s.mediaIds.map((id) => ctx.media.get(id)).filter(Boolean) as PublicMedia[];
+  if (items.length === 0) return null;
+  const shown = s.limit > 0 ? items.slice(0, s.limit) : items;
+  const H = first ? "h1" : "h2";
+  return (
+    <section className={`${wrap} ${first ? "pb-24 pt-32 lg:pt-40" : "py-24 lg:py-32"}`}>
+      {(s.heading || s.eyebrow) && (
+        <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+          <div>
+            {s.eyebrow && <p className="eyebrow mb-4">{s.eyebrow}</p>}
+            {s.heading && <H className="display text-5xl text-bone sm:text-6xl">{s.heading}</H>}
+          </div>
+          {s.limit > 0 && s.cta.label && (
+            <Link href={resolveHref(s.cta.href, ctx.book).href} className="group inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.16em] text-bone">
+              {s.cta.label}
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+          )}
+        </div>
+      )}
+      <GalleryGrid items={shown} />
+    </section>
+  );
+}
+
+function Reviews({ s, ctx }: { s: SectionOf<"reviews">; ctx: SectionContext }) {
+  if (!ctx.features.reviewsEnabled || !ctx.features.reviewsEmbedSrc) return null;
+  return (
+    <section className={`${wrap} py-24 lg:py-28`}>
+      <Heading eyebrow={s.eyebrow} heading={s.heading} className="mb-10 max-w-3xl" />
+      <ReviewsEmbed src={ctx.features.reviewsEmbedSrc} />
+    </section>
+  );
+}
+
+function ContactDetails({ business, compact = false }: { business: BusinessSettings; compact?: boolean }) {
+  const address = formatAddress(business);
+  const hours = business.hours.length ? groupHours(business.hours) : [];
+  return (
+    <div className={`grid gap-10 ${compact ? "" : "sm:grid-cols-2"}`}>
+      {(address || business.phone || business.email) && (
+        <div>
+          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-bronze">Contact</h3>
+          <address className="mt-4 space-y-2 not-italic leading-relaxed text-stone">
+            {address && <p>{address}</p>}
+            {business.phone && (
+              <p>
+                <a href={telHref(business.phone)} className="link-underline text-bone">
+                  {business.phone}
+                </a>
+              </p>
+            )}
+            {business.email && (
+              <p>
+                <a href={`mailto:${business.email}`} className="link-underline break-all text-bone">
+                  {business.email}
+                </a>
+              </p>
+            )}
+          </address>
+        </div>
+      )}
+      {hours.length > 0 && (
+        <div>
+          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-bronze">Opening hours</h3>
+          <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-stone">
+            {hours.map((h) => (
+              <div key={h.label} className="contents">
+                <dt>{h.label}</dt>
+                <dd className="whitespace-nowrap tabular-nums text-bone">{h.value}</dd>
+              </div>
+            ))}
+          </dl>
+          {business.hoursNote && <p className="mt-3 text-sm text-mute">{business.hoursNote}</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Visit({ s, ctx }: { s: SectionOf<"visit">; ctx: SectionContext }) {
+  const img = s.mediaId ? ctx.media.get(s.mediaId) : undefined;
+  const b = ctx.business;
+  if (!formatAddress(b) && !b.phone && b.hours.length === 0) return null;
+  return (
+    <section className="relative isolate overflow-hidden border-t border-ink-800">
+      <div className={`grid lg:grid-cols-2`}>
+        <div className={`px-4 py-24 sm:px-6 lg:py-32 lg:pl-10 lg:pr-16 xl:pl-[max(2.5rem,calc((100vw-1400px)/2+2.5rem))]`}>
+          <Heading eyebrow={s.eyebrow} heading={s.heading} />
+          {s.body && <p className="mt-6 max-w-[48ch] leading-relaxed text-stone">{s.body}</p>}
+          <div className="mt-12">
+            <ContactDetails business={b} />
+          </div>
+          <div className="mt-12 flex flex-wrap gap-3">
+            <CtaLink cta={{ label: "Book Table", href: "book" }} ctx={ctx} variant="primary" />
+            {b.mapUrl && (
+              <a href={b.mapUrl} target="_blank" rel="noopener" className="btn btn-ghost">
+                <MapPin size={18} aria-hidden />
+                Directions
+              </a>
+            )}
+          </div>
+        </div>
+        {img && (
+          <div className="relative min-h-[360px] lg:min-h-full">
+            <MediaImage media={img} sizes="(min-width: 1024px) 50vw, 100vw" />
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function CtaBand({ s, ctx }: { s: SectionOf<"cta">; ctx: SectionContext }) {
+  const img = s.mediaId ? ctx.media.get(s.mediaId) : undefined;
+  return (
+    <section className="relative isolate overflow-hidden">
+      {img && (
+        <div className="absolute inset-0 -z-10">
+          <MediaImage media={img} sizes="100vw" />
+          <div className="absolute inset-0 bg-ink-950/70" />
+        </div>
+      )}
+      <div className={`${wrap} py-28 text-center lg:py-40 ${img ? "" : "border-y border-ink-800"}`}>
+        <h2 className="display mx-auto max-w-3xl text-5xl text-bone sm:text-6xl">{s.heading}</h2>
+        {s.body && <p className="mx-auto mt-6 max-w-[52ch] text-lg leading-relaxed text-bone/80">{s.body}</p>}
+        <div className="mt-10 flex flex-wrap justify-center gap-3">
+          <CtaLink cta={s.primaryCta} ctx={ctx} variant="primary" />
+          <CtaLink cta={s.secondaryCta} ctx={ctx} variant="ghost" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FormSection({ s, ctx, first }: { s: SectionOf<"form">; ctx: SectionContext; first: boolean }) {
+  const form = ctx.forms[s.formKey];
+  const H = first ? "h1" : "h2";
+  return (
+    <section className={`${wrap} ${first ? "pb-24 pt-32 lg:pb-32 lg:pt-40" : "py-24 lg:py-32"}`}>
+      <div className={`grid gap-14 ${s.showContact ? "lg:grid-cols-[1fr_1.15fr] lg:gap-24" : "max-w-3xl"}`}>
+        <div>
+          {s.eyebrow && <p className="eyebrow mb-4">{s.eyebrow}</p>}
+          {s.heading && <H className="display text-5xl text-bone sm:text-6xl">{s.heading}</H>}
+          {s.body && <RichText text={s.body} className="mt-6 max-w-[52ch] text-lg leading-relaxed text-stone" />}
+          {s.showContact && (
+            <div className="mt-12">
+              <ContactDetails business={ctx.business} compact />
+            </div>
+          )}
+        </div>
+        <div>
+          {form ? (
+            <PublicForm
+              action={submitFormAction.bind(null, s.formKey)}
+              fields={form.fields}
+              submitLabel={form.submitLabel}
+              turnstileSiteKey={ctx.turnstileSiteKey}
+              privacyHref={ctx.privacyHref}
+            />
+          ) : (
+            <p className="border border-ink-700 p-6 text-stone">
+              This form isn&apos;t available right now.
+              {ctx.business.phone && (
+                <>
+                  {" "}
+                  Please call us on{" "}
+                  <a href={telHref(ctx.business.phone)} className="text-bone underline underline-offset-4">
+                    {ctx.business.phone}
+                  </a>
+                  .
+                </>
+              )}
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Newsletter({ s, ctx }: { s: SectionOf<"newsletter">; ctx: SectionContext }) {
+  return (
+    <section className="border-t border-ink-800 bg-ink-900">
+      <div className={`${wrap} grid gap-10 py-20 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-20 lg:py-24`}>
+        <div>
+          <h2 className="display text-4xl text-bone sm:text-5xl">{s.heading}</h2>
+          {s.body && <p className="mt-4 max-w-[48ch] leading-relaxed text-stone">{s.body}</p>}
+        </div>
+        <NewsletterForm
+          action={subscribeAction.bind(null, "section")}
+          consentText={NEWSLETTER_CONSENT}
+          turnstileSiteKey={ctx.turnstileSiteKey}
+          privacyHref={ctx.privacyHref}
+        />
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+
+export function RenderSections({ sections, ctx }: { sections: Section[]; ctx: SectionContext }) {
+  return (
+    <>
+      {sections.map((s, i) => {
+        const first = i === 0;
+        switch (s.type) {
+          case "hero":
+            return <Hero key={s.id} s={s} ctx={ctx} first={first} />;
+          case "story":
+            return <Story key={s.id} s={s} ctx={ctx} />;
+          case "text":
+            return <TextBlock key={s.id} s={s} />;
+          case "quote":
+            return <Quote key={s.id} s={s} />;
+          case "video":
+            return <VideoFeature key={s.id} s={s} ctx={ctx} />;
+          case "menuHighlights":
+            return <MenuHighlights key={s.id} s={s} ctx={ctx} />;
+          case "menu":
+            return <FullMenu key={s.id} s={s} ctx={ctx} first={first} />;
+          case "offers":
+            return <Offers key={s.id} s={s} ctx={ctx} />;
+          case "gallery":
+            return <Gallery key={s.id} s={s} ctx={ctx} first={first} />;
+          case "reviews":
+            return <Reviews key={s.id} s={s} ctx={ctx} />;
+          case "visit":
+            return <Visit key={s.id} s={s} ctx={ctx} />;
+          case "cta":
+            return <CtaBand key={s.id} s={s} ctx={ctx} />;
+          case "form":
+            return <FormSection key={s.id} s={s} ctx={ctx} first={first} />;
+          case "newsletter":
+            return <Newsletter key={s.id} s={s} ctx={ctx} />;
+        }
+      })}
+    </>
+  );
+}
+
+/** Used when a page's first section isn't a hero: a plain page title for structure and SEO. */
+export function PageTitle({ title }: { title: string }) {
+  return (
+    <header className={`${wrap} pb-4 pt-32 lg:pt-40`}>
+      <h1 className="display text-5xl text-bone sm:text-6xl lg:text-7xl">{title}</h1>
+    </header>
+  );
+}
+

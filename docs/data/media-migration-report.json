@@ -1,0 +1,703 @@
+{
+ "generatedAt": "2026-10-20T13:38:01.155Z",
+ "totals": {
+  "listed": 87,
+  "imported": 85,
+  "existing": 2,
+  "failed": 0
+ },
+ "items": [
+  {
+   "path": "2023/10/couple-by-dinner-2021-09-24-03-01-38-utc.jpg",
+   "status": "imported",
+   "id": "6f6f3230-bcec-4a39-a04e-0e603ceaccdc",
+   "bytes": 100113,
+   "mime": "image/jpeg",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2025/10/WhatsApp-Image-2025-10-13-at-17.18.00_d2bf89a3-e1760462777221.jpg",
+   "status": "imported",
+   "id": "8ea9e45b-4c00-40ae-8adc-64d553d8ca45",
+   "bytes": 136416,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2025/10/WhatsApp-Image-2025-10-13-at-17.18.00_5b182930.jpg",
+   "status": "imported",
+   "id": "589c1f2a-3e07-4085-9238-7e3199e0fcad",
+   "bytes": 294975,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/01/DEBBL2XFOIOSJEJY2LAYYFL2.webp",
+   "status": "imported",
+   "id": "b4f73867-0544-409f-b22d-1547c2bfe068",
+   "bytes": 945756,
+   "mime": "image/webp",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/01/shared-image-1.jpg",
+   "status": "imported",
+   "id": "1edc7b61-7f48-44ec-928a-1147a91efb2e",
+   "bytes": 446925,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2025/12/Steak-Sizzling.mp4",
+   "status": "imported",
+   "id": "48438159-33d5-4ae6-931b-a9f0a65827f3",
+   "bytes": 50490686,
+   "mime": "video/mp4",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2025/10/WhatsApp-Image-2025-10-13-at-17.18.00_3281e347-e1760462301109.jpg",
+   "status": "imported",
+   "id": "03c569a1-60e8-4382-8638-bdbd03803e36",
+   "bytes": 112243,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/01/WhatsApp-Image-2025-10-13-at-17.06.117.jpeg",
+   "status": "imported",
+   "id": "e046dd10-fc7e-4973-b9f4-4588e12e79c2",
+   "bytes": 203353,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/Media.jpg",
+   "status": "imported",
+   "id": "f1b9ee3b-7be3-4fbe-87c0-c466ac88ddd9",
+   "bytes": 408301,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-2.jpeg",
+   "status": "imported",
+   "id": "ed1831f4-57b1-41f6-812d-7329b54f20a2",
+   "bytes": 138721,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM.jpeg",
+   "status": "imported",
+   "id": "6a4fb823-5ed2-4876-a627-96b463545524",
+   "bytes": 255186,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-4.jpeg",
+   "status": "imported",
+   "id": "c92ac654-ea7d-4198-a95f-1e0620418a86",
+   "bytes": 261466,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-3.jpeg",
+   "status": "imported",
+   "id": "3ce75f3a-88f9-407d-a196-9e4b12e02f00",
+   "bytes": 161409,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-1.jpeg",
+   "status": "imported",
+   "id": "b75fe2b1-817f-4b4b-8939-4404334d091d",
+   "bytes": 176308,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/Media-3.jpg",
+   "status": "imported",
+   "id": "ba0af49b-12a3-4ea7-92a8-42b7916844c9",
+   "bytes": 808624,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Video-2026-02-07-at-10.09.54-PM.mp4",
+   "status": "imported",
+   "id": "6843440d-5629-42d5-b63d-0bdee9f06b02",
+   "bytes": 4130554,
+   "mime": "video/mp4",
+   "rights": "cleared"
+  },
+  {
+   "path": "2023/10/grilled-beef-steak-2021-08-26-16-31-42-utc.jpg",
+   "status": "imported",
+   "id": "18e7b0f5-8711-4bc3-bcf5-f372d883a9c0",
+   "bytes": 125988,
+   "mime": "image/jpeg",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2023/10/wine-in-wine-cellar-2021-08-26-15-34-10-utc.jpg",
+   "status": "imported",
+   "id": "61ae2d45-485f-49b5-a372-2c97975dd7fa",
+   "bytes": 59214,
+   "mime": "image/jpeg",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/01/Instagram-post-132.jpg.jpeg",
+   "status": "imported",
+   "id": "39d59cf6-ff97-42a7-93c1-31913b85c449",
+   "bytes": 2422461,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/01/daisy3.jpg",
+   "status": "imported",
+   "id": "2b888fbd-5860-4de7-ac5e-03ea7be6eeb5",
+   "bytes": 87380,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/daisy-cv-copy-3.jpg",
+   "status": "imported",
+   "id": "6e91c5fc-5111-4b66-9bc6-9ce854964bb4",
+   "bytes": 61304,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-04-at-10.19.04-PM.jpeg",
+   "status": "imported",
+   "id": "8008915b-e783-4c80-8817-2adbbbc08b00",
+   "bytes": 345664,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/01/Q7XQAQNMAC5545RGFRILW3BR.webp",
+   "status": "imported",
+   "id": "0d53aac9-95c6-4e9f-b362-cf5cca106be2",
+   "bytes": 448412,
+   "mime": "image/webp",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/02/madm.jpg",
+   "status": "imported",
+   "id": "0ab2f141-3c30-4393-9dcd-78655a2124d3",
+   "bytes": 96462,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/fillet-fri-enh.jpg",
+   "status": "imported",
+   "id": "e47d3a1b-a472-40f1-b711-ae9e1ab72f33",
+   "bytes": 105388,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/wagyud.jpg",
+   "status": "imported",
+   "id": "b2e7a6f3-a035-4845-a05d-aca8c20004e4",
+   "bytes": 97844,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/01/GMPLQOGCDDQ2BZNOKR7VI2NP.webp",
+   "status": "imported",
+   "id": "de155c39-c283-4282-8f38-2b9e1d2a6dd3",
+   "bytes": 938932,
+   "mime": "image/webp",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/01/WhatsApp-Image-2025-10-13-at-16.57.15.jpeg",
+   "status": "imported",
+   "id": "5e05e896-ec38-4c61-9292-a2e127d1d02f",
+   "bytes": 376658,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2023/10/beef-steak-food-styling-2021-10-21-04-23-34-utc.jpg",
+   "status": "imported",
+   "id": "cf5c0d0d-9854-48b2-b4b0-19305bfbd369",
+   "bytes": 271683,
+   "mime": "image/jpeg",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2023/10/marinated-turkey-steak-with-spices-on-a-wooden-boa-2022-04-22-13-31-31-utc.jpg",
+   "status": "imported",
+   "id": "53263039-d977-44a5-9895-fe21d5b6d026",
+   "bytes": 181936,
+   "mime": "image/jpeg",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2023/10/wine-and-cheese-on-the-table-2022-09-09-18-10-10-utc.jpg",
+   "status": "imported",
+   "id": "95ff3302-d3c9-42f6-add6-5af7df47e8c9",
+   "bytes": 94315,
+   "mime": "image/jpeg",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2023/10/organic-grass-fed-bacon-wrapped-sirloin-steak-2021-08-26-16-20-47-utc.jpg",
+   "status": "imported",
+   "id": "2c8f4b28-47b7-48e2-a318-99fba6985810",
+   "bytes": 156592,
+   "mime": "image/jpeg",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/02/wagyuim.jpg",
+   "status": "imported",
+   "id": "fa7a8200-1f44-48f6-82a3-3f247f013634",
+   "bytes": 105288,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/01/AOXPBXBW7NZNI2DAJ7G7IZ46.webp",
+   "status": "imported",
+   "id": "ad64e5a9-b35b-40b9-bc43-44ed32e7c373",
+   "bytes": 201734,
+   "mime": "image/webp",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/02/ourm-h.jpg",
+   "status": "imported",
+   "id": "f64e7496-76e5-47f0-b059-e8a192287b0e",
+   "bytes": 72482,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/01/6VYDUVRRVBP5W65ELBOHRGGI.jpeg",
+   "status": "imported",
+   "id": "b269a952-c746-4713-b254-3c0d28bc97e9",
+   "bytes": 215414,
+   "mime": "image/jpeg",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/01/D63BCCYOUKOFPU265JFP5AKQ.webp",
+   "status": "imported",
+   "id": "e6e74ed0-90c2-4d05-876d-8fe4c72cfec7",
+   "bytes": 235862,
+   "mime": "image/webp",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/01/Y6FV63GPAMSB3HSYJT46OHA3.webp",
+   "status": "imported",
+   "id": "773d6e0c-678a-4964-84ae-713907f34d93",
+   "bytes": 953436,
+   "mime": "image/webp",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/02/minted-lamb-chops.jpeg",
+   "status": "imported",
+   "id": "c4f923d4-9d1d-4b90-a306-d7aa1f69409c",
+   "bytes": 306613,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/01/RERNUNN2IQEX5OOPS3YSBJPQ.webp",
+   "status": "imported",
+   "id": "0d4f1951-388f-487c-8da8-f3e2bf30b047",
+   "bytes": 299272,
+   "mime": "image/webp",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/01/AZODMMSYA2UBSIVPW2DX3557.webp",
+   "status": "imported",
+   "id": "7a5592a2-2a2c-43c6-af65-d4b2fcefeb64",
+   "bytes": 1176550,
+   "mime": "image/webp",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/01/7EB2WCGNUEZUVTAJHBZAUINY.webp",
+   "status": "imported",
+   "id": "a1eacbf2-31d5-43cf-9dc9-67ebdb4e5a87",
+   "bytes": 822078,
+   "mime": "image/webp",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/02/val.jpg",
+   "status": "imported",
+   "id": "3f0ea97e-6983-4f4d-abaa-c3b9a6fdaf5b",
+   "bytes": 95083,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-01-at-7.48.49-PM.jpeg",
+   "status": "imported",
+   "id": "97327151-f4ae-40df-b525-d431e0799af3",
+   "bytes": 440761,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-01-31-at-11.34.22-PM.jpeg",
+   "status": "imported",
+   "id": "1a824f6d-98f5-4f77-a135-cdcc1e76f223",
+   "bytes": 185351,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/lsca.png",
+   "status": "imported",
+   "id": "79d53b73-1702-461c-95fb-d36bcafb861a",
+   "bytes": 1789220,
+   "mime": "image/png",
+   "rights": "cleared"
+  },
+  {
+   "path": "2023/10/smiling-businessman-talking-to-waiter-in-restauran-2021-09-24-03-47-52-utc-1.jpg",
+   "status": "imported",
+   "id": "2b7bbf82-692c-4761-a4a4-bd73dfc7d5cb",
+   "bytes": 129136,
+   "mime": "image/jpeg",
+   "rights": "unconfirmed"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-22-at-8.10.56-PM.jpeg",
+   "status": "imported",
+   "id": "bbf92337-37ba-4a53-a40b-ae1a4aec6792",
+   "bytes": 249635,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-22-at-8.10.56-PM-1.jpeg",
+   "status": "imported",
+   "id": "ef459ec0-72b9-489c-b661-97b39572d0f0",
+   "bytes": 224385,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/Apple-Rocktail.jpeg",
+   "status": "imported",
+   "id": "3ac203c1-5399-475e-a4e4-e24b41159be7",
+   "bytes": 369762,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/Kiwi-Rocktail.jpeg",
+   "status": "imported",
+   "id": "bdf890db-8917-4b96-9c95-de0df484d46f",
+   "bytes": 472228,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/Blueberry-Rocktail.jpeg",
+   "status": "imported",
+   "id": "e4454167-7677-498e-ba91-72b90bf8e269",
+   "bytes": 440882,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-11-at-11.42.44-AM.jpeg",
+   "status": "imported",
+   "id": "05909095-97e2-4b14-a7c0-6762543b844c",
+   "bytes": 305561,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-11-at-11.42.40-AM.jpeg",
+   "status": "imported",
+   "id": "d601c38c-a922-4acc-8ebe-6550f12db921",
+   "bytes": 349526,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-11-at-11.42.41-AM.jpeg",
+   "status": "imported",
+   "id": "7594d99c-7c1d-44e5-929a-43276c6e3952",
+   "bytes": 346727,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-11-at-11.34.35-AM.jpeg",
+   "status": "imported",
+   "id": "1791150d-d43e-4b30-9f55-0b85fe2f9871",
+   "bytes": 184545,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-11-at-11.34.35-AM-1.jpeg",
+   "status": "imported",
+   "id": "9cb409ae-b0ca-41b2-9502-c287481d9bc5",
+   "bytes": 228058,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.54-PM-2.jpeg",
+   "status": "imported",
+   "id": "c0737fd7-c7b2-48d9-8495-22418ef2e162",
+   "bytes": 68039,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.54-PM-1.jpeg",
+   "status": "imported",
+   "id": "cb451737-75d0-44ea-8c65-af6e7e5b264d",
+   "bytes": 327866,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.53-PM.jpeg",
+   "status": "imported",
+   "id": "bd2a7dc7-8082-4aa5-80c1-2388c63566d2",
+   "bytes": 138549,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM.jpeg",
+   "status": "imported",
+   "id": "1b90d163-3726-4578-a554-4079992f4eab",
+   "bytes": 242962,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM-1.jpeg",
+   "status": "imported",
+   "id": "32c63213-96fb-48ea-bc01-ee50e15e5324",
+   "bytes": 153207,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM-3.jpeg",
+   "status": "imported",
+   "id": "8d980260-425c-4b4c-8061-3c5277216574",
+   "bytes": 178164,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.56-PM.jpeg",
+   "status": "imported",
+   "id": "73311b84-eb75-4007-8320-cbb3c502cef5",
+   "bytes": 214877,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.56-PM-1.jpeg",
+   "status": "imported",
+   "id": "a25c984b-b820-4e19-ae22-622285a3f633",
+   "bytes": 360679,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM-2.jpeg",
+   "status": "imported",
+   "id": "d07835c5-ab12-4ae9-bbd0-4b47a09bb12f",
+   "bytes": 214068,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-04-at-8.27.44-PM.jpeg",
+   "status": "imported",
+   "id": "9bc082d2-829a-4911-9b67-f60bb4115f1a",
+   "bytes": 408990,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-04-at-8.27.44-PM-1.jpeg",
+   "status": "imported",
+   "id": "55ea2c19-b5a5-41d3-abf9-9d73d2401bf2",
+   "bytes": 376940,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-04-at-8.27.45-PM.jpeg",
+   "status": "imported",
+   "id": "b5ffb233-5c19-4529-bd1b-42bae5a532d3",
+   "bytes": 452156,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-01-31-at-2.52.01-PM.jpeg",
+   "status": "imported",
+   "id": "b4180b64-bb94-45d1-8a98-a27e4b442a3a",
+   "bytes": 351518,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-01-31-at-2.52.02-PM.jpeg",
+   "status": "imported",
+   "id": "b7265ef8-29db-4c67-9798-6a15c38a1500",
+   "bytes": 300239,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-01-31-at-2.52.02-PM-1.jpeg",
+   "status": "imported",
+   "id": "907bf639-d8d6-4da0-81c3-ff05c951b0ee",
+   "bytes": 296601,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-01-at-10.27.06-PM.jpeg",
+   "status": "duplicate-of",
+   "id": "8008915b-e783-4c80-8817-2adbbbc08b00",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-04-at-10.19.04-PM.jpeg"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-01-31-at-3.49.26-PM.jpeg",
+   "status": "imported",
+   "id": "65d8b403-d229-4a59-95b8-d96f4ae2801e",
+   "bytes": 255334,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-01-30-at-11.05.57-AM.jpeg",
+   "status": "imported",
+   "id": "9784dde9-2ab5-413e-9788-941ccd19ccd2",
+   "bytes": 204147,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-01-31-at-11.21.00-PM.jpeg",
+   "status": "imported",
+   "id": "9e616cc0-4980-4461-83f7-5b93c31ed03d",
+   "bytes": 134835,
+   "mime": "image/jpeg",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Image-2026-02-01-at-7.48.48-PM.jpeg",
+   "status": "duplicate-of",
+   "id": "c4f923d4-9d1d-4b90-a306-d7aa1f69409c",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/minted-lamb-chops.jpeg"
+  },
+  {
+   "path": "2026/02/WhatsApp-Video-2026-02-25-at-11.28.29-AM.mp4",
+   "status": "imported",
+   "id": "7cb18797-18d6-47a1-a5fb-91b826859d8d",
+   "bytes": 7532195,
+   "mime": "video/mp4",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/revht.mp4",
+   "status": "imported",
+   "id": "51c0bca7-bfc6-46df-9dac-8859d1a545aa",
+   "bytes": 4713147,
+   "mime": "video/mp4",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Video-2026-02-11-at-11.42.41-AM.mp4",
+   "status": "imported",
+   "id": "2050b95e-e646-4d71-8700-e0b48cb157f6",
+   "bytes": 584321,
+   "mime": "video/mp4",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Video-2026-02-11-at-11.34.34-AM-1-3.mp4",
+   "status": "imported",
+   "id": "3906f271-43b0-4b7b-86dd-5507bc0253c3",
+   "bytes": 6200334,
+   "mime": "video/mp4",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/sun.mp4",
+   "status": "imported",
+   "id": "3a23a2da-0405-4c1d-832e-bbb5996754ae",
+   "bytes": 15289763,
+   "mime": "video/mp4",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Video-2026-02-11-at-11.34.34-AM.mp4",
+   "status": "imported",
+   "id": "b7fdc580-2327-459f-b4f2-3271a1bcc127",
+   "bytes": 1735361,
+   "mime": "video/mp4",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Video-2026-02-04-at-3.05.26-PM.mp4",
+   "status": "imported",
+   "id": "c204077f-1d7d-4c8c-873c-2ec2d90e7892",
+   "bytes": 105937774,
+   "mime": "video/mp4",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Video-2026-01-31-at-11.35.48-PM-1.mp4",
+   "status": "imported",
+   "id": "92a0e039-4939-42a1-9d36-bd73147e38ca",
+   "bytes": 6209829,
+   "mime": "video/mp4",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Video-2026-02-01-at-8.07.08-PM.mp4",
+   "status": "imported",
+   "id": "6fef07ec-b179-489f-9374-fa9ad84800e9",
+   "bytes": 1068363,
+   "mime": "video/mp4",
+   "rights": "cleared"
+  },
+  {
+   "path": "2026/02/WhatsApp-Video-2026-02-01-at-8.07.08-PM-1.mp4",
+   "status": "imported",
+   "id": "c90308fb-6d90-4592-946f-beaaa5440723",
+   "bytes": 2345798,
+   "mime": "video/mp4",
+   "rights": "cleared"
+  }
+ ]
+}

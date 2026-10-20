@@ -1,0 +1,577 @@
+{
+ "source": "https://hotrockhove.com/our-menus/",
+ "captured": "2026-10-20",
+ "note": "Captured verbatim from the live page (headings h2/h4). price_raw is the exact published string; do not normalise without owner approval.",
+ "categories": [
+  {
+   "name": "STARTERS",
+   "items": [
+    {
+     "name": "Bradon Rost",
+     "description_raw": "Hot roasted fillet of salmon, sourced from the icy cold lochs of Scotland. Served cold. Recommended by chef Sonny. £10.99",
+     "description": "Hot roasted fillet of salmon, sourced from the icy cold lochs of Scotland. Served cold. Recommended by chef Sonny.",
+     "price_raw": "£10.99"
+    },
+    {
+     "name": "Minted Lamb Chops",
+     "description_raw": "2 thick cut pieces of the finest lamb chops. Coated in our house made mint and garlic marinade. Prepared fresh to order. £10.99",
+     "description": "2 thick cut pieces of the finest lamb chops. Coated in our house made mint and garlic marinade. Prepared fresh to order.",
+     "price_raw": "£10.99"
+    },
+    {
+     "name": "Smoked Mussels",
+     "description_raw": "(Seasonal) Smoked mussels-the worlds best, sourced from the icy cold lochs of Scotland. Served cold. Recommended by chef Sonny. £9.99",
+     "description": "(Seasonal) Smoked mussels-the worlds best, sourced from the icy cold lochs of Scotland. Served cold. Recommended by chef Sonny.",
+     "price_raw": "£9.99"
+    },
+    {
+     "name": "Creamy Garlic Prawns",
+     "description_raw": "Prawns cooked in a delicate creamy garlic sauce, garnished with chilli flakes. £7.99",
+     "description": "Prawns cooked in a delicate creamy garlic sauce, garnished with chilli flakes.",
+     "price_raw": "£7.99"
+    },
+    {
+     "name": "Smokey BBQ Wings",
+     "description_raw": "Our Hot Rock wings, coated in our house made smokey BBQ sauce. £7.49",
+     "description": "Our Hot Rock wings, coated in our house made smokey BBQ sauce.",
+     "price_raw": "£7.49"
+    },
+    {
+     "name": "Naga Wings",
+     "description_raw": "Our original Hot Rock wings with a very spicy kick. £7.49",
+     "description": "Our original Hot Rock wings with a very spicy kick.",
+     "price_raw": "£7.49"
+    },
+    {
+     "name": "Scampi",
+     "description_raw": "Succulent breaded lobster tail, deep fried and served with tangy tartare sauce. £6.99",
+     "description": "Succulent breaded lobster tail, deep fried and served with tangy tartare sauce.",
+     "price_raw": "£6.99"
+    },
+    {
+     "name": "Chilli & Cheese Orbs",
+     "description_raw": "Deep fried chilli & cheese orbs, served with a sweet chilli dipping sauce. £5.99",
+     "description": "Deep fried chilli & cheese orbs, served with a sweet chilli dipping sauce.",
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Grilled Halloumi",
+     "description_raw": "4 slices of our delicious grilled halloumi.£5.99",
+     "description": "4 slices of our delicious grilled halloumi.",
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Hot Rock Chicken Wings",
+     "description_raw": "Coated wings with a kick.£5.99",
+     "description": "Coated wings with a kick.",
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Creamy Garlic Mushrooms",
+     "description_raw": "Mushrooms cooked in a delicate creamy garlic sauce. £5.99",
+     "description": "Mushrooms cooked in a delicate creamy garlic sauce.",
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Garlic Bread With Cheese",
+     "description_raw": "2 pieces of our freshly baked garlic bread topped with melted cheddar cheese. £5.99",
+     "description": "2 pieces of our freshly baked garlic bread topped with melted cheddar cheese.",
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Garlic Bread",
+     "description_raw": "2 pieces of our freshly baked garlic bread. £4.99",
+     "description": "2 pieces of our freshly baked garlic bread.",
+     "price_raw": "£4.99"
+    },
+    {
+     "name": "Freshly Baked Bread & Butter",
+     "description_raw": "Freshly baked crusty bread & butter. £3.99",
+     "description": "Freshly baked crusty bread & butter.",
+     "price_raw": "£3.99"
+    }
+   ]
+  },
+  {
+   "name": "Premium Range",
+   "items": [
+    {
+     "name": "Premium A5+9 Wagyu Fillet Steak",
+     "description_raw": "THE WORLDS BEST-there is simply no better steak in this world. 11-12oz Thin sliced A5+9 marbling score of the finest, hand selected Wagyu available in the UK. (Check for availability) £119.99",
+     "description": "THE WORLDS BEST-there is simply no better steak in this world. 11-12oz Thin sliced A5+9 marbling score of the finest, hand selected Wagyu available in the UK. (Check for availability)",
+     "price_raw": "£119.99"
+    },
+    {
+     "name": "Premium A5+9 Wagyu Sirloin Steak",
+     "description_raw": "11-12oz Thin sliced A5+9 marbling score of the finest, hand selected A5 +9 Full Blood Wagyu available in the UK. (Check for availability)£99.99",
+     "description": "11-12oz Thin sliced A5+9 marbling score of the finest, hand selected A5 +9 Full Blood Wagyu available in the UK. (Check for availability)",
+     "price_raw": "£99.99"
+    }
+   ],
+   "note": "All are served with steak chips, please ask your server for alternative options."
+  },
+  {
+   "name": "Mains",
+   "items": [
+    {
+     "name": "Tomahawk Steak",
+     "description_raw": "Cut from the cote de boeuf, bone in ribeye. Approx 1kg weight. For one big appetite, or two to share. £79.99",
+     "description": "Cut from the cote de boeuf, bone in ribeye. Approx 1kg weight. For one big appetite, or two to share.",
+     "price_raw": "£79.99"
+    },
+    {
+     "name": "Porterhouse Steak",
+     "description_raw": "Approx 24oz. The finest porterhouse steak available. The T-Bone’s BIG BROTHER! With even more fillet and even more sirloin. £64.99",
+     "description": "Approx 24oz. The finest porterhouse steak available. The T-Bone’s BIG BROTHER! With even more fillet and even more sirloin.",
+     "price_raw": "£64.99"
+    },
+    {
+     "name": "T Bone Steak",
+     "description_raw": "The legendary T-Bone steak. Approx 16oz of the tender fillet and the succulent flavour of the sirloin in one cut. The very best of both worlds. £42.99",
+     "description": "The legendary T-Bone steak. Approx 16oz of the tender fillet and the succulent flavour of the sirloin in one cut. The very best of both worlds.",
+     "price_raw": "£42.99"
+    },
+    {
+     "name": "Fillet Steak",
+     "description_raw": "Approx 9oz of organic, grass fed, minimum 28-day matured beef from the inner T-bone. Famed for its tenderness and being the premium end of any steak. £36.99",
+     "description": "Approx 9oz of organic, grass fed, minimum 28-day matured beef from the inner T-bone. Famed for its tenderness and being the premium end of any steak.",
+     "price_raw": "£36.99"
+    },
+    {
+     "name": "Ribeye Steak",
+     "description_raw": "Approx 9oz of organic, grass fed, free range ribeye. £27.99",
+     "description": "Approx 9oz of organic, grass fed, free range ribeye.",
+     "price_raw": "£27.99"
+    },
+    {
+     "name": "Hot Rock Lamb",
+     "description_raw": "Lamb with our in house rub, served on the rock. £23.99",
+     "description": "Lamb with our in house rub, served on the rock.",
+     "price_raw": "£23.99"
+    },
+    {
+     "name": "Sirloin Steak",
+     "description_raw": "Approx 10oz of organic, grass fed, minimum 28-day matured sirloin steak. £25.99",
+     "description": "Approx 10oz of organic, grass fed, minimum 28-day matured sirloin steak.",
+     "price_raw": "£25.99"
+    },
+    {
+     "name": "Minted Lamb Steak",
+     "description_raw": "Approx 10-11oz premium boneless, lamb leg steak marinated in mint and garlic. £23.99",
+     "description": "Approx 10-11oz premium boneless, lamb leg steak marinated in mint and garlic.",
+     "price_raw": "£23.99"
+    },
+    {
+     "name": "Rump Steak",
+     "description_raw": "Approx 9oz of organic, grass fed 28-day matured beef from the hind leg. £20.99",
+     "description": "Approx 9oz of organic, grass fed 28-day matured beef from the hind leg.",
+     "price_raw": "£20.99"
+    },
+    {
+     "name": "Hot Rock Chicken Breast",
+     "description_raw": "Premium, organic chicken fillet coated in our Hot Rock rub, served fully cooked on the rock. £19.99",
+     "description": "Premium, organic chicken fillet coated in our Hot Rock rub, served fully cooked on the rock.",
+     "price_raw": "£19.99"
+    },
+    {
+     "name": "Fresh Salmon Steak",
+     "description_raw": "For all fish lovers, fresh salmon fillet cooked to perfection on the rock. £20.99",
+     "description": "For all fish lovers, fresh salmon fillet cooked to perfection on the rock.",
+     "price_raw": "£20.99"
+    }
+   ],
+   "note": "All are served with steak chips, please ask your server for alternative options."
+  },
+  {
+   "name": "SPECIAL OPENING OFFER",
+   "items": [
+    {
+     "name": "FILLET FRIDAY",
+     "description_raw": "Fillet steak and chips. Melt in the mouth fillet steak & chips.£29.99",
+     "description": "Fillet steak and chips. Melt in the mouth fillet steak & chips.",
+     "price_raw": "£29.99"
+    }
+   ]
+  },
+  {
+   "name": "Burgers",
+   "items": [
+    {
+     "name": "Hot Rock Gourmet Wagyu Burger",
+     "description_raw": "Wagyu is the standard by which all beef is measured, there is simply no better beef. Served with steak chips. Recommended by chef Sonny. £19.99",
+     "description": "Wagyu is the standard by which all beef is measured, there is simply no better beef. Served with steak chips. Recommended by chef Sonny.",
+     "price_raw": "£19.99"
+    },
+    {
+     "name": "Minted Lamb Burger",
+     "description_raw": "The finest quality lamb mince patties made in-house, and coated in our mint and herb marinade. Served with steak chips. Recommended by chef Sonny. £14.99",
+     "description": "The finest quality lamb mince patties made in-house, and coated in our mint and herb marinade. Served with steak chips. Recommended by chef Sonny.",
+     "price_raw": "£14.99"
+    },
+    {
+     "name": "Grilled Chicken Fillet Burger",
+     "description_raw": "Topped with mayo and a slice of cheese. Served with steak chips. £13.99",
+     "description": "Topped with mayo and a slice of cheese. Served with steak chips.",
+     "price_raw": "£13.99"
+    },
+    {
+     "name": "Grilled Halloumi Burger",
+     "description_raw": "Slice halloumi, grilled to perfection. Served with steak chips. £10.99",
+     "description": "Slice halloumi, grilled to perfection. Served with steak chips.",
+     "price_raw": "£10.99"
+    }
+   ],
+   "note": "All served in our tasty original Hot Rock branded brioche bun with crisp lettuce."
+  },
+  {
+   "name": "Sides & Extras",
+   "items": [
+    {
+     "name": "Grilled Halloumi",
+     "description_raw": "4 Slices of our delicious grilled halloumi.£5.99",
+     "description": "4 Slices of our delicious grilled halloumi.",
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "An Extra Hot Rock",
+     "description_raw": "£5.00",
+     "description": null,
+     "price_raw": "£5.00"
+    },
+    {
+     "name": "Trio of Butters",
+     "description_raw": "£6.00",
+     "description": null,
+     "price_raw": "£6.00"
+    },
+    {
+     "name": "Cheesy Mash",
+     "description_raw": "£5.50",
+     "description": null,
+     "price_raw": "£5.50"
+    },
+    {
+     "name": "Steak Chips",
+     "description_raw": "Cooked in beef dripping.£4.99",
+     "description": "Cooked in beef dripping.",
+     "price_raw": "£4.99"
+    },
+    {
+     "name": "Buttery Creamy Mash",
+     "description_raw": "£4.99",
+     "description": null,
+     "price_raw": "£4.99"
+    },
+    {
+     "name": "Buttered New Potatoes",
+     "description_raw": "£5.99",
+     "description": null,
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Sweet Potato Fries",
+     "description_raw": "Cooked in beef dripping.£4.99",
+     "description": "Cooked in beef dripping.",
+     "price_raw": "£4.99"
+    },
+    {
+     "name": "Onion Rings",
+     "description_raw": "Cooked in beef dripping.£4.99",
+     "description": "Cooked in beef dripping.",
+     "price_raw": "£4.99"
+    },
+    {
+     "name": "Side Mixed Salad",
+     "description_raw": "£4.99",
+     "description": null,
+     "price_raw": "£4.99"
+    },
+    {
+     "name": "Side of Mixed veg",
+     "description_raw": "Baby corn, tender stem broccoli and juicy carrots.£5.50",
+     "description": "Baby corn, tender stem broccoli and juicy carrots.",
+     "price_raw": "£5.50"
+    },
+    {
+     "name": "King prawns on a skewer",
+     "description_raw": "£7.99",
+     "description": null,
+     "price_raw": "£7.99"
+    },
+    {
+     "name": "Mushroom Sauce",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    },
+    {
+     "name": "Two Fried Eggs",
+     "description_raw": "£3.50",
+     "description": null,
+     "price_raw": "£3.50"
+    },
+    {
+     "name": "Peppercorn Sauce",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    },
+    {
+     "name": "Cracked Black Pepper Butter",
+     "description_raw": "£2.50",
+     "description": null,
+     "price_raw": "£2.50"
+    },
+    {
+     "name": "Naga Sauce",
+     "description_raw": "£2.50",
+     "description": null,
+     "price_raw": "£2.50"
+    },
+    {
+     "name": "Naga Butter",
+     "description_raw": "£2.50",
+     "description": null,
+     "price_raw": "£2.50"
+    },
+    {
+     "name": "Garlic and Herb Butter",
+     "description_raw": "£2.50",
+     "description": null,
+     "price_raw": "£2.50"
+    }
+   ]
+  },
+  {
+   "name": "Desserts",
+   "items": [
+    {
+     "name": "De - constructed Cheesecake",
+     "description_raw": "Available in mixed berry, Mr Whippy, strawberry and white chocolate, Belgian chocolate, Lotus Biscoff and white chocolate flavours.£7.00",
+     "description": "Available in mixed berry, Mr Whippy, strawberry and white chocolate, Belgian chocolate, Lotus Biscoff and white chocolate flavours.",
+     "price_raw": "£7.00"
+    },
+    {
+     "name": "Warm Chocolate Fudge Cake",
+     "description_raw": "£5.99",
+     "description": null,
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Apple Crumble",
+     "description_raw": "Served with warm custard.£5.99",
+     "description": "Served with warm custard.",
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Sticky Toffee Pudding",
+     "description_raw": "Served with warm custard.£5.99",
+     "description": "Served with warm custard.",
+     "price_raw": "£5.99"
+    }
+   ]
+  },
+  {
+   "name": "Drinks",
+   "items": [
+    {
+     "name": "Zanti Cola",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    },
+    {
+     "name": "Zanti Zero Cola",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    },
+    {
+     "name": "Irn-Bru",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    },
+    {
+     "name": "Apple Juice",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    },
+    {
+     "name": "Orange Juice",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    },
+    {
+     "name": "Mango Juice",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    },
+    {
+     "name": "Pineapple Juice",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    },
+    {
+     "name": "Zanti Zest",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    },
+    {
+     "name": "Zanti Orange",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    },
+    {
+     "name": "Bottled water",
+     "description_raw": "fizzy and still330ml £3.00 , 750ml £4.50",
+     "description": "fizzy and still330ml",
+     "price_raw": "£3.00 , 750ml £4.50"
+    },
+    {
+     "name": "Peach Tea",
+     "description_raw": "£3.00",
+     "description": null,
+     "price_raw": "£3.00"
+    }
+   ]
+  },
+  {
+   "name": "Rocktails",
+   "items": [
+    {
+     "name": "Kiwi",
+     "description_raw": "£5.99",
+     "description": null,
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Apple",
+     "description_raw": "£5.99",
+     "description": null,
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Apple and Kiwi",
+     "description_raw": "£5.99",
+     "description": null,
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Blueberry",
+     "description_raw": "£5.99",
+     "description": null,
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Beijing passion",
+     "description_raw": "£5.99",
+     "description": null,
+     "price_raw": "£5.99"
+    },
+    {
+     "name": "Strawberry",
+     "price_raw": "£5:99",
+     "description_raw": null,
+     "description": null
+    }
+   ],
+   "note": "Our own house made mocktails, available in:"
+  },
+  {
+   "name": "Beers, Wines and Ciders",
+   "items": [
+    {
+     "name": "Prosecco Bottle",
+     "description_raw": "£24.00",
+     "description": null,
+     "price_raw": "£24.00"
+    },
+    {
+     "name": "Not Guilty Wine Bottle",
+     "description_raw": "£18.00",
+     "description": null,
+     "price_raw": "£18.00"
+    },
+    {
+     "name": "Prosecco Glass 250ml",
+     "description_raw": "£8.00",
+     "description": null,
+     "price_raw": "£8.00"
+    },
+    {
+     "name": "Not Guilty Wine 250ml Glass",
+     "description_raw": "£7.00",
+     "description": null,
+     "price_raw": "£7.00"
+    },
+    {
+     "name": "Thatchers Cider (Alcohol Free) Bottle 500ml",
+     "description_raw": "£5.00",
+     "description": null,
+     "price_raw": "£5.00"
+    },
+    {
+     "name": "Peroni Zero Bottle 330ml",
+     "description_raw": "£5.00",
+     "description": null,
+     "price_raw": "£5.00"
+    },
+    {
+     "name": "Doombar (Alcohol Free) 500ml",
+     "description_raw": "£5.00",
+     "description": null,
+     "price_raw": "£5.00"
+    },
+    {
+     "name": "Koppaberg Cider (Alcohol Free) 500ml",
+     "description_raw": "Strawberry & Lime£5.00",
+     "description": "Strawberry & Lime",
+     "price_raw": "£5.00"
+    },
+    {
+     "name": "Alcohol Free Guinness",
+     "description_raw": "£5.00",
+     "description": null,
+     "price_raw": "£5.00"
+    }
+   ],
+   "note": "All drinks are Alcohol free."
+  },
+  {
+   "name": "Hot Drinks",
+   "items": [
+    {
+     "name": "Floater Coffee",
+     "description_raw": "£3.50",
+     "description": null,
+     "price_raw": "£3.50"
+    },
+    {
+     "name": "Hot Rock Choc",
+     "description_raw": "£3.50",
+     "description": null,
+     "price_raw": "£3.50"
+    },
+    {
+     "name": "Tea",
+     "description_raw": "£2.50",
+     "description": null,
+     "price_raw": "£2.50"
+    },
+    {
+     "name": "Coffee",
+     "description_raw": "£2.50",
+     "description": null,
+     "price_raw": "£2.50"
+    }
+   ]
+  }
+ ]
+}
