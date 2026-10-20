@@ -1,89 +1,81 @@
-# Architecture (proposed — confirm before build)
+# Architecture
 
-The audit found no compatibility issue with the recommended stack. The choices below also match the owner's other projects (Recruitment-hotrock, Sonny's), so they can share operational knowledge.
+## 1. Stack (as built)
 
-## 1. Stack
-
-| Concern | Choice | Why |
+| Concern | Choice | Notes |
 |---|---|---|
-| Framework | Next.js 16 (App Router), React, TypeScript strict | Server components, ISR, metadata API, Vercel-native |
-| Styling | Tailwind CSS v4 + design tokens in CSS variables | Tokens editable (brand colours) without a rebuild |
-| UI primitives | Radix-based accessible components (dialog, menu, tabs), custom-styled | Accessibility without a template look |
-| Database | Neon Postgres (dev branch / preview branch / prod) | Managed, branching per preview |
-| ORM / migrations | Drizzle ORM + drizzle-kit SQL migrations (additive, committed) | Already used in the owner's other projects; plain SQL migrations to review before deploy |
-| Auth | Better Auth (email + password, optional TOTP) with DB sessions | Established library; RBAC in our own tables |
-| Email | Resend via an `EmailProvider` adapter; SMTP adapter (Nodemailer) | See INTEGRATIONS_AND_EMAILS |
-| Media | `StorageProvider` adapter; Cloudinary default (D6) | Image/video transforms and CDN |
-| Spam | Cloudflare Turnstile + honeypot + per-IP/per-form rate limit (Postgres-backed) | No extra service |
-| Validation | Zod schemas shared by forms, server actions and API routes | One source of truth |
-| Rich text | Constrained structured blocks (heading, paragraph, image, video, CTA, menu reference, offer list, gallery). Paragraph text = limited Markdown, sanitised on render | No arbitrary HTML |
-| Hosting | Vercel (preview per branch, production on `main` after approval) | — |
-| Tests | Vitest (unit/integration), Playwright (E2E + axe accessibility), Lighthouse CI | — |
+| Framework | Next.js 16.4 (App Router), React 19.3, TypeScript strict | `src/proxy.ts` (Next 16's replacement for middleware) |
+| Styling | Tailwind CSS 4 + tokens in `src/app/globals.css` | Public site locked dark (brand); admin light. Sharp corners on the public site |
+| Fonts | Cormorant Garamond (display) + Inter (body) via `next/font` | The existing brand fonts, self-hosted |
+| Icons | Phosphor | |
+| Database | Neon Postgres (production) · PGlite (local) | Same SQL migrations for both |
+| ORM | Drizzle ORM + drizzle-kit SQL migrations in `drizzle/` | |
+| Auth | Better Auth, email + password, database sessions (12 h), sign-up disabled | Accounts created by the owner or `admin:create` |
+| Email | `EmailProvider` adapter: Resend (default) or SMTP (Nodemailer) | `src/lib/email` |
+| Media | `StorageAdapter`: Cloudinary (production) or local disk (development only) | `src/lib/storage` |
+| Bot protection | Cloudflare Turnstile (when configured) + honeypot + Postgres-backed rate limits | |
+| Validation | Zod 4 everywhere (settings, sections, forms, actions) | |
+| Tests | node:test (unit) + Playwright (e2e, desktop + mobile) | |
 
-## 2. Layout
+## 2. Request flow
 
 ```
-src/
-  app/
-    (site)/            public pages: /, /our-menus, /daisy, /gallery, /contact, /wagyu, [slug]
-    admin/             dashboard (server-rendered, auth-gated)
-    api/               form submit, newsletter confirm/unsubscribe, popup events, health
-    sitemap.ts robots.ts
-  components/          ui/ (primitives)  site/ (nav, footer, hero, menu, gallery, popup)  admin/
-  domain/              pages, menu, offers, forms, newsletter, popups, settings, media, redirects, audit
-  db/                  schema.ts, migrations/, client.ts
-  adapters/            email/{resend,smtp}  storage/{cloudinary,blob}  captcha/turnstile
-  lib/                 auth, rbac, crypto (AES-256-GCM), rate-limit, env (zod-validated)
-middleware.ts          redirects, maintenance mode, admin gate
-scripts/import/        menu, pages, media, redirects (idempotent)
+request ─▶ src/proxy.ts
+            ├─ /admin/* without session cookie → 307 /admin/login (UX only; every page/action re-checks)
+            ├─ redirects table (301/302/410) and trailing-slash 301 → single hop
+            ├─ maintenance mode → rewrite to /maintenance (503) unless signed in
+            └─ per-request CSP nonce + headers
+        ─▶ (site) layout: settings, navigation, Book Table target, pop-ups, consent
+        ─▶ page: sections → components (data via cached queries)
 ```
 
-Presentation never calls Drizzle directly. It calls `domain/*` services, which enforce permissions server-side.
+The proxy reads redirects and the maintenance flag from `/api/internal/routing` (cached 60 s per instance) instead of opening the database itself.
 
-## 3. Data model (initial)
+## 3. Rendering and caching
 
-- `user`, `session`, `account` (Better Auth) + `role` on user: `owner`, `admin`, `editor`, `viewer`
-- `site_settings` (single row, versioned): business info, hours (structured), socials, Book Table URL, SEO defaults, analytics ID, consent config, announcement banner, maintenance flag, feature flags
-- `integration_secret` (provider, key name, ciphertext, iv, tag, last4, updatedBy)
-- `page` (slug, status draft/published/scheduled, seo fields) · `page_revision` · `page_section` (type, order, json validated by Zod per type)
-- `nav_item` (location header-left/header-right/footer/mobile, label, href/pageId, order, visible)
-- `menu_category` · `menu_item` (name, description, featured, visible, image) · `menu_item_price` (label, amount_pence, raw_label) · `allergen` (only when verified)
-- `offer` (title, copy, price, code, weekdays, starts/ends, visible)
-- `media_asset` (provider id, url, filename, mime, bytes, w/h, checksum, alt, caption) · `media_usage`
-- `form` (key, fields json, messages, recipients, ack template, consent text, retention days) · `form_submission` (data json, status, ip hash, created) — admin-only
-- `newsletter_subscriber` (email, status pending/subscribed/unsubscribed/legacy_unconfirmed, consent text + timestamp, tokens)
-- `popup` (template, content, CTA, form key, pages, trigger type/delay/scroll, frequency, schedule, enabled) · `popup_event` (impression/dismiss/convert, aggregated daily)
-- `email_template` · `email_log` (no bodies)
-- `redirect` (from, to, code, hits)
-- `audit_log` (actor, action, entity, before/after diff with secrets redacted)
+- **Every page renders per request** (`await connection()` in the root layout), because Next.js can only add the CSP nonce during dynamic rendering. Static pages would have unnonced scripts that `strict-dynamic` blocks.
+- Database reads go through `unstable_cache` with tags (`pages`, `menu`, `offers`, `media`, `nav`, `popups`, `redirects`, `settings:*`). Admin saves call `revalidateTag(tag, { expire: 0 })`, so changes appear on the next request.
+- Images go through `next/image` (AVIF/WebP); Cloudinary URLs are optimised too. Videos are click-to-play (poster only) except an optional muted hero loop that respects reduced motion and Save-Data.
 
-## 4. Rendering and performance
+## 4. Data model (`src/db/schema.ts`)
 
-- Public pages: static with on-demand revalidation (`revalidateTag`) when the admin publishes. No DB call on most requests.
-- Images through `next/image` (or the Cloudinary loader); hero video lazy, muted, with a poster; `prefers-reduced-motion` respected.
-- Third-party embeds (reviews, map, VR) load only after consent and on interaction.
-- Targets: LCP < 2.5 s on 4G mobile, CLS < 0.05, homepage JS < 150 KB gzip.
+| Table | Purpose |
+|---|---|
+| `users`, `sessions`, `accounts`, `verifications` | Better Auth; `users.role` ∈ owner/admin/editor/viewer, `users.active` |
+| `settings` | One JSON row per group: business, brand, notifications, email, seo, consent, features, storage. Each is validated by Zod; secrets AES-256-GCM encrypted |
+| `pages`, `page_revisions` | Slug, status, typed `sections` JSON, SEO fields, review note; last 20 revisions |
+| `nav_items` | Header/footer links (`book` = Book Table setting) |
+| `redirects` | from, to, 301/302/410, prefix match |
+| `menu_categories`, `menu_items` | Prices as `[{label, amountPence}]` + exact `source_price_text` + review note |
+| `offers` | Weekly offers with optional dates and promo code |
+| `media_assets` | Provider, key, URL, poster, checksum (unique), alt + alt status, rights status + note, source URL |
+| `forms`, `form_submissions` | Field definitions JSON, messages, recipients, acknowledgement, retention; submissions with status |
+| `newsletter_subscribers` | Status (pending/subscribed/unsubscribed/legacy_unconfirmed), consent text + timestamps, hashed token |
+| `popups`, `popup_stats` | Content, targeting, trigger, frequency, schedule; daily aggregate counters |
+| `email_log` | Idempotency key (unique), template, status, provider id, error; no message bodies |
+| `audit_logs` | Actor, action, entity, metadata (no secrets or submission content), hashed IP |
+| `rate_limits` | Fixed-window counters with hashed keys |
 
-## 5. Security
+## 5. Security controls
 
-- Admin: Better Auth sessions (httpOnly, Secure, SameSite=Lax), login rate limit, optional TOTP, RBAC checked in every server action and route.
-- CSRF: server actions use origin checks; API POSTs verify Origin.
-- CSP with nonces; HSTS, frame-ancestors none, Referrer-Policy, Permissions-Policy.
-- Uploads: MIME sniffing + allow-list, size caps, direct-to-storage signed uploads for video.
-- Secrets: env vars for platform infrastructure; owner-owned provider keys encrypted in the DB (`ENCRYPTION_KEY` env), masked in the UI, write-only.
-- Pop-up and CTA links validated (relative paths or an https allow-list); content sanitised.
-- Submissions are never logged. Retention job deletes expired submissions (Vercel Cron).
-- `npm audit` / Dependabot, gitleaks in CI.
+- **Authorisation:** `src/lib/rbac.ts` permission matrix. `requirePermission` guards pages; `assertPermission` guards every server action and route handler (tests prove direct calls are refused).
+- **Secrets:** owner-only to change; encrypted at rest; masked (last 4) in the UI; never in HTML, logs or audit metadata. Platform secrets (DB, auth, encryption key, Turnstile, cron) are environment variables.
+- **Forms:** honeypot → per-IP rate limit → Turnstile → Zod validation → per-email rate limit → save → emails via `after()` with idempotency keys. Bots get a fake success; nothing about internals is revealed.
+- **XSS:** no raw HTML is ever rendered from content. Rich text is a minimal parser that outputs React text nodes, JSON-LD escapes `<`, and emails escape every value.
+- **Links** from editors are validated: relative paths, https, tel/mailto, or `book`. `javascript:` and `//host` are rejected.
+- **CSP:** nonce + `strict-dynamic`, `frame-ancestors 'none'`, `object-src 'none'`; third-party origins documented in `src/lib/csp.ts`. Also HSTS, nosniff, X-Frame-Options DENY, Referrer-Policy, Permissions-Policy, and no X-Powered-By.
+- **Uploads:** real type detected from file bytes, size limits, dimension check, server-generated keys, de-duplication. Large videos go browser → Cloudinary with a server-signed request, then are verified with the Cloudinary API before registration.
+- **CSV exports** neutralise spreadsheet formulas, are owner/admin only, and are audited.
+- **Privacy:** consent banner (essential only by default); reviews widget and analytics load only after "Accept all"; retention cron deletes expired submissions and unconfirmed sign-ups; newsletter needs double opt-in and stores the consent wording.
 
-## 6. Environments
+## 6. Decisions
 
-| Env | Branch | DB | Email |
-|---|---|---|---|
-| Local | any | Neon dev branch (or local Postgres) | Resend test mode / log adapter |
-| Preview | PR branches | Neon preview branch | Resend, sandbox recipients only |
-| Production | `main` (deploy after approval) | Neon main | Resend, verified domain |
-
-## 7. Open architecture decisions
-
-- D6 media provider (see MIGRATION_PLAN).
-- Whether editors can schedule publishing (needs Vercel Cron — free tier allows daily jobs; hourly needs Pro).
+| Decision | Reason |
+|---|---|
+| Drizzle over Prisma | Plain SQL migrations to review before deploy; same toolchain as the owner's other projects |
+| Nonce CSP with dynamic rendering (not hash-based SRI) | Stronger protection; SRI support is experimental. Cost: no CDN page cache, mitigated by data caching |
+| Proxy reads routing data over HTTP | Avoids a second database client inside the proxy (a corruption risk with PGlite in development) |
+| Typed sections instead of a free-form page builder | Editors can't break layout or inject HTML; the design stays consistent |
+| Business details imported as "unconfirmed" | The old site contradicted itself; launch is blocked until a person confirms |
+| Table-request form kept as the Book Table fallback | Preserves the existing workflow until the separate booking system is ready |
+| Background audio, preloader and 360° tour not rebuilt | Rights and UX issues found in the audit (tour switch exists, off) |

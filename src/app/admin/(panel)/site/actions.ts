@@ -1,0 +1,56 @@
+"use server";
+
+import { audit } from "@/lib/audit";
+import { bool, failure, guarded, str, success, zodFailure, type ActionState } from "@/lib/actions";
+import { assertPermission } from "@/lib/session";
+import { getSettingFresh, saveSetting, validateSetting } from "@/lib/settings";
+import { invalidate } from "@/domain/content";
+
+export async function saveFeaturesAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  return guarded(async () => {
+    const user = await assertPermission("settings.edit");
+    const before = await getSettingFresh("features");
+    const parsed = validateSetting("features", {
+      maintenanceMode: bool(fd, "maintenanceMode"),
+      maintenanceMessage: str(fd, "maintenanceMessage"),
+      announcementEnabled: bool(fd, "announcementEnabled"),
+      announcementText: str(fd, "announcementText"),
+      announcementHref: str(fd, "announcementHref"),
+      reviewsEnabled: bool(fd, "reviewsEnabled"),
+      reviewsEmbedSrc: str(fd, "reviewsEmbedSrc"),
+      vrTourEnabled: bool(fd, "vrTourEnabled"),
+      vrTourUrl: str(fd, "vrTourUrl"),
+    });
+    if (!parsed.success) return zodFailure(parsed.error);
+    if (parsed.data.announcementEnabled && !parsed.data.announcementText)
+      return failure("Write the announcement text, or switch the bar off.", { announcementText: "Required when the bar is on" });
+    await saveSetting("features", parsed.data, user.id);
+    invalidate("pages");
+    await audit("settings.update", {
+      actorUserId: user.id,
+      entityType: "settings",
+      entityId: "features",
+      metadata: { maintenanceMode: parsed.data.maintenanceMode, changedMaintenance: before.maintenanceMode !== parsed.data.maintenanceMode },
+    });
+    return success(
+      parsed.data.maintenanceMode
+        ? "Saved. Maintenance mode is ON: visitors see the maintenance page (signed-in staff still see the site). Takes effect within a minute."
+        : "Saved.",
+    );
+  });
+}
+
+export async function saveConsentAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  return guarded(async () => {
+    const user = await assertPermission("settings.edit");
+    const parsed = validateSetting("consent", {
+      bannerText: str(fd, "bannerText"),
+      analyticsProvider: str(fd, "analyticsProvider"),
+      analyticsId: str(fd, "analyticsId"),
+    });
+    if (!parsed.success) return zodFailure(parsed.error);
+    await saveSetting("consent", parsed.data, user.id);
+    await audit("settings.update", { actorUserId: user.id, entityType: "settings", entityId: "consent", metadata: { analytics: parsed.data.analyticsProvider } });
+    return success("Saved.");
+  });
+}

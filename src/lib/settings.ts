@@ -288,8 +288,8 @@ export async function saveSetting<K extends SettingsKey>(key: K, value: Settings
   }
 }
 
-export function validateSetting<K extends SettingsKey>(key: K, value: unknown) {
-  return SCHEMAS[key].safeParse(value);
+export function validateSetting<K extends SettingsKey>(key: K, value: unknown): z.ZodSafeParseResult<SettingsMap[K]> {
+  return SCHEMAS[key].safeParse(value) as z.ZodSafeParseResult<SettingsMap[K]>;
 }
 
 /* -------------------------------------------------------------------------- */

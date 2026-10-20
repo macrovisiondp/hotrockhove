@@ -88,7 +88,10 @@ export function PopupHost({
 }) {
   const path = usePathname();
   const consent = useConsent();
-  const [active, setActive] = useState<ClientPopup | null>(null);
+  const [opened, setOpened] = useState<{ popup: ClientPopup; path: string } | null>(null);
+  // A pop-up belongs to the page it opened on; navigating away closes it.
+  const active = opened && opened.path === path ? opened.popup : null;
+  const setActive = useCallback((p: ClientPopup | null) => setOpened(p ? { popup: p, path: window.location.pathname } : null), []);
   const dialog = useRef<HTMLDivElement>(null);
   const opener = useRef<Element | null>(null);
   const sentinel = useRef<HTMLDivElement>(null);
@@ -98,16 +101,15 @@ export function PopupHost({
       ? null
       : ([...popups].sort((a, b) => b.priority - a.priority).find((p) => matches(p, path) && !suppressed(p)) ?? null);
 
-  const open = useCallback((p: ClientPopup) => {
-    opener.current = document.activeElement;
-    setActive(p);
-    remember(p);
-    track(p.id, "impression");
-  }, []);
-
-  useEffect(() => {
-    setActive(null);
-  }, [path]);
+  const open = useCallback(
+    (p: ClientPopup) => {
+      opener.current = document.activeElement;
+      setActive(p);
+      remember(p);
+      track(p.id, "impression");
+    },
+    [setActive],
+  );
 
   useEffect(() => {
     if (!candidate || active) return;
@@ -142,7 +144,7 @@ export function PopupHost({
       setActive(null);
       (opener.current as HTMLElement | null)?.focus?.();
     },
-    [active],
+    [active, setActive],
   );
 
   useEffect(() => {

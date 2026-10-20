@@ -43,8 +43,6 @@ export function Header({
     return () => io.disconnect();
   }, [overlay]);
 
-  useEffect(() => setOpen(false), [pathname]);
-
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -166,6 +164,7 @@ export function Header({
               <li key={l.id} style={{ animationDelay: `${60 + i * 50}ms` }} className={open ? "animate-rise" : ""}>
                 <Link
                   href={l.href}
+                  onClick={() => setOpen(false)}
                   {...(l.external ? { target: "_blank", rel: "noopener" } : {})}
                   aria-current={isActive(l.href) ? "page" : undefined}
                   className="display block py-2 text-[2.4rem] text-bone aria-[current=page]:text-bronze"
@@ -178,6 +177,7 @@ export function Header({
           {book && (
             <Link
               href={book.href}
+              onClick={() => setOpen(false)}
               {...(book.external ? { target: "_blank", rel: "noopener" } : {})}
               className="btn btn-primary mt-10 w-full"
             >

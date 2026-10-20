@@ -6,7 +6,7 @@ import { db, t } from "@/db";
 import { env, turnstileConfigured } from "@/lib/env";
 import { formatAddress, getSetting, type BusinessSettings } from "@/lib/settings";
 import { PageTitle, RenderSections, type SectionContext } from "@/components/site/sections";
-import { getMediaByIds, getMenu, getOffers, getPublishedPage, sectionMediaIds } from "./content";
+import { getMediaByIds, getMenu, getOffers, getPublishedPage, sectionMediaIds, type PublicPage } from "./content";
 import { parseFields } from "./forms/fields";
 import { getBookTarget } from "./links";
 import { getPrivacyHref } from "./site-chrome";
@@ -63,6 +63,12 @@ function restaurantJsonLd(b: BusinessSettings, hasMenu: boolean) {
 export async function RenderPage({ slug }: { slug: string }) {
   const page = await getPublishedPage(slug);
   if (!page) notFound();
+  return <PageContent page={page} />;
+}
+
+/** Shared by the live site and the admin preview (which renders drafts). */
+export async function PageContent({ page }: { page: Pick<PublicPage, "slug" | "title" | "sections"> }) {
+  const slug = page.slug;
 
   const types = new Set(page.sections.map((s) => s.type));
   const formKeys = page.sections.flatMap((s) => (s.type === "form" ? [s.formKey] : []));

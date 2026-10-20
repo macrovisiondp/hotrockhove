@@ -17,6 +17,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // src/proxy.ts handles trailing slashes so old WordPress URLs (/page/) reach
+  // their final destination in a single 301 instead of a 308 + 301 chain.
+  skipTrailingSlashRedirect: true,
   serverExternalPackages: ["@electric-sql/pglite"],
   experimental: {
     // Image uploads through server actions (Vercel caps request bodies at ~4.5 MB).

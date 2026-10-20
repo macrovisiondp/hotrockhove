@@ -15,7 +15,8 @@
     "media:import": "tsx --conditions=react-server --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/import-media.ts",
     "test": "tsx --conditions=react-server --test tests/unit/*.test.ts",
     "test:e2e": "playwright test",
-    "cache:clear": "node -e \"require('fs').rmSync('.next/dev/cache/fetch-cache',{recursive:true,force:true});require('fs').rmSync('.next/cache/fetch-cache',{recursive:true,force:true})\""
+    "cache:clear": "node -e \"require('fs').rmSync('.next/dev/cache/fetch-cache',{recursive:true,force:true});require('fs').rmSync('.next/cache/fetch-cache',{recursive:true,force:true})\"",
+    "dev:reset": "node -e \"require('fs').rmSync('.data/pglite',{recursive:true,force:true})\" && npm run db:migrate && npm run db:seed && npm run media:import && npm run db:seed -- --force=pages,offers,popups,menu && npm run admin:create -- --dev && npm run cache:clear"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",

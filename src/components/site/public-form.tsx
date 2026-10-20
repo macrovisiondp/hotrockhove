@@ -5,6 +5,7 @@ import { useActionState, useEffect, useRef } from "react";
 import { CheckCircle } from "@phosphor-icons/react";
 import type { FormField } from "@/domain/forms/fields";
 import type { PublicFormState } from "@/domain/forms/submit";
+import { submitWithoutReset } from "@/lib/submit";
 import { Turnstile } from "./turnstile";
 
 const initial: PublicFormState = { status: "idle", message: "" };
@@ -54,7 +55,7 @@ export function PublicForm({
   const val = state.values ?? {};
 
   return (
-    <form action={formAction} noValidate className="relative">
+    <form action={formAction} onSubmit={submitWithoutReset(formAction)} noValidate className="relative">
       <Honeypot />
       {state.status === "error" && (
         <div ref={status} tabIndex={-1} role="alert" className="mb-6 border-l-2 border-ember bg-ink-900 px-4 py-3 text-sm text-bone outline-none">

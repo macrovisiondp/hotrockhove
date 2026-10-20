@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import type { PublicFormState } from "@/domain/forms/submit";
 import { Honeypot } from "./public-form";
+import { submitWithoutReset } from "@/lib/submit";
 import { Turnstile } from "./turnstile";
 
 const initial: PublicFormState = { status: "idle", message: "" };
@@ -39,7 +40,7 @@ export function NewsletterForm({
   }
   const id = compact ? "nl-popup" : "nl";
   return (
-    <form action={formAction} noValidate className="relative">
+    <form action={formAction} onSubmit={submitWithoutReset(formAction)} noValidate className="relative">
       <Honeypot />
       <label htmlFor={`${id}-email`} className="mb-2 block text-sm font-medium text-bone">
         Email address

@@ -82,6 +82,11 @@ export async function proxy(request: NextRequest) {
       const url = /^https:\/\//.test(target) ? new URL(target) : new URL(target, request.nextUrl.origin);
       if (url.toString() !== request.nextUrl.toString()) return NextResponse.redirect(url, rule.statusCode === 302 ? 302 : 301);
     }
+    // Canonical URLs have no trailing slash (WordPress used /page/).
+    if (pathname.length > 1 && pathname.endsWith("/")) {
+      const target = new URL(pathname.replace(/\/+$/, "") + request.nextUrl.search, request.nextUrl.origin);
+      return NextResponse.redirect(target, 301);
+    }
   }
 
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");

@@ -37,10 +37,13 @@ export function useConsent(): ConsentChoice {
 export function ConsentBanner({ text, policyHref }: { text: string; policyHref: string | null }) {
   const choice = useConsent();
   const [forcedOpen, setForcedOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  // True only in the browser (the banner depends on a cookie the server render can't see).
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const acceptRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {

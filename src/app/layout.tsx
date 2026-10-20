@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { connection } from "next/server";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import { getSetting } from "@/lib/settings";
 import { env } from "@/lib/env";
@@ -27,7 +28,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const viewport: Viewport = { themeColor: "#0b0a09", colorScheme: "dark" };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Every page is rendered per request so Next.js can attach the CSP nonce set in
+  // src/proxy.ts. Database reads stay cached (unstable_cache + tags), so this is cheap.
+  await connection();
   return (
     <html lang="en-GB" className={`${cormorant.variable} ${inter.variable}`}>
       <body>{children}</body>
