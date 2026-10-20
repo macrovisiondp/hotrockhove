@@ -32,7 +32,7 @@ export default async function Seo() {
               <TextInput name="titleTemplate" label="Page title pattern" defaultValue={seo.titleTemplate} hint="%s is replaced by the page title." />
             </div>
             <TextArea name="defaultDescription" label="Default description" defaultValue={seo.defaultDescription} rows={2} maxLength={200} />
-            <TextInput name="defaultOgImage" label="Default sharing image URL" defaultValue={seo.defaultOgImage} hint="Copy an image URL from Media (Cloudinary) or use /brand/…" />
+            <TextInput name="defaultOgImage" label="Default sharing image URL" defaultValue={seo.defaultOgImage} hint="The https:// address of an image in Media, or /brand/…" />
             <div className="rounded-md border border-[#e6e3de] bg-[#faf9f7] p-4">
               <Toggle
                 name="allowIndexing"

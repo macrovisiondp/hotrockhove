@@ -33,6 +33,8 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1154.0",
+    "@aws-sdk/s3-request-presigner": "^3.1154.0",
     "@electric-sql/pglite": "^0.5.10",
     "@phosphor-icons/react": "^2.1.10",
     "better-auth": "^1.7.12",

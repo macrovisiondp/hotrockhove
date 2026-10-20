@@ -1,14 +1,15 @@
 "use server";
 
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
+import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { v2 as cloudinary } from "cloudinary";
 import sharp from "sharp";
 import { z } from "zod";
 import { db, t } from "@/db";
 import { audit } from "@/lib/audit";
-import { failure, guarded, str, success, type ActionState } from "@/lib/actions";
+import { failure, guarded, str, success, zodFailure, type ActionState } from "@/lib/actions";
 import { assertPermission } from "@/lib/session";
 import { getSettingFresh, mergeSecret, saveSetting, validateSetting } from "@/lib/settings";
 import {
@@ -16,11 +17,16 @@ import {
   cloudinaryAuth,
   cloudinaryFolder,
   cloudinaryPoster,
+  CLOUDINARY_MAX_VIDEO_BYTES,
   getActiveStorage,
   getStorageFor,
   IMAGE_TYPES,
   MAX_IMAGE_BYTES,
   MAX_VIDEO_BYTES,
+  presignS3Upload,
+  S3_CACHE_CONTROL,
+  s3Config,
+  s3PublicUrl,
   sniffMime,
   storageKeyFor,
   StorageNotConfiguredError,
@@ -185,70 +191,150 @@ export async function deleteMediaAction(_prev: ActionState, fd: FormData): Promi
 
 /* --------------------------- direct video upload --------------------------- */
 
+export type VideoUploadTicket =
+  | { ok: true; provider: "s3"; uploadUrl: string; objectKey: string; headers: Record<string, string> }
+  | { ok: true; provider: "cloudinary"; cloudName: string; apiKey: string; timestamp: number; signature: string; folder: string }
+  | { ok: false; message: string };
+
+const videoRequest = z.object({
+  filename: z.string().trim().min(1).max(200),
+  contentType: z.enum(["video/mp4", "video/webm"]),
+  bytes: z.number().int().positive(),
+});
+
 /**
- * Signed parameters for a browser → Cloudinary upload (videos up to 100 MB),
- * avoiding Vercel's request-size limit. The browser never sees the API secret.
+ * Permission to upload one video straight from the browser to storage, avoiding
+ * Vercel's ~4.5 MB request limit. S3: a presigned PUT (15 min) for exactly this
+ * size and type. Cloudinary: signed upload parameters. Secrets never leave the server.
  */
-export async function signVideoUploadAction(): Promise<
-  { ok: true; cloudName: string; apiKey: string; timestamp: number; signature: string; folder: string } | { ok: false; message: string }
-> {
+export async function requestVideoUploadAction(input: { filename: string; contentType: string; bytes: number }): Promise<VideoUploadTicket> {
   try {
     await assertPermission("media.upload");
+    const req = videoRequest.safeParse(input);
+    if (!req.success) return { ok: false, message: "Choose an MP4 or WebM video." };
     const s = await getSettingFresh("storage");
-    if (s.provider !== "cloudinary") return { ok: false, message: "Large video uploads need Cloudinary (Media settings)." };
-    const auth = cloudinaryAuth(s);
-    const timestamp = Math.floor(Date.now() / 1000);
-    const folder = cloudinaryFolder(s);
-    const signature = cloudinary.utils.api_sign_request({ timestamp, folder }, auth.api_secret);
-    return { ok: true, cloudName: auth.cloud_name, apiKey: auth.api_key, timestamp, signature, folder };
+    if (s.provider === "s3") {
+      if (req.data.bytes > MAX_VIDEO_BYTES) return { ok: false, message: "Videos must be under 500 MB. Compress it first (e.g. HandBrake, 1080p, H.264)." };
+      const safeName = req.data.filename.replace(/[^A-Za-z0-9.]+/g, "-").toLowerCase().slice(-80);
+      const key = `${new Date().getUTCFullYear()}/videos/${randomUUID()}-${safeName}`;
+      const p = await presignS3Upload(s, key, req.data.contentType, req.data.bytes);
+      // The browser must send exactly the signed headers.
+      return { ok: true, provider: "s3", uploadUrl: p.url, objectKey: p.objectKey, headers: { "Content-Type": req.data.contentType, "Cache-Control": S3_CACHE_CONTROL } };
+    }
+    if (s.provider === "cloudinary") {
+      if (req.data.bytes > CLOUDINARY_MAX_VIDEO_BYTES) return { ok: false, message: "Cloudinary's plan allows videos up to 100 MB." };
+      const auth = cloudinaryAuth(s);
+      const timestamp = Math.floor(Date.now() / 1000);
+      const folder = cloudinaryFolder(s);
+      const signature = cloudinary.utils.api_sign_request({ timestamp, folder }, auth.api_secret);
+      return { ok: true, provider: "cloudinary", cloudName: auth.cloud_name, apiKey: auth.api_key, timestamp, signature, folder };
+    }
+    return { ok: false, message: "Video uploads need S3 or Cloudinary (Media → Storage settings)." };
   } catch (err) {
     return { ok: false, message: err instanceof StorageNotConfiguredError ? err.message : "Not allowed." };
   }
 }
 
-/** Register a video the browser uploaded to Cloudinary, after verifying it exists there. */
-export async function registerVideoAction(publicId: string, filename: string): Promise<{ ok: boolean; message: string; id?: string }> {
+/**
+ * Register a video the browser uploaded, after checking it on the storage side:
+ * it must exist, be within the size limit and really be MP4/WebM (first bytes).
+ * Anything else is deleted from the bucket.
+ */
+export async function registerVideoAction(ref: string, filename: string): Promise<{ ok: boolean; message: string; id?: string }> {
   try {
     const user = await assertPermission("media.upload");
-    if (!/^[A-Za-z0-9_\-/]{1,300}$/.test(publicId)) return { ok: false, message: "Invalid upload reference." };
     const s = await getSettingFresh("storage");
-    const auth = cloudinaryAuth(s);
-    const folder = cloudinaryFolder(s);
-    if (folder && !publicId.startsWith(folder + "/")) return { ok: false, message: "Upload went to an unexpected folder." };
-    const res = (await cloudinary.api.resource(publicId, { ...auth, resource_type: "video" })) as {
-      secure_url: string;
-      bytes: number;
-      width: number;
-      height: number;
-      format: string;
-      etag: string;
-    };
-    if (res.bytes > MAX_VIDEO_BYTES) return { ok: false, message: "Video is larger than 100 MB." };
-    const sha = createHash("sha256").update(`cloudinary:${publicId}:${res.etag}`).digest("hex");
-    const [row] = await db
-      .insert(t.mediaAssets)
-      .values({
+    let values: typeof t.mediaAssets.$inferInsert;
+
+    if (s.provider === "s3") {
+      const { client, bucket, prefix, publicBase } = s3Config(s);
+      if (!/^[A-Za-z0-9._\-/]{1,400}$/.test(ref) || (prefix && !ref.startsWith(prefix + "/"))) return { ok: false, message: "Invalid upload reference." };
+      const head = await client.send(new HeadObjectCommand({ Bucket: bucket, Key: ref }));
+      const bytes = head.ContentLength ?? 0;
+      const first = await client.send(new GetObjectCommand({ Bucket: bucket, Key: ref, Range: "bytes=0-63" }));
+      const sniffed = sniffMime(Buffer.from(await first.Body!.transformToByteArray()));
+      if (!sniffed?.startsWith("video/") || bytes > MAX_VIDEO_BYTES) {
+        await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: ref })).catch(() => {});
+        return { ok: false, message: "That file isn't a supported video, so it was removed." };
+      }
+      values = {
+        provider: "s3",
+        storageKey: ref,
+        url: s3PublicUrl(publicBase, ref),
+        posterUrl: null,
+        filename: filename.slice(0, 200),
+        mimeType: sniffed,
+        bytes,
+        width: null,
+        height: null,
+        sha256: createHash("sha256").update(`s3:${bucket}:${ref}:${head.ETag ?? ""}`).digest("hex"),
+        altStatus: "missing",
+        uploadedById: user.id,
+      };
+    } else if (s.provider === "cloudinary") {
+      if (!/^[A-Za-z0-9_\-/]{1,300}$/.test(ref)) return { ok: false, message: "Invalid upload reference." };
+      const auth = cloudinaryAuth(s);
+      const folder = cloudinaryFolder(s);
+      if (folder && !ref.startsWith(folder + "/")) return { ok: false, message: "Upload went to an unexpected folder." };
+      const res = (await cloudinary.api.resource(ref, { ...auth, resource_type: "video" })) as {
+        secure_url: string;
+        bytes: number;
+        width: number;
+        height: number;
+        format: string;
+        etag: string;
+      };
+      if (res.bytes > CLOUDINARY_MAX_VIDEO_BYTES) return { ok: false, message: "Video is larger than 100 MB." };
+      values = {
         provider: "cloudinary",
-        storageKey: publicId,
+        storageKey: ref,
         url: res.secure_url,
-        posterUrl: cloudinaryPoster(auth.cloud_name, publicId),
+        posterUrl: cloudinaryPoster(auth.cloud_name, ref),
         filename: filename.slice(0, 200),
         mimeType: res.format === "webm" ? "video/webm" : "video/mp4",
         bytes: res.bytes,
         width: res.width,
         height: res.height,
-        sha256: sha,
+        sha256: createHash("sha256").update(`cloudinary:${ref}:${res.etag}`).digest("hex"),
         altStatus: "missing",
         uploadedById: user.id,
-      })
-      .onConflictDoNothing({ target: t.mediaAssets.sha256 })
-      .returning({ id: t.mediaAssets.id });
+      };
+    } else {
+      return { ok: false, message: "Video uploads need S3 or Cloudinary." };
+    }
+
+    const [row] = await db.insert(t.mediaAssets).values(values).onConflictDoNothing({ target: t.mediaAssets.sha256 }).returning({ id: t.mediaAssets.id });
     invalidate("media");
-    await audit("media.upload", { actorUserId: user.id, entityType: "media", entityId: row?.id, metadata: { filename, bytes: res.bytes, video: true } });
-    return { ok: true, message: "Video uploaded.", id: row?.id };
+    await audit("media.upload", { actorUserId: user.id, entityType: "media", entityId: row?.id, metadata: { filename, bytes: values.bytes, video: true } });
+    return {
+      ok: true,
+      message: s.provider === "s3" ? "Video uploaded. Open it to choose a poster image and add a description." : "Video uploaded.",
+      id: row?.id,
+    };
   } catch {
-    return { ok: false, message: "Couldn't confirm the upload with Cloudinary." };
+    return { ok: false, message: "Couldn't confirm the upload with the storage provider." };
   }
+}
+
+/** Use an image from the library as a video's poster (S3 doesn't generate posters). */
+export async function setPosterAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  return guarded(async () => {
+    const user = await assertPermission("media.upload");
+    const id = str(fd, "id");
+    const posterId = str(fd, "posterId");
+    if (!uuid.safeParse(id).success) return failure("Unknown media.");
+    let posterUrl: string | null = null;
+    if (posterId) {
+      if (!uuid.safeParse(posterId).success) return failure("Choose an image.");
+      const img = await db.query.mediaAssets.findFirst({ where: eq(t.mediaAssets.id, posterId) });
+      if (!img || !img.mimeType.startsWith("image/")) return failure("The poster must be an image.");
+      posterUrl = img.url;
+    }
+    await db.update(t.mediaAssets).set({ posterUrl }).where(eq(t.mediaAssets.id, id));
+    invalidate("media", "pages");
+    await audit("media.update", { actorUserId: user.id, entityType: "media", entityId: id, metadata: { poster: Boolean(posterUrl) } });
+    return success(posterUrl ? "Poster set." : "Poster removed.");
+  });
 }
 
 /* ------------------------------ storage settings ----------------------------- */
@@ -257,26 +343,45 @@ export async function saveStorageAction(_prev: ActionState, fd: FormData): Promi
   return guarded(async () => {
     const user = await assertPermission("settings.edit");
     const current = await getSettingFresh("storage");
-    const newSecret = str(fd, "apiSecret");
-    if (newSecret) {
+    const newS3Secret = str(fd, "s3SecretAccessKey");
+    const newCloudinarySecret = str(fd, "apiSecret");
+    const keyChanged = str(fd, "s3AccessKeyId") !== current.s3.accessKeyId;
+    if (newS3Secret || newCloudinarySecret || (keyChanged && current.s3.accessKeyId)) {
       const owner = await assertPermission("secrets.edit").catch(() => null);
-      if (!owner) return failure("Only the owner can change the Cloudinary API secret.");
+      if (!owner) return failure("Only the owner can change storage access keys.");
     }
+    const provider = str(fd, "provider");
     const next = {
-      provider: str(fd, "provider") === "local" ? ("local" as const) : ("cloudinary" as const),
+      provider: (provider === "local" ? "local" : provider === "cloudinary" ? "cloudinary" : "s3") as "s3" | "cloudinary" | "local",
+      s3: {
+        bucket: str(fd, "s3Bucket").toLowerCase(),
+        region: str(fd, "s3Region"),
+        accessKeyId: str(fd, "s3AccessKeyId"),
+        secretAccessKey: mergeSecret(current.s3.secretAccessKey, newS3Secret),
+        prefix: str(fd, "s3Prefix").replace(/^\/+|\/+$/g, "") || "hotrockhove",
+        publicBaseUrl: str(fd, "s3PublicBaseUrl").replace(/\/+$/, ""),
+        endpoint: str(fd, "s3Endpoint").replace(/\/+$/, ""),
+      },
       cloudinary: {
-        cloudName: str(fd, "cloudName"),
-        apiKey: str(fd, "apiKey"),
-        apiSecret: mergeSecret(current.cloudinary.apiSecret, newSecret),
-        folder: str(fd, "folder") || "hotrockhove",
+        cloudName: str(fd, "cloudName") || current.cloudinary.cloudName,
+        apiKey: str(fd, "apiKey") || current.cloudinary.apiKey,
+        apiSecret: mergeSecret(current.cloudinary.apiSecret, newCloudinarySecret),
+        folder: str(fd, "folder") || current.cloudinary.folder,
       },
     };
     const parsed = validateSetting("storage", next);
-    if (!parsed.success) return failure("Please check the fields.");
+    if (!parsed.success) return zodFailure(parsed.error);
+    if (parsed.data.s3.bucket && !/^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/.test(parsed.data.s3.bucket))
+      return failure("That isn't a valid S3 bucket name.", { s3Bucket: "Lowercase letters, numbers, dots and hyphens" });
     if (parsed.data.provider === "local" && process.env.VERCEL) return failure("Local storage isn't available on Vercel.");
     await saveSetting("storage", parsed.data, user.id);
-    await audit(newSecret ? "secret.update" : "settings.update", { actorUserId: user.id, entityType: "settings", entityId: "storage", metadata: { provider: parsed.data.provider } });
-    return success("Media storage settings saved.");
+    await audit(newS3Secret || newCloudinarySecret ? "secret.update" : "settings.update", {
+      actorUserId: user.id,
+      entityType: "settings",
+      entityId: "storage",
+      metadata: { provider: parsed.data.provider, bucket: parsed.data.s3.bucket, region: parsed.data.s3.region },
+    });
+    return success("Media storage settings saved. Use “Test now” to check uploads and public access.");
   });
 }
 

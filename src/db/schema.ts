@@ -30,7 +30,7 @@ const timestamps = {
 export const userRole = pgEnum("user_role", ["owner", "admin", "editor", "viewer"]);
 export const publishStatus = pgEnum("publish_status", ["draft", "published"]);
 export const navLocation = pgEnum("nav_location", ["header", "footer"]);
-export const storageProvider = pgEnum("storage_provider", ["cloudinary", "local"]);
+export const storageProvider = pgEnum("storage_provider", ["cloudinary", "local", "s3"]);
 export const altStatus = pgEnum("alt_status", ["ok", "missing", "needs_review"]);
 export const rightsStatus = pgEnum("rights_status", ["cleared", "unconfirmed", "excluded"]);
 export const submissionStatus = pgEnum("submission_status", ["new", "read", "archived", "spam"]);
@@ -136,9 +136,9 @@ export const mediaAssets = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     provider: storageProvider("provider").notNull(),
     storageKey: text("storage_key").notNull(),
-    /** Public delivery URL (Cloudinary secure URL, or /media/<key> for local development). */
+    /** Public delivery URL (S3/CDN URL, Cloudinary secure URL, or /media/<key> for local development). */
     url: text("url").notNull(),
-    /** Cloudinary-generated poster frame for videos. */
+    /** Poster image for videos (Cloudinary generates one; for S3 an admin picks an image). */
     posterUrl: text("poster_url"),
     filename: text("filename").notNull(),
     mimeType: text("mime_type").notNull(),

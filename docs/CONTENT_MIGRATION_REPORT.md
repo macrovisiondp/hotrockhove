@@ -105,11 +105,13 @@ Not migrated: theme demo copy (About Us "Grand Restaurant", "wood-fired grill"),
 - **Alt text:** written by viewing every image: 68 reviewed, 5 marked "needs review" (they identify Sonny, or the subject is inferred), and the 12 videos have no description yet. These counts are from the admin dashboard.
 - **Rights:** 9 files are marked *unconfirmed*: 8 stock photos from the WordPress theme demo (Envato filenames, not used on any page) and the "Steak-Sizzling.mp4" clip of unknown origin. The random-named WebP food photos show Hot Rock branding and are marked cleared with a note to confirm.
 - **Excluded entirely:** the YouTube-ripped "ASMR … Applebees Grill Bar" audio (3 copies) and the cow "moo" sound (background audio is retired).
-- **Too large for Cloudinary's free plan (100 MB per video):** `WhatsApp-Video-2026-02-04-at-3.05.26-PM.mp4` (105.9 MB). It's imported in local development; for production, compress it (e.g. HandBrake 1080p H.264) and upload through Admin → Media.
+- **Largest video:** `WhatsApp-Video-2026-02-04-at-3.05.26-PM.mp4` (105.9 MB) is within S3's limit (the admin allows up to 500 MB). Compressing it to around 20 MB (HandBrake, 1080p H.264) is still recommended so it loads quickly for visitors.
+- **Video posters:** S3 doesn't create poster frames. The homepage Wagyu video has a poster set; the 11 gallery videos need one chosen in Admin → Media (until then they show a dark tile with a play button).
 - **360° tour (vr.3d66.com):** not embedded. The feature switch stays off until ownership is confirmed.
 
 ### Still to do for production media
 
-1. Configure Cloudinary in Admin → Media → Storage settings.
-2. Run `npm run media:import` against the production database. It uploads to Cloudinary and records the new URLs.
+1. Create the S3 bucket and IAM user, then enter them in Admin → Media → Storage settings. The page shows the exact bucket policy, CORS and IAM JSON. Press **Test now**.
+2. Run `npm run media:import` against the production database. It uploads to S3 and records the new URLs.
 3. Re-run `npm run db:seed -- --force=pages,offers,popups,menu` **only on a fresh database** (it replaces page content), or reassign images in the admin.
+4. Choose poster images for the gallery videos.

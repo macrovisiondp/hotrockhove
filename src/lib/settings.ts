@@ -134,7 +134,19 @@ export const featuresSchema = z.object({
 });
 
 export const storageSchema = z.object({
-  provider: z.enum(["cloudinary", "local"]),
+  provider: z.enum(["s3", "cloudinary", "local"]),
+  s3: z.object({
+    bucket: z.string().trim().max(63),
+    region: z.string().trim().max(40),
+    accessKeyId: z.string().trim().max(128),
+    secretAccessKey: z.string(), // encrypted at rest
+    /** Folder inside the bucket, e.g. "hotrockhove". */
+    prefix: z.string().trim().max(100),
+    /** Public address files are served from: a CloudFront/CDN domain, or empty for the bucket's own URL. */
+    publicBaseUrl: z.union([z.literal(""), z.string().trim().url().startsWith("https://")]),
+    /** Only for S3-compatible services (e.g. Cloudflare R2). Empty for AWS. */
+    endpoint: z.union([z.literal(""), z.string().trim().url().startsWith("https://")]),
+  }),
   cloudinary: z.object({
     cloudName: z.string().trim().max(100),
     apiKey: z.string().trim().max(100),
@@ -240,7 +252,8 @@ export const DEFAULTS: SettingsMap = {
     vrTourUrl: "",
   },
   storage: {
-    provider: "cloudinary",
+    provider: "s3",
+    s3: { bucket: "", region: "eu-west-2", accessKeyId: "", secretAccessKey: "", prefix: "hotrockhove", publicBaseUrl: "", endpoint: "" },
     cloudinary: { cloudName: "", apiKey: "", apiSecret: "", folder: "hotrockhove" },
   },
 };

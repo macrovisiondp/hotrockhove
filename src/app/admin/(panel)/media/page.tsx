@@ -63,7 +63,7 @@ export default async function MediaAdmin({ searchParams }: PageProps<"/admin/med
       )}
       {storage.provider === "local" && (
         <div className="mb-4">
-          <Notice tone="info">Development mode: files are stored on this computer. Configure Cloudinary before launch.</Notice>
+          <Notice tone="info">Development mode: files are stored on this computer. Configure the S3 bucket before launch.</Notice>
         </div>
       )}
 
@@ -76,10 +76,10 @@ export default async function MediaAdmin({ searchParams }: PageProps<"/admin/med
                 <input type="file" name="files" multiple accept="image/jpeg,image/png,image/webp,image/avif" className="mt-1.5 block text-sm" />
               </label>
             </ActionForm>
-            {storage.provider === "cloudinary" ? (
-              <VideoUploader />
+            {storage.provider === "local" ? (
+              <p className="text-sm text-[#6b665e]">Videos upload straight from your browser to the S3 bucket, so they&apos;re available once S3 is configured.</p>
             ) : (
-              <p className="text-sm text-[#6b665e]">Video uploads go straight to Cloudinary, so they&apos;re available once Cloudinary is configured.</p>
+              <VideoUploader maxMb={storage.provider === "s3" ? 500 : 100} />
             )}
           </div>
         </Card>

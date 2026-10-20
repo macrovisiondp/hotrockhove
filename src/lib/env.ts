@@ -27,6 +27,8 @@ const schema = z.object({
   TURNSTILE_SECRET_KEY: optional,
   /** Shared secret for Vercel Cron requests (retention purge). */
   CRON_SECRET: optional,
+  /** Optional custom media domain (CloudFront alias), e.g. media.hotrockhove.com. Read at build time for image optimisation and CSP. */
+  MEDIA_PUBLIC_HOST: optional,
   /** Allows the local-disk media adapter (development only; refused on Vercel). */
   ALLOW_LOCAL_STORAGE: z
     .enum(["true", "false"])

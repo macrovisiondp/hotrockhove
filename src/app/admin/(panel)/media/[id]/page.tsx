@@ -7,7 +7,8 @@ import { can } from "@/lib/rbac";
 import { requirePermission } from "@/lib/session";
 import { ActionForm, ConfirmButton, Select, TextArea, TextInput, Toggle } from "@/components/admin/form";
 import { Badge, Card, Notice, PageHeader, formatBytes, formatDateTime } from "@/components/admin/ui";
-import { deleteMediaAction, replaceMediaAction, updateMediaAction } from "../actions";
+import { MediaField } from "@/components/admin/media-picker";
+import { deleteMediaAction, replaceMediaAction, setPosterAction, updateMediaAction } from "../actions";
 
 export const metadata = { title: "Media file" };
 
@@ -50,7 +51,7 @@ export default async function MediaDetail({ params }: PageProps<"/admin/media/[i
                 {m.width && m.height ? ` · ${m.width}×${m.height}` : ""}
               </dd>
               <dt className="text-[#6b665e]">Stored on</dt>
-              <dd>{m.provider === "cloudinary" ? "Cloudinary" : "Local (development)"}</dd>
+              <dd>{m.provider === "s3" ? "Amazon S3" : m.provider === "cloudinary" ? "Cloudinary" : "Local (development)"}</dd>
               <dt className="text-[#6b665e]">Added</dt>
               <dd>{formatDateTime(m.createdAt)}</dd>
               {m.sourceUrl && (
@@ -114,6 +115,15 @@ export default async function MediaDetail({ params }: PageProps<"/admin/media/[i
             </ActionForm>
           </Card>
 
+          {isVideo && m.provider !== "cloudinary" && canEdit && (
+            <Card title="Poster image" description="Shown before the video plays (S3 doesn't create one automatically). Pick a still from the Media library.">
+              <ActionForm action={setPosterAction} submitLabel="Save poster" showCancel={false} compact>
+                <input type="hidden" name="id" value={m.id} />
+                <MediaField name="posterId" label="Poster" type="image" />
+                {m.posterUrl && <p className="text-xs text-[#6b665e]">A poster is set. Choose another, or save with none to remove it.</p>}
+              </ActionForm>
+            </Card>
+          )}
           {canEdit && (
             <Card title="Replace file" description="Upload a new version. Every page, menu item and pop-up using this file updates automatically.">
               <ActionForm action={replaceMediaAction} submitLabel="Replace" showCancel={false} compact>

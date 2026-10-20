@@ -9,7 +9,7 @@
 | Vercel | Hosting, previews, cron | Hobby works for testing; Pro is needed for commercial use (owner decision, recurring cost) | Owner |
 | Neon | Postgres database | Free tier is enough for this data volume | Owner |
 | Resend | Transactional email | Free tier (a few thousand emails a month, with a daily cap; confirm current limits on resend.com/pricing) | Owner |
-| Cloudinary | Images and video | Free: 25 credits/month (see Admin → Media → Storage settings) | Owner |
+| Amazon S3 (+ optional CloudFront) | Images and video | Pay as you go: storage for ~0.25 GB is pennies a month; data transfer is billed per GB beyond AWS's free allowance | Owner |
 | Cloudflare Turnstile | Bot protection on forms | Free | Owner |
 
 ## 2. Environment variables (Vercel → Project → Settings → Environment Variables)
@@ -23,6 +23,7 @@
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | recommended | From Cloudflare Turnstile (widget for hotrockhove.com + preview domain) |
 | `CRON_SECRET` | yes | Random string; Vercel sends it to `/api/cron/retention` |
 | `RESEND_API_KEY` | optional | Fallback only. Normally the owner pastes the key in Admin → Email |
+| `MEDIA_PUBLIC_HOST` | only with a custom CDN domain | Hostname of a CloudFront alias, e.g. `media.hotrockhove.com`; allows image optimisation and CSP for that host (set before building) |
 | `VERCEL_AUTOMATION_BYPASS_SECRET` | if preview protection is on | Lets the proxy read its own routing data on protected previews |
 | `ALLOW_LOCAL_STORAGE` | never on Vercel | Refused automatically |
 
@@ -32,11 +33,11 @@ Never commit real values. `.env.example` has placeholders only.
 
 | Question | Answer |
 |---|---|
-| Is a migration required before deploying? | **Yes**, on a new Neon database: `drizzle/0000_init.sql` (creates all tables) |
-| Exact file | `drizzle/0000_init.sql` (journal: `drizzle/meta/_journal.json`) |
-| Tested? | Yes, applied repeatedly to PGlite (Postgres 17) by `npm run dev:reset`; the app and e2e suite ran against it. **Not yet run on Neon.** |
-| Safe order | 1. Create Neon project and branch → 2. `DATABASE_URL=… npm run db:migrate` → 3. `npm run db:seed` → 4. configure Cloudinary in the admin, then `npm run media:import` → 5. `npm run db:seed -- --force=pages,offers,popups,menu` (fresh DB only) → 6. `npm run admin:create -- --email … --role owner` → 7. deploy |
-| Backward compatible? | Not applicable: no earlier version of this app is deployed. Future migrations must be additive (new tables/columns with defaults) so the running version keeps working during deploys |
+| Is a migration required before deploying? | **Yes**, on a new Neon database: `drizzle/0000_init.sql` (creates all tables) then `drizzle/0001_storage_s3.sql` (adds `s3` to the storage-provider type). `npm run db:migrate` applies both in order |
+| Exact files | `drizzle/0000_init.sql`, `drizzle/0001_storage_s3.sql` (journal: `drizzle/meta/_journal.json`) |
+| Tested? | Yes: both applied to the local PGlite database (Postgres 17), `0001` as an upgrade on top of existing data; the app and e2e suite ran against it. **Not yet run on Neon.** |
+| Safe order | 1. Create Neon project and branch → 2. `DATABASE_URL=… npm run db:migrate` → 3. `npm run db:seed` → 4. configure S3 in Admin → Media → Storage settings, then `npm run media:import` → 5. `npm run db:seed -- --force=pages,offers,popups,menu` (fresh DB only) → 6. `npm run admin:create -- --email … --role owner` → 7. deploy |
+| Backward compatible? | `0001` only adds an enum value (additive). No earlier version of this app is deployed. Future migrations must be additive (new tables/columns with defaults) so the running version keeps working during deploys |
 | Backup / rollback | Neon keeps point-in-time history; take a named branch (`pre-launch`) before seeding production. Rolling back the database = restore that branch. The WordPress site is untouched and remains the rollback for the website |
 
 Run migrations from a trusted machine with the production `DATABASE_URL` in the shell only (not saved to disk), or through a one-off Vercel deployment command. Never run `--force` seeds against a database that already has real edits: they replace page and menu content.

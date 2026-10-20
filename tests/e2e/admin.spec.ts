@@ -168,3 +168,16 @@ test("dashboard shows launch blockers from real configuration", async ({ page })
   await expect(page.getByRole("link", { name: "Notification recipients" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Email delivery" })).toBeVisible();
 });
+
+test("media storage settings explain the S3 setup; videos accept a poster", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/admin/media/settings");
+  await waitForForms(page);
+  await expect(page.getByLabel("Bucket name")).toBeVisible();
+  await expect(page.getByText('PublicReadSiteMedia')).toBeVisible();
+  await expect(page.getByText('"AllowedMethods"')).toBeVisible();
+  await page.goto("/admin/media?type=video");
+  await page.locator("ul a[href^='/admin/media/']").first().click();
+  await page.waitForURL(/\/admin\/media\/[0-9a-f-]{36}$/);
+  await expect(page.getByRole("heading", { name: "Poster image" })).toBeVisible();
+});

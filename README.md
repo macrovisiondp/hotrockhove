@@ -2,7 +2,7 @@
 
 Replacement for the WordPress site at https://hotrockhove.com/: a Next.js website with its own admin dashboard. The WordPress site stays live until the owner approves cutover.
 
-**Status:** the website and admin are built and tested locally; production setup (Vercel, Neon, Resend, Cloudinary) is pending. See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
+**Status:** the website and admin are built and tested locally; production setup (Vercel, Neon, Resend, Amazon S3) is pending. See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 
 | Read this | For |
 |---|---|

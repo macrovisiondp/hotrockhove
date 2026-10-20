@@ -17,7 +17,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"   # 
 In `.env.local` also set:
 
 ```
-ALLOW_LOCAL_STORAGE=true          # media on local disk (.data/media) instead of Cloudinary
+ALLOW_LOCAL_STORAGE=true          # media on local disk (.data/media) instead of S3
 DEV_ADMIN_EMAIL=owner@hotrockhove.test
 DEV_ADMIN_PASSWORD=<12+ random characters>
 ```

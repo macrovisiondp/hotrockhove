@@ -26,7 +26,13 @@ const nextConfig: NextConfig = {
     serverActions: { bodySizeLimit: "4.5mb" },
   },
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "res.cloudinary.com" }],
+    // S3 (virtual-hosted URLs), CloudFront, Cloudinary, plus an optional custom media domain.
+    remotePatterns: [
+      { protocol: "https", hostname: "**.amazonaws.com" },
+      { protocol: "https", hostname: "**.cloudfront.net" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      ...(process.env.MEDIA_PUBLIC_HOST ? [{ protocol: "https" as const, hostname: process.env.MEDIA_PUBLIC_HOST }] : []),
+    ],
     localPatterns: [{ pathname: "/brand/**" }, { pathname: "/media/**" }],
     formats: ["image/avif", "image/webp"],
   },

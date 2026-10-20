@@ -80,7 +80,7 @@ Redirects live in the `redirect` table (editable in the admin) and are applied i
 | D3 | Merge the two contact forms | Yes |
 | D4 | Keep the table-request form as a fallback? | No — link to the booking project; keep a general enquiry form |
 | D5 | Retire background audio, preloader, VR tour? | Retire audio and preloader; VR tour optional after rights check |
-| D6 | Media storage | Cloudinary (image and video transcoding, CDN; free tier likely enough at ≈ 0.2 GB of live media). Alternatives: Vercel Blob or Cloudflare R2 behind the same `StorageProvider` adapter. Any paid plan needs approval |
+| D6 | Media storage | **Decided by owner (2026-10-20): Amazon S3**, optionally behind CloudFront. Cloudinary adapter kept as an alternative |
 | D7 | Legacy subscribers | Archive; re-permission email only with separate approval |
 | D8 | About Us copy | Owner to supply, or derive from the founder story |
 | D9 | Reviews widget | Keep Trustindex embed (consent-gated) |

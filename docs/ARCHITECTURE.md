@@ -12,7 +12,7 @@
 | ORM | Drizzle ORM + drizzle-kit SQL migrations in `drizzle/` | |
 | Auth | Better Auth, email + password, database sessions (12 h), sign-up disabled | Accounts created by the owner or `admin:create` |
 | Email | `EmailProvider` adapter: Resend (default) or SMTP (Nodemailer) | `src/lib/email` |
-| Media | `StorageAdapter`: Cloudinary (production) or local disk (development only) | `src/lib/storage` |
+| Media | `StorageAdapter`: **Amazon S3** (production, owner's choice; optional CloudFront), local disk (development only); Cloudinary kept as an alternative adapter | `src/lib/storage` |
 | Bot protection | Cloudflare Turnstile (when configured) + honeypot + Postgres-backed rate limits | |
 | Validation | Zod 4 everywhere (settings, sections, forms, actions) | |
 | Tests | node:test (unit) + Playwright (e2e, desktop + mobile) | |
@@ -35,7 +35,7 @@ The proxy reads redirects and the maintenance flag from `/api/internal/routing` 
 
 - **Every page renders per request** (`await connection()` in the root layout), because Next.js can only add the CSP nonce during dynamic rendering. Static pages would have unnonced scripts that `strict-dynamic` blocks.
 - Database reads go through `unstable_cache` with tags (`pages`, `menu`, `offers`, `media`, `nav`, `popups`, `redirects`, `settings:*`). Admin saves call `revalidateTag(tag, { expire: 0 })`, so changes appear on the next request.
-- Images go through `next/image` (AVIF/WebP); Cloudinary URLs are optimised too. Videos are click-to-play (poster only) except an optional muted hero loop that respects reduced motion and Save-Data.
+- Images go through `next/image` (AVIF/WebP); S3/CloudFront images are resized and converted on the fly by Next.js, because S3 itself doesn't transform images. Videos need a poster image chosen in Media, since S3 doesn't generate one. Videos are click-to-play (poster only) except an optional muted hero loop that respects reduced motion and Save-Data.
 
 ## 4. Data model (`src/db/schema.ts`)
 
@@ -64,7 +64,7 @@ The proxy reads redirects and the maintenance flag from `/api/internal/routing` 
 - **XSS:** no raw HTML is ever rendered from content. Rich text is a minimal parser that outputs React text nodes, JSON-LD escapes `<`, and emails escape every value.
 - **Links** from editors are validated: relative paths, https, tel/mailto, or `book`. `javascript:` and `//host` are rejected.
 - **CSP:** nonce + `strict-dynamic`, `frame-ancestors 'none'`, `object-src 'none'`; third-party origins documented in `src/lib/csp.ts`. Also HSTS, nosniff, X-Frame-Options DENY, Referrer-Policy, Permissions-Policy, and no X-Powered-By.
-- **Uploads:** real type detected from file bytes, size limits, dimension check, server-generated keys, de-duplication. Large videos go browser → Cloudinary with a server-signed request, then are verified with the Cloudinary API before registration.
+- **Uploads:** real type detected from file bytes, size limits, dimension check, server-generated keys, de-duplication. Large videos go browser → S3 with a 15-minute presigned PUT for that exact size and type. The server then checks the object (size via HeadObject, real type from its first bytes) and deletes it if it isn't a video.
 - **CSV exports** neutralise spreadsheet formulas, are owner/admin only, and are audited.
 - **Privacy:** consent banner (essential only by default); reviews widget and analytics load only after "Accept all"; retention cron deletes expired submissions and unconfirmed sign-ups; newsletter needs double opt-in and stores the consent wording.
 
@@ -78,4 +78,5 @@ The proxy reads redirects and the maintenance flag from `/api/internal/routing` 
 | Typed sections instead of a free-form page builder | Editors can't break layout or inject HTML; the design stays consistent |
 | Business details imported as "unconfirmed" | The old site contradicted itself; launch is blocked until a person confirms |
 | Table-request form kept as the Book Table fallback | Preserves the existing workflow until the separate booking system is ready |
+| S3 for media (owner decision 2026-10-20) | Owner preference; cheap at this volume; Cloudinary adapter kept, so switching back is a setting |
 | Background audio, preloader and 360° tour not rebuilt | Rights and UX issues found in the audit (tour switch exists, off) |

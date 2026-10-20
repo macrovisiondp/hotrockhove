@@ -42,7 +42,7 @@ export function MediaImage({
 
 /**
  * Click-to-play video: only the poster loads until the visitor presses play,
- * which keeps bandwidth (and Cloudinary credits) low. Muted autoplay is used only
+ * which keeps bandwidth (and storage/CDN costs) low. Muted autoplay is used only
  * for hero backgrounds (see HeroVideo).
  */
 export function MediaVideo({ media, className = "" }: { media: PublicMedia; className?: string }) {

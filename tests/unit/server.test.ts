@@ -99,3 +99,19 @@ test("emails escape submitted content", () => {
   const { html } = layout({ brandName: "Hot Rock", heading: "New", paragraphs: [], rows: [["Message", "<script>alert(1)</script>"]] });
   assert.ok(!html.includes("<script>"));
 });
+
+test("S3 public URLs: bucket URL by default, CDN when set, keys URL-encoded per segment", async () => {
+  const { s3PublicBase, s3PublicUrl, s3ObjectKey } = await import("../../src/lib/storage");
+  const base = { ...DEFAULTS.storage, provider: "s3" as const, s3: { ...DEFAULTS.storage.s3, bucket: "hotrock-media", region: "eu-west-2" } };
+  assert.equal(s3PublicBase(base), "https://hotrock-media.s3.eu-west-2.amazonaws.com");
+  assert.equal(s3PublicBase({ ...base, s3: { ...base.s3, publicBaseUrl: "https://media.hotrockhove.com/" } }), "https://media.hotrockhove.com");
+  assert.equal(s3PublicBase({ ...base, s3: { ...base.s3, endpoint: "https://acct.r2.cloudflarestorage.com" } }), "https://acct.r2.cloudflarestorage.com/hotrock-media");
+  assert.equal(s3ObjectKey("hotrockhove", "2026/10/a b.jpg"), "hotrockhove/2026/10/a b.jpg");
+  assert.equal(s3PublicUrl("https://x.example", "hotrockhove/2026/a b+c.jpg"), "https://x.example/hotrockhove/2026/a%20b%2Bc.jpg");
+});
+
+test("storage settings: S3 is the default and http URLs are rejected", () => {
+  assert.equal(DEFAULTS.storage.provider, "s3");
+  assert.equal(validateSetting("storage", DEFAULTS.storage).success, true);
+  assert.equal(validateSetting("storage", { ...DEFAULTS.storage, s3: { ...DEFAULTS.storage.s3, publicBaseUrl: "http://insecure.example" } }).success, false);
+});

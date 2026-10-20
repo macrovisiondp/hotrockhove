@@ -16,7 +16,7 @@ import path from "node:path";
 import { eq } from "drizzle-orm";
 import sharp from "sharp";
 import { db, t } from "../src/db";
-import { getActiveStorage, MAX_VIDEO_BYTES, sniffMime } from "../src/lib/storage";
+import { CLOUDINARY_MAX_VIDEO_BYTES, getActiveStorage, MAX_VIDEO_BYTES, sniffMime } from "../src/lib/storage";
 import { classifyRights, MEDIA_PATHS, WP_UPLOADS } from "./data/media-manifest";
 
 type WpItem = { url: string; w: number | null; h: number | null; alt: string };
@@ -88,9 +88,10 @@ async function main() {
         height = meta.height ?? height;
       }
 
-      if (storage?.provider === "cloudinary" && mime.startsWith("video/") && buf.length > MAX_VIDEO_BYTES) {
+      const videoLimit = storage?.provider === "cloudinary" ? CLOUDINARY_MAX_VIDEO_BYTES : MAX_VIDEO_BYTES;
+      if (mime.startsWith("video/") && buf.length > videoLimit) {
         failed++;
-        report.push({ path: rel, status: "skipped-too-large", bytes: buf.length, note: "Over Cloudinary's 100 MB upload limit. Compress (e.g. HandBrake, 1080p H.264) and upload in Admin → Media." });
+        report.push({ path: rel, status: "skipped-too-large", bytes: buf.length, note: `Over the ${Math.round(videoLimit / 1048576)} MB upload limit. Compress (e.g. HandBrake, 1080p H.264) and upload in Admin → Media.` });
         continue;
       }
       if (dry) {

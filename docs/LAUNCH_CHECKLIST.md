@@ -30,7 +30,7 @@ Live status is on the admin **Dashboard → Launch readiness**, which checks rea
 | Neon project | Production database (`DATABASE_URL`) |
 | Resend account + API key | Email (owner pastes it in Admin → Email) |
 | Hostinger hPanel DNS access (or someone to apply records) | Resend DKIM, then the domain cutover |
-| Cloudinary account (cloud name, API key, secret) | Media storage |
+| AWS account: S3 bucket (eu-west-2) + IAM user access key (exact policies shown in Admin → Media → Storage settings); optional CloudFront | Media storage |
 | Cloudflare Turnstile keys | Form bot protection |
 | Trustindex account | Reviews widget |
 | Rank Math redirects export from WordPress (couldn't be read: HTTP 403) | Confirm no other old URLs need redirects |
@@ -39,7 +39,7 @@ Live status is on the admin **Dashboard → Launch readiness**, which checks rea
 ## C. Technical items before production
 
 - [ ] Neon database created, `0000_init.sql` applied, seeded, `pre-launch` branch taken (DEPLOYMENT §3)
-- [ ] Cloudinary configured; `npm run media:import` run against production; the 106 MB gallery video compressed and uploaded
+- [ ] S3 bucket, bucket policy, CORS and IAM key set up; storage **Test now** passes (upload + public read); `npm run media:import` run against production; poster images chosen for gallery videos; the 106 MB video ideally compressed
 - [ ] Production owner account created; dev account never created in production
 - [ ] Resend domain verified; test email received; delivery switched on
 - [ ] Turnstile keys set; a form tested with the widget
@@ -53,5 +53,6 @@ Live status is on the admin **Dashboard → Launch readiness**, which checks rea
 - Pages render per request (required for the nonce-based Content Security Policy). Data is cached and invalidated on save, so this is fast, but pages aren't served from the CDN cache.
 - Redirect, maintenance and tour-embed changes reach the edge within about 60 seconds (per-instance cache in the proxy).
 - The admin preview shows page content without the site header and footer.
-- Videos have no auto-generated poster in local development; Cloudinary generates them in production.
+- S3 doesn't generate video posters; choose a poster image per video in Media.
+- With S3, images are optimised by the website (Next.js) rather than by a media service; with heavy traffic a CloudFront CDN is worthwhile.
 - Seasonal pages (Valentine's) need their dates and copy updated before republishing.

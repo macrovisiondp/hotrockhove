@@ -54,7 +54,7 @@ const FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "heading", label: "Heading", kind: "text", max: 140 },
     { key: "body", label: "Caption", kind: "textarea", max: 1000, rows: 4, hint: BODY_HINT },
     { key: "videoId", label: "Video", kind: "media", type: "video" },
-    { key: "mediaId", label: "Poster image (optional)", kind: "media", type: "image", hint: "Cloudinary creates one automatically if left empty." },
+    { key: "mediaId", label: "Poster image (optional)", kind: "media", type: "image", hint: "Shown before the video plays. If empty, the poster set on the video in Media is used." },
   ],
   menuHighlights: [
     { key: "eyebrow", label: "Small label", kind: "text", max: 80 },

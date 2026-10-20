@@ -112,7 +112,7 @@ export default async function BusinessPage() {
         <Card title="Logo, icon and brand colour">
           <ActionForm action={saveBrandAction} disabled={readOnly} compact>
             <div className="grid gap-4 md:grid-cols-3">
-              <TextInput name="logoUrl" label="Logo (white, transparent)" defaultValue={brand.logoUrl} hint="A /brand/… file or a Cloudinary https:// URL from Media." />
+              <TextInput name="logoUrl" label="Logo (white, transparent)" defaultValue={brand.logoUrl} hint="A /brand/… file, or the https:// address of an image in Media." />
               <TextInput name="faviconUrl" label="Browser icon" defaultValue={brand.faviconUrl} hint="Square PNG, at least 192×192." />
               <TextInput name="accentColour" label="Accent colour" defaultValue={brand.accentColour} pattern="#[0-9a-fA-F]{6}" hint="Buttons and highlights. Keep enough contrast with dark text." />
             </div>
