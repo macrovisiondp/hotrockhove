@@ -119,8 +119,16 @@ test("S3 public URLs: bucket URL by default, CDN when set, keys URL-encoded per 
   assert.equal(s3PublicUrl("https://x.example", "hotrockhove/2026/a b+c.jpg"), "https://x.example/hotrockhove/2026/a%20b%2Bc.jpg");
 });
 
-test("storage settings: S3 is the default and http URLs are rejected", () => {
-  assert.equal(DEFAULTS.storage.provider, "s3");
+test("Neon public URLs: endpoint/bucket by default, CDN when set", async () => {
+  const { neonPublicBase } = await import("../../src/lib/storage");
+  const s = { ...DEFAULTS.storage, neon: { bucket: "hotrockhove", prefix: "site", publicBaseUrl: "" } };
+  assert.equal(neonPublicBase(s, "https://br-x.storage.c-6.us-east-2.aws.neon.tech/"), "https://br-x.storage.c-6.us-east-2.aws.neon.tech/hotrockhove");
+  assert.equal(neonPublicBase({ ...s, neon: { ...s.neon, publicBaseUrl: "https://media.hotrockhove.com/" } }, "https://ignored"), "https://media.hotrockhove.com");
+});
+
+test("storage settings: Neon is the default and http URLs are rejected", () => {
+  assert.equal(DEFAULTS.storage.provider, "neon");
+  assert.equal(DEFAULTS.storage.neon.bucket, "hotrockhove");
   assert.equal(validateSetting("storage", DEFAULTS.storage).success, true);
   assert.equal(validateSetting("storage", { ...DEFAULTS.storage, s3: { ...DEFAULTS.storage.s3, publicBaseUrl: "http://insecure.example" } }).success, false);
 });

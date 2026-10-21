@@ -130,8 +130,8 @@ async function seedSettings() {
   });
   await put("consent", DEFAULTS.consent);
   await put("features", DEFAULTS.features);
-  // Local disk in development (ALLOW_LOCAL_STORAGE=true); S3 otherwise (configured in the admin).
-  await put("storage", { ...DEFAULTS.storage, provider: process.env.ALLOW_LOCAL_STORAGE === "true" ? "local" : "s3" });
+  // Local disk in development (ALLOW_LOCAL_STORAGE=true); Neon Object Storage otherwise.
+  await put("storage", { ...DEFAULTS.storage, provider: process.env.ALLOW_LOCAL_STORAGE === "true" ? "local" : "neon" });
 }
 
 /* -------------------------------------------------------------------------- */

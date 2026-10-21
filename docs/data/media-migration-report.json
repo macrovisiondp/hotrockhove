@@ -1,16 +1,16 @@
 {
- "generatedAt": "2026-10-20T14:17:37.149Z",
+ "generatedAt": "2026-10-21T07:59:45.414Z",
  "totals": {
   "listed": 87,
-  "imported": 85,
-  "existing": 2,
+  "imported": 39,
+  "existing": 48,
   "failed": 0
  },
  "items": [
   {
    "path": "2023/10/couple-by-dinner-2021-09-24-03-01-38-utc.jpg",
    "status": "imported",
-   "id": "2c655f6c-05af-4fe3-a845-d8c33602d42c",
+   "id": "ff529f04-a099-496a-8f43-7a8b78248e6f",
    "bytes": 100113,
    "mime": "image/jpeg",
    "rights": "unconfirmed"
@@ -18,7 +18,7 @@
   {
    "path": "2025/10/WhatsApp-Image-2025-10-13-at-17.18.00_d2bf89a3-e1760462777221.jpg",
    "status": "imported",
-   "id": "52df1686-e5a8-4c60-95fa-b1970b639ac0",
+   "id": "dd3556e0-467d-43c3-a8fd-964d4c1a372a",
    "bytes": 136416,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -26,7 +26,7 @@
   {
    "path": "2025/10/WhatsApp-Image-2025-10-13-at-17.18.00_5b182930.jpg",
    "status": "imported",
-   "id": "f03b8d73-d5a9-4311-93b0-fce65aae3243",
+   "id": "7dbe07d2-f0e5-4e62-bd35-f89f94634845",
    "bytes": 294975,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -34,7 +34,7 @@
   {
    "path": "2026/01/DEBBL2XFOIOSJEJY2LAYYFL2.webp",
    "status": "imported",
-   "id": "19d81282-0208-4e8c-9953-5c7e3a43c2c2",
+   "id": "b1b426ca-c313-4d9f-b2fe-f9e7267918af",
    "bytes": 945756,
    "mime": "image/webp",
    "rights": "cleared"
@@ -42,7 +42,7 @@
   {
    "path": "2026/01/shared-image-1.jpg",
    "status": "imported",
-   "id": "d3bbdc5b-e6fa-4153-acf1-6880495b3212",
+   "id": "27f4c394-1341-4bdd-bb7c-16fe1593227e",
    "bytes": 446925,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -50,7 +50,7 @@
   {
    "path": "2025/12/Steak-Sizzling.mp4",
    "status": "imported",
-   "id": "766afb31-5d79-4b2b-a795-4cb464d7a207",
+   "id": "c2d809c6-1acd-4440-b2fb-5561b339b703",
    "bytes": 50490686,
    "mime": "video/mp4",
    "rights": "unconfirmed"
@@ -58,7 +58,7 @@
   {
    "path": "2025/10/WhatsApp-Image-2025-10-13-at-17.18.00_3281e347-e1760462301109.jpg",
    "status": "imported",
-   "id": "a8a3f37a-1445-4cab-a46b-af5d474c3580",
+   "id": "d0404296-0218-4b89-b105-1d105d2ac783",
    "bytes": 112243,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -66,7 +66,7 @@
   {
    "path": "2026/01/WhatsApp-Image-2025-10-13-at-17.06.117.jpeg",
    "status": "imported",
-   "id": "cb546e64-06a3-4a23-9652-1f2e4060308e",
+   "id": "a1321e97-2ebd-4e13-baab-c4ea80c41e1c",
    "bytes": 203353,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -74,7 +74,7 @@
   {
    "path": "2026/02/Media.jpg",
    "status": "imported",
-   "id": "7f653cda-03fb-4c47-ac6e-8c9b5eb1212f",
+   "id": "f3f1b8e3-6f0f-427b-8c6a-2467768f4c07",
    "bytes": 408301,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -82,7 +82,7 @@
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-2.jpeg",
    "status": "imported",
-   "id": "0d905d82-f15f-4cc6-a770-5e7a85170bda",
+   "id": "da19ede4-9863-4d71-ba06-506271694165",
    "bytes": 138721,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -90,7 +90,7 @@
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM.jpeg",
    "status": "imported",
-   "id": "47478a9e-81b5-4043-accd-378454f56ecc",
+   "id": "7c3ce95b-67b5-45db-ba4e-a860beefadff",
    "bytes": 255186,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -98,7 +98,7 @@
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-4.jpeg",
    "status": "imported",
-   "id": "e1c85772-6d24-4630-84fd-87892e025445",
+   "id": "bb656e94-494f-468c-94cc-1de0a9dbd2ff",
    "bytes": 261466,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -106,7 +106,7 @@
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-3.jpeg",
    "status": "imported",
-   "id": "9fe2f2d6-0a59-40c4-a09e-4f45db20bdbb",
+   "id": "1c5b13d4-e8f5-4c11-97ec-ae8fb854c52f",
    "bytes": 161409,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -114,7 +114,7 @@
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-1.jpeg",
    "status": "imported",
-   "id": "74d76074-cae5-4070-9fce-bcb8ed6569f8",
+   "id": "87d8a097-53f6-4676-ba6c-e4997589cb2c",
    "bytes": 176308,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -122,7 +122,7 @@
   {
    "path": "2026/02/Media-3.jpg",
    "status": "imported",
-   "id": "8b6e4536-9fcf-4667-b832-2d5d628a09b5",
+   "id": "01e58255-eefd-4402-8701-9bca1e29c754",
    "bytes": 808624,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -130,7 +130,7 @@
   {
    "path": "2026/02/WhatsApp-Video-2026-02-07-at-10.09.54-PM.mp4",
    "status": "imported",
-   "id": "5751ceb8-44ec-4d76-9535-3bf4447f1aac",
+   "id": "523be29b-7636-4b71-b755-a367c9ce2721",
    "bytes": 4130554,
    "mime": "video/mp4",
    "rights": "cleared"
@@ -138,7 +138,7 @@
   {
    "path": "2023/10/grilled-beef-steak-2021-08-26-16-31-42-utc.jpg",
    "status": "imported",
-   "id": "10c43465-c637-45d1-bbcf-0cd67ea1e9a3",
+   "id": "0be796e1-07a1-4138-ad47-fca0e52c32fa",
    "bytes": 125988,
    "mime": "image/jpeg",
    "rights": "unconfirmed"
@@ -146,7 +146,7 @@
   {
    "path": "2023/10/wine-in-wine-cellar-2021-08-26-15-34-10-utc.jpg",
    "status": "imported",
-   "id": "5f816b23-7dc2-444f-baa1-e8f9ecda8176",
+   "id": "e67424e0-f548-44df-b47c-e840c9a0a0dd",
    "bytes": 59214,
    "mime": "image/jpeg",
    "rights": "unconfirmed"
@@ -154,7 +154,7 @@
   {
    "path": "2026/01/Instagram-post-132.jpg.jpeg",
    "status": "imported",
-   "id": "7fb850ca-bf41-4e1d-bbc3-bdb4eba9c1ed",
+   "id": "e39eccb7-44bd-48d2-9322-82eafd22159f",
    "bytes": 2422461,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -162,7 +162,7 @@
   {
    "path": "2026/01/daisy3.jpg",
    "status": "imported",
-   "id": "13b1eb39-123f-4839-b2c2-522298643a04",
+   "id": "4fadc814-0e2a-497c-b7f0-a70342d5c277",
    "bytes": 87380,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -170,7 +170,7 @@
   {
    "path": "2026/02/daisy-cv-copy-3.jpg",
    "status": "imported",
-   "id": "ac538f84-3eb6-4262-b3d5-626dae35450d",
+   "id": "1c34c997-491b-4129-9049-2282085e6d3d",
    "bytes": 61304,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -178,7 +178,7 @@
   {
    "path": "2026/02/WhatsApp-Image-2026-02-04-at-10.19.04-PM.jpeg",
    "status": "imported",
-   "id": "3c182850-6ad1-494d-b0c8-72838ef2f418",
+   "id": "83026c98-0b4c-4334-8a71-ae22527df263",
    "bytes": 345664,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -186,7 +186,7 @@
   {
    "path": "2026/01/Q7XQAQNMAC5545RGFRILW3BR.webp",
    "status": "imported",
-   "id": "ce66f85e-6c93-4803-b055-c92a316cdc4f",
+   "id": "dc866861-e8eb-44b0-8b71-a950b8b2d4fa",
    "bytes": 448412,
    "mime": "image/webp",
    "rights": "cleared"
@@ -194,383 +194,291 @@
   {
    "path": "2026/02/madm.jpg",
    "status": "imported",
-   "id": "83cbb1ea-8a51-4cf0-a04b-1e78a1ec1464",
+   "id": "c3ea83d4-383f-4447-b000-5ee1e1da73bc",
    "bytes": 96462,
    "mime": "image/jpeg",
    "rights": "cleared"
   },
   {
    "path": "2026/02/fillet-fri-enh.jpg",
-   "status": "imported",
-   "id": "af8f1f63-a003-4695-b9e2-707b9c99120e",
-   "bytes": 105388,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "a382ecc5-2763-4b99-9b00-8c1be40014d8",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/fillet-fri-enh.jpg"
   },
   {
    "path": "2026/02/wagyud.jpg",
-   "status": "imported",
-   "id": "11a5108b-0e18-4336-94fd-47c96ee54570",
-   "bytes": 97844,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "2b51afd4-54bb-4966-84d6-f2bde92b6fb2",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/wagyud.jpg"
   },
   {
    "path": "2026/01/GMPLQOGCDDQ2BZNOKR7VI2NP.webp",
-   "status": "imported",
-   "id": "a153426c-1fb4-4e30-abc6-a7ab312b04c4",
-   "bytes": 938932,
-   "mime": "image/webp",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "2f64aa57-145b-4491-b5a8-48609985d57e",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/01/GMPLQOGCDDQ2BZNOKR7VI2NP.webp"
   },
   {
    "path": "2026/01/WhatsApp-Image-2025-10-13-at-16.57.15.jpeg",
-   "status": "imported",
-   "id": "b7969b93-1ecc-4ba0-9de9-b23d33f51890",
-   "bytes": 376658,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "72875574-cde0-432b-bd1b-9e4d548d2f44",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/01/WhatsApp-Image-2025-10-13-at-16.57.15.jpeg"
   },
   {
    "path": "2023/10/beef-steak-food-styling-2021-10-21-04-23-34-utc.jpg",
-   "status": "imported",
-   "id": "2ff728e5-ca5f-4f95-8631-2622719741bd",
-   "bytes": 271683,
-   "mime": "image/jpeg",
-   "rights": "unconfirmed"
+   "status": "already-imported",
+   "id": "292e911b-ebd6-49a5-96fb-a4afa7e44cba",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2023/10/beef-steak-food-styling-2021-10-21-04-23-34-utc.jpg"
   },
   {
    "path": "2023/10/marinated-turkey-steak-with-spices-on-a-wooden-boa-2022-04-22-13-31-31-utc.jpg",
-   "status": "imported",
-   "id": "0d99e2d2-a13a-41b5-881d-f92e0597c759",
-   "bytes": 181936,
-   "mime": "image/jpeg",
-   "rights": "unconfirmed"
+   "status": "already-imported",
+   "id": "358754b6-cc13-452d-a81a-a724bec195bc",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2023/10/marinated-turkey-steak-with-spices-on-a-wooden-boa-2022-04-22-13-31-31-utc.jpg"
   },
   {
    "path": "2023/10/wine-and-cheese-on-the-table-2022-09-09-18-10-10-utc.jpg",
-   "status": "imported",
-   "id": "ab4a69fd-a807-4e45-a0d3-51ac2dd18032",
-   "bytes": 94315,
-   "mime": "image/jpeg",
-   "rights": "unconfirmed"
+   "status": "already-imported",
+   "id": "66338de0-41cf-4819-952e-b6ea7b260c92",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2023/10/wine-and-cheese-on-the-table-2022-09-09-18-10-10-utc.jpg"
   },
   {
    "path": "2023/10/organic-grass-fed-bacon-wrapped-sirloin-steak-2021-08-26-16-20-47-utc.jpg",
-   "status": "imported",
-   "id": "d4fe7b88-dc1a-4e7d-9f5e-d6952e564453",
-   "bytes": 156592,
-   "mime": "image/jpeg",
-   "rights": "unconfirmed"
+   "status": "already-imported",
+   "id": "d56fbae5-6055-4617-b155-6fac19e97299",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2023/10/organic-grass-fed-bacon-wrapped-sirloin-steak-2021-08-26-16-20-47-utc.jpg"
   },
   {
    "path": "2026/02/wagyuim.jpg",
-   "status": "imported",
-   "id": "853e261a-7f6a-4616-8e21-3e78ed7fc26d",
-   "bytes": 105288,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "46c63d81-6c2f-46e2-8492-d198dd8d45f4",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/wagyuim.jpg"
   },
   {
    "path": "2026/01/AOXPBXBW7NZNI2DAJ7G7IZ46.webp",
-   "status": "imported",
-   "id": "b8fdb3c8-d0d3-4b2c-9b1b-5b8a529b2791",
-   "bytes": 201734,
-   "mime": "image/webp",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "67fc4674-f7b4-44aa-b35a-2d20f7cd179d",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/01/AOXPBXBW7NZNI2DAJ7G7IZ46.webp"
   },
   {
    "path": "2026/02/ourm-h.jpg",
-   "status": "imported",
-   "id": "36b45c91-dd49-45b3-9701-92e6dd9b9cbc",
-   "bytes": 72482,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "aec24051-cc6a-41c8-b624-4d009a1b823d",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/ourm-h.jpg"
   },
   {
    "path": "2026/01/6VYDUVRRVBP5W65ELBOHRGGI.jpeg",
-   "status": "imported",
-   "id": "013068e7-013f-4787-b6d5-d0e49074fcc3",
-   "bytes": 215414,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "73ce7bc9-6daf-4e80-b7cf-cbc1d2a480d5",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/01/6VYDUVRRVBP5W65ELBOHRGGI.jpeg"
   },
   {
    "path": "2026/01/D63BCCYOUKOFPU265JFP5AKQ.webp",
-   "status": "imported",
-   "id": "52611b68-680b-4e11-a1f8-1ade38cfa4e9",
-   "bytes": 235862,
-   "mime": "image/webp",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "b64bf2fb-8d74-49b4-acb3-4e8ced35de38",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/01/D63BCCYOUKOFPU265JFP5AKQ.webp"
   },
   {
    "path": "2026/01/Y6FV63GPAMSB3HSYJT46OHA3.webp",
-   "status": "imported",
-   "id": "f03350f7-25fc-41dc-847e-b75dbdd1b288",
-   "bytes": 953436,
-   "mime": "image/webp",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "7a060ae1-743d-4dfc-a619-ab4c8a6417b1",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/01/Y6FV63GPAMSB3HSYJT46OHA3.webp"
   },
   {
    "path": "2026/02/minted-lamb-chops.jpeg",
-   "status": "imported",
-   "id": "bab59d99-ca9d-4c42-ad50-f2dcd3342c0f",
-   "bytes": 306613,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "ddc766cd-afc4-4f84-92e2-005c1a198d82",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/minted-lamb-chops.jpeg"
   },
   {
    "path": "2026/01/RERNUNN2IQEX5OOPS3YSBJPQ.webp",
-   "status": "imported",
-   "id": "0d373fcb-9ad4-4ff4-a55a-92edecfb7e99",
-   "bytes": 299272,
-   "mime": "image/webp",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "0e3bb2e7-a996-4eda-b1dc-167dbc10d04f",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/01/RERNUNN2IQEX5OOPS3YSBJPQ.webp"
   },
   {
    "path": "2026/01/AZODMMSYA2UBSIVPW2DX3557.webp",
-   "status": "imported",
-   "id": "0f1f4f68-e6f0-428e-89e4-f88b57019326",
-   "bytes": 1176550,
-   "mime": "image/webp",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "356493bf-f659-4415-8062-9c9448a2cfa2",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/01/AZODMMSYA2UBSIVPW2DX3557.webp"
   },
   {
    "path": "2026/01/7EB2WCGNUEZUVTAJHBZAUINY.webp",
-   "status": "imported",
-   "id": "21a2fff4-9093-499a-aa02-dade429e82d9",
-   "bytes": 822078,
-   "mime": "image/webp",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "2307ec04-6de7-4c21-833b-7f575e082325",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/01/7EB2WCGNUEZUVTAJHBZAUINY.webp"
   },
   {
    "path": "2026/02/val.jpg",
-   "status": "imported",
-   "id": "48c39a19-8e85-4733-94d8-18f538ac109f",
-   "bytes": 95083,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "3d888578-6222-4425-9abf-756513184414",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/val.jpg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-01-at-7.48.49-PM.jpeg",
-   "status": "imported",
-   "id": "2d7f4726-b15f-45a9-a951-86172ff81ead",
-   "bytes": 440761,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "c68912cc-773e-49bf-9adb-58b470ede58b",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-01-at-7.48.49-PM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-01-31-at-11.34.22-PM.jpeg",
-   "status": "imported",
-   "id": "d40833aa-058e-4569-a834-83bccd1f177d",
-   "bytes": 185351,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "89af27e8-e862-472f-87a6-d2f4224af175",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-01-31-at-11.34.22-PM.jpeg"
   },
   {
    "path": "2026/02/lsca.png",
-   "status": "imported",
-   "id": "f6f44168-241a-4553-b38e-5a0ac8453539",
-   "bytes": 1789220,
-   "mime": "image/png",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "49648270-d6e4-4487-8f0d-620aa90f438e",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/lsca.png"
   },
   {
    "path": "2023/10/smiling-businessman-talking-to-waiter-in-restauran-2021-09-24-03-47-52-utc-1.jpg",
-   "status": "imported",
-   "id": "5899041f-da7b-4afa-b102-1dc542535781",
-   "bytes": 129136,
-   "mime": "image/jpeg",
-   "rights": "unconfirmed"
+   "status": "already-imported",
+   "id": "739af10e-c1e1-45f2-b769-f4c60320464b",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2023/10/smiling-businessman-talking-to-waiter-in-restauran-2021-09-24-03-47-52-utc-1.jpg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-22-at-8.10.56-PM.jpeg",
-   "status": "imported",
-   "id": "9c2c9443-d2bb-4056-a99c-39a21ee35561",
-   "bytes": 249635,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "a9eea4e4-2be9-4282-9ac7-7428a4ddf663",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-22-at-8.10.56-PM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-22-at-8.10.56-PM-1.jpeg",
-   "status": "imported",
-   "id": "96aac3b0-de5c-4fe5-86f1-89d757eab37e",
-   "bytes": 224385,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "2291be47-8133-44d4-b76d-58e5cb103baf",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-22-at-8.10.56-PM-1.jpeg"
   },
   {
    "path": "2026/02/Apple-Rocktail.jpeg",
-   "status": "imported",
-   "id": "15404f1c-ef38-43a8-86c8-00f310ca1deb",
-   "bytes": 369762,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "61706036-79a1-4f3c-85f6-fa2e1e8a7454",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/Apple-Rocktail.jpeg"
   },
   {
    "path": "2026/02/Kiwi-Rocktail.jpeg",
-   "status": "imported",
-   "id": "bc5e937e-32b3-416c-819f-cabf932f5648",
-   "bytes": 472228,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "62ce2bbd-5b2d-4b95-8d76-28b45b41d7d9",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/Kiwi-Rocktail.jpeg"
   },
   {
    "path": "2026/02/Blueberry-Rocktail.jpeg",
-   "status": "imported",
-   "id": "07c4988d-948b-4861-9c19-a9215745da78",
-   "bytes": 440882,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "1f9771b1-c93d-4039-b145-7cbc59f8406c",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/Blueberry-Rocktail.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-11-at-11.42.44-AM.jpeg",
-   "status": "imported",
-   "id": "251bfeee-171b-42c8-ae3c-3e031bc34766",
-   "bytes": 305561,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "174a6075-c042-4a58-8b79-53b1a7fc6a81",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-11-at-11.42.44-AM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-11-at-11.42.40-AM.jpeg",
-   "status": "imported",
-   "id": "3ad2ed2a-db06-43c5-bf6d-e19bbd763a5e",
-   "bytes": 349526,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "0ca1597e-7ddd-4aef-875f-30916a5e6f5b",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-11-at-11.42.40-AM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-11-at-11.42.41-AM.jpeg",
-   "status": "imported",
-   "id": "6e676d1f-f7cf-4c85-a8bb-338d4d2fac0a",
-   "bytes": 346727,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "f1357390-a12e-4e85-8336-295087c6580d",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-11-at-11.42.41-AM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-11-at-11.34.35-AM.jpeg",
-   "status": "imported",
-   "id": "e995bc26-8179-4d44-a651-c06dcccae012",
-   "bytes": 184545,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "d2c4998d-f3bf-4e59-9127-5189eab4e43d",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-11-at-11.34.35-AM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-11-at-11.34.35-AM-1.jpeg",
-   "status": "imported",
-   "id": "7a9093f3-ba9e-4e0e-812c-cb10721d4877",
-   "bytes": 228058,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "1bf5f3ae-187c-4e68-bed3-0e92650c89d0",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-11-at-11.34.35-AM-1.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.54-PM-2.jpeg",
-   "status": "imported",
-   "id": "0394eb55-2ae8-4048-a4ee-cdbb9802a002",
-   "bytes": 68039,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "6b121b73-5c80-40b4-ada8-2c49c7a667b2",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-07-at-10.09.54-PM-2.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.54-PM-1.jpeg",
-   "status": "imported",
-   "id": "9261883d-626f-403e-910d-0372e15cc70f",
-   "bytes": 327866,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "6569c3ae-b0a9-4095-9b62-76e396c108d9",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-07-at-10.09.54-PM-1.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.53-PM.jpeg",
-   "status": "imported",
-   "id": "a75e64f6-3b85-4532-b230-ecf7ceee13ad",
-   "bytes": 138549,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "0debf5af-cdf0-4477-9cd8-a9261022a27c",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-07-at-10.09.53-PM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM.jpeg",
-   "status": "imported",
-   "id": "2042a7f9-7749-4de4-9c97-537cf3eac792",
-   "bytes": 242962,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "5b1ebecb-bdad-46f1-9ab2-c8323a3dcc2a",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM-1.jpeg",
-   "status": "imported",
-   "id": "b6089606-c5ca-4b5f-9088-0804d74edc0d",
-   "bytes": 153207,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "cf960629-e9df-453b-864e-3bd415ca660d",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM-1.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM-3.jpeg",
-   "status": "imported",
-   "id": "3258b77f-137e-4843-94c1-b0646becab79",
-   "bytes": 178164,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "fbc7b42b-97fd-47ac-8d09-6f2031c0e978",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM-3.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.56-PM.jpeg",
-   "status": "imported",
-   "id": "4a392b2b-ed58-4214-9df1-1fad26297b66",
-   "bytes": 214877,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "bd0ab0f0-4f05-47ca-9f74-8b4527140ead",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-07-at-10.09.56-PM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.56-PM-1.jpeg",
-   "status": "imported",
-   "id": "91ddbdbd-6901-4cb6-ac0b-5997b139de03",
-   "bytes": 360679,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "35fcbd13-bea3-464c-8dab-92fed1432b62",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-07-at-10.09.56-PM-1.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM-2.jpeg",
-   "status": "imported",
-   "id": "833c2152-7efa-4532-9fbc-f826620ef94c",
-   "bytes": 214068,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "93891019-1efe-4f1c-9513-6cf31aba5d67",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM-2.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-04-at-8.27.44-PM.jpeg",
-   "status": "imported",
-   "id": "93f487c6-a6a7-4263-ac58-3a647cf7515a",
-   "bytes": 408990,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "bd2b6861-8eb9-4d4e-bdf6-b2f1474c3d83",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-04-at-8.27.44-PM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-04-at-8.27.44-PM-1.jpeg",
-   "status": "imported",
-   "id": "3d22c8f6-5efe-4ec9-b133-3d9879e5ab91",
-   "bytes": 376940,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "2915ca0e-453f-4fd4-8fe2-17589cd71366",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-04-at-8.27.44-PM-1.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-02-04-at-8.27.45-PM.jpeg",
-   "status": "imported",
-   "id": "037e481c-a22c-40cf-91ba-8cbfd10e0294",
-   "bytes": 452156,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "a046a9a7-ec66-4ec7-8238-f604bb0472e9",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-04-at-8.27.45-PM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-01-31-at-2.52.01-PM.jpeg",
-   "status": "imported",
-   "id": "17af0d69-0a38-4532-8c58-f33a3cdaf42c",
-   "bytes": 351518,
-   "mime": "image/jpeg",
-   "rights": "cleared"
+   "status": "already-imported",
+   "id": "085b1b78-ca41-4232-bce2-ae64c66fb914",
+   "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-01-31-at-2.52.01-PM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-01-31-at-2.52.02-PM.jpeg",
    "status": "imported",
-   "id": "5dc836fc-9e8d-4b60-ab29-15633a99bbda",
+   "id": "026757b3-5936-4d1f-a5a6-0755fabe83d8",
    "bytes": 300239,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -578,7 +486,7 @@
   {
    "path": "2026/02/WhatsApp-Image-2026-01-31-at-2.52.02-PM-1.jpeg",
    "status": "imported",
-   "id": "4be1df9a-7079-43b8-b346-c07c52f6f73b",
+   "id": "4a894750-ba01-4214-a4f0-a6f7e79f3ddc",
    "bytes": 296601,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -586,13 +494,13 @@
   {
    "path": "2026/02/WhatsApp-Image-2026-02-01-at-10.27.06-PM.jpeg",
    "status": "duplicate-of",
-   "id": "3c182850-6ad1-494d-b0c8-72838ef2f418",
+   "id": "83026c98-0b4c-4334-8a71-ae22527df263",
    "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-04-at-10.19.04-PM.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Image-2026-01-31-at-3.49.26-PM.jpeg",
    "status": "imported",
-   "id": "be31a825-e55f-43f8-aa4f-09c6b9adf893",
+   "id": "1eb4dcee-95df-4255-bdac-a209284b70c9",
    "bytes": 255334,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -600,7 +508,7 @@
   {
    "path": "2026/02/WhatsApp-Image-2026-01-30-at-11.05.57-AM.jpeg",
    "status": "imported",
-   "id": "14721ed6-259e-467c-aa4c-cc8dc4a130e1",
+   "id": "00e5604a-daa9-48ee-9487-e4cac3a8376f",
    "bytes": 204147,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -608,7 +516,7 @@
   {
    "path": "2026/02/WhatsApp-Image-2026-01-31-at-11.21.00-PM.jpeg",
    "status": "imported",
-   "id": "18dbb3ce-0d6e-4db8-bcee-2703f6ef60e4",
+   "id": "5b40048a-18ec-4feb-882b-14957f3f4137",
    "bytes": 134835,
    "mime": "image/jpeg",
    "rights": "cleared"
@@ -616,13 +524,13 @@
   {
    "path": "2026/02/WhatsApp-Image-2026-02-01-at-7.48.48-PM.jpeg",
    "status": "duplicate-of",
-   "id": "bab59d99-ca9d-4c42-ad50-f2dcd3342c0f",
+   "id": "ddc766cd-afc4-4f84-92e2-005c1a198d82",
    "duplicateOf": "https://hotrockhove.com/wp-content/uploads/2026/02/minted-lamb-chops.jpeg"
   },
   {
    "path": "2026/02/WhatsApp-Video-2026-02-25-at-11.28.29-AM.mp4",
    "status": "imported",
-   "id": "e37113fa-5387-473e-a73d-9938a4a7e9d0",
+   "id": "b03cdcfe-7615-4f9a-a0d4-5637b7e50111",
    "bytes": 7532195,
    "mime": "video/mp4",
    "rights": "cleared"
@@ -630,7 +538,7 @@
   {
    "path": "2026/02/revht.mp4",
    "status": "imported",
-   "id": "3a35e601-45ab-430c-87ab-d59178b2d79a",
+   "id": "aeb5c18b-bc2c-4786-a52b-68375bbcd5b2",
    "bytes": 4713147,
    "mime": "video/mp4",
    "rights": "cleared"
@@ -638,7 +546,7 @@
   {
    "path": "2026/02/WhatsApp-Video-2026-02-11-at-11.42.41-AM.mp4",
    "status": "imported",
-   "id": "e4e90ca4-5123-4ae9-a959-110b72bf85b1",
+   "id": "1c0362a2-9515-4df4-9324-b7e16f97dd31",
    "bytes": 584321,
    "mime": "video/mp4",
    "rights": "cleared"
@@ -646,7 +554,7 @@
   {
    "path": "2026/02/WhatsApp-Video-2026-02-11-at-11.34.34-AM-1-3.mp4",
    "status": "imported",
-   "id": "3bb4fee2-8463-414f-9cd3-64b9471a256f",
+   "id": "79103ecb-0642-48c6-b04a-76fd24871533",
    "bytes": 6200334,
    "mime": "video/mp4",
    "rights": "cleared"
@@ -654,7 +562,7 @@
   {
    "path": "2026/02/sun.mp4",
    "status": "imported",
-   "id": "e1b133fa-c199-4eec-9ca7-f3c881abe9a7",
+   "id": "64d858dc-2995-434d-aa0c-e598f7b869f8",
    "bytes": 15289763,
    "mime": "video/mp4",
    "rights": "cleared"
@@ -662,7 +570,7 @@
   {
    "path": "2026/02/WhatsApp-Video-2026-02-11-at-11.34.34-AM.mp4",
    "status": "imported",
-   "id": "9c4708ce-1c0b-4145-a08e-f38ce7fe65e3",
+   "id": "fb254404-8164-4562-abac-4f4183caadb0",
    "bytes": 1735361,
    "mime": "video/mp4",
    "rights": "cleared"
@@ -670,7 +578,7 @@
   {
    "path": "2026/02/WhatsApp-Video-2026-02-04-at-3.05.26-PM.mp4",
    "status": "imported",
-   "id": "27af77a2-ce4a-47cd-80b2-d07dc5b03afa",
+   "id": "a4740c98-9e1e-4ed2-9df6-9800fc13dc88",
    "bytes": 105937774,
    "mime": "video/mp4",
    "rights": "cleared"
@@ -678,7 +586,7 @@
   {
    "path": "2026/02/WhatsApp-Video-2026-01-31-at-11.35.48-PM-1.mp4",
    "status": "imported",
-   "id": "7d964cea-c658-435b-a04d-d6089760edd9",
+   "id": "4fa95e49-74cb-4951-b780-7f946ac50070",
    "bytes": 6209829,
    "mime": "video/mp4",
    "rights": "cleared"
@@ -686,7 +594,7 @@
   {
    "path": "2026/02/WhatsApp-Video-2026-02-01-at-8.07.08-PM.mp4",
    "status": "imported",
-   "id": "0580c578-22fa-42b8-9d3e-32eeddb59a51",
+   "id": "d4ff2412-2d24-4e2f-ba75-6947e63c231e",
    "bytes": 1068363,
    "mime": "video/mp4",
    "rights": "cleared"
@@ -694,7 +602,7 @@
   {
    "path": "2026/02/WhatsApp-Video-2026-02-01-at-8.07.08-PM-1.mp4",
    "status": "imported",
-   "id": "3acbc923-eca4-49ac-b9ae-6ce1893dcbec",
+   "id": "ad6d141e-4ae3-4c02-8295-aaad5ac88b3e",
    "bytes": 2345798,
    "mime": "video/mp4",
    "rights": "cleared"

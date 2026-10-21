@@ -134,7 +134,17 @@ export const featuresSchema = z.object({
 });
 
 export const storageSchema = z.object({
-  provider: z.enum(["s3", "cloudinary", "local"]),
+  provider: z.enum(["neon", "s3", "cloudinary", "local"]),
+  /**
+   * Neon Object Storage: credentials, endpoint and region come from the Neon-injected
+   * AWS_* environment variables (rotated by Neon), so only the bucket is configured here.
+   */
+  neon: z.object({
+    bucket: z.string().trim().max(63),
+    prefix: z.string().trim().max(100),
+    /** Optional CDN in front of the bucket (e.g. a Vercel/Cloudflare rewrite). Empty = the bucket's public URL. */
+    publicBaseUrl: z.union([z.literal(""), z.string().trim().url().startsWith("https://")]),
+  }),
   s3: z.object({
     bucket: z.string().trim().max(63),
     region: z.string().trim().max(40),
@@ -252,7 +262,8 @@ export const DEFAULTS: SettingsMap = {
     vrTourUrl: "",
   },
   storage: {
-    provider: "s3",
+    provider: "neon",
+    neon: { bucket: "hotrockhove", prefix: "site", publicBaseUrl: "" },
     s3: { bucket: "", region: "eu-west-2", accessKeyId: "", secretAccessKey: "", prefix: "hotrockhove", publicBaseUrl: "", endpoint: "" },
     cloudinary: { cloudName: "", apiKey: "", apiSecret: "", folder: "hotrockhove" },
   },

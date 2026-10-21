@@ -8,11 +8,11 @@
 | Styling | Tailwind CSS 4 + tokens in `src/app/globals.css` | Public site locked dark (brand); admin light. Sharp corners on the public site |
 | Fonts | Cormorant Garamond (display) + Inter (body) via `next/font` | The existing brand fonts, self-hosted |
 | Icons | Phosphor | |
-| Database | Neon Postgres (production) · PGlite (local) | Same SQL migrations for both |
+| Database | Neon Postgres 18 (project `hotrockhove`, branch `production`, aws-us-east-2) via postgres-js on the pooled `DATABASE_URL`; migrations over `DATABASE_URL_UNPOOLED` · PGlite (local) | Same SQL migrations for both |
 | ORM | Drizzle ORM + drizzle-kit SQL migrations in `drizzle/` | |
 | Auth | Better Auth, email + password, database sessions (12 h), sign-up disabled | Accounts created by the owner or `admin:create` |
 | Email | `EmailProvider` adapter: Resend (default) or SMTP (Nodemailer) | `src/lib/email` |
-| Media | `StorageAdapter`: **Amazon S3** (production, owner's choice; optional CloudFront), local disk (development only); Cloudinary kept as an alternative adapter | `src/lib/storage` |
+| Media | `StorageAdapter`: **Neon Object Storage** (production default: bucket `hotrockhove`, public_read, credentials injected by Neon as `AWS_*` env vars), Amazon S3 and Cloudinary as selectable alternatives, local disk for development | `src/lib/storage`, `neon.ts` |
 | Bot protection | Cloudflare Turnstile (when configured) + honeypot + Postgres-backed rate limits | |
 | Validation | Zod 4 everywhere (settings, sections, forms, actions) | |
 | Tests | node:test (unit) + Playwright (e2e, desktop + mobile) | |
@@ -78,5 +78,6 @@ The proxy reads redirects and the maintenance flag from `/api/internal/routing` 
 | Typed sections instead of a free-form page builder | Editors can't break layout or inject HTML; the design stays consistent |
 | Business details imported as "unconfirmed" | The old site contradicted itself; launch is blocked until a person confirms |
 | Table-request form kept as the Book Table fallback | Preserves the existing workflow until the separate booking system is ready |
-| S3 for media (owner decision 2026-10-20) | Owner preference; cheap at this volume; Cloudinary adapter kept, so switching back is a setting |
+| Neon Object Storage for media (owner decision 2026-10-21) | Same provider and branching as the database; no extra account. S3 stays available as an alternative |
+| S3 adapter (owner decision 2026-10-20) | Owner preference; cheap at this volume; Cloudinary adapter kept, so switching back is a setting |
 | Background audio, preloader and 360° tour not rebuilt | Rights and UX issues found in the audit (tour switch exists, off) |

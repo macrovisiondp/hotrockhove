@@ -9,3 +9,4 @@ test-results/
 .data/
 *.tsbuildinfo
 next-env.d.ts
+.neon

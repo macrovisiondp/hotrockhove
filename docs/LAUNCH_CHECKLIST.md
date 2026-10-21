@@ -30,7 +30,7 @@ Live status is on the admin **Dashboard → Launch readiness**, which checks rea
 | Neon project | Production database (`DATABASE_URL`) |
 | Resend account + API key | Email (owner pastes it in Admin → Email) |
 | Hostinger hPanel DNS access (or someone to apply records) | Resend DKIM, then the domain cutover |
-| AWS account: S3 bucket (eu-west-2) + IAM user access key (exact policies shown in Admin → Media → Storage settings); optional CloudFront | Media storage |
+| Neon Console: switch bucket `hotrockhove` to public_read (CLI can't change an existing bucket's access) | Media storage |
 | Cloudflare Turnstile keys | Form bot protection |
 | Trustindex account | Reviews widget |
 | Rank Math redirects export from WordPress (couldn't be read: HTTP 403) | Confirm no other old URLs need redirects |
@@ -39,7 +39,8 @@ Live status is on the admin **Dashboard → Launch readiness**, which checks rea
 ## C. Technical items before production
 
 - [ ] Neon database created, `0000_init.sql` applied, seeded, `pre-launch` branch taken (DEPLOYMENT §3)
-- [ ] S3 bucket, bucket policy, CORS and IAM key set up; storage **Test now** passes (upload + public read); `npm run media:import` run against production; poster images chosen for gallery videos; the 106 MB video ideally compressed
+- [x] Neon database migrated and seeded; 85 media files imported to the Neon bucket `hotrockhove` (2026-10-21)
+- [ ] Neon bucket `hotrockhove` switched to **public_read** in the Neon Console; storage **Test now** passes; poster images chosen for gallery videos; the 106 MB video ideally compressed
 - [ ] Production owner account created; dev account never created in production
 - [ ] Resend domain verified; test email received; delivery switched on
 - [ ] Turnstile keys set; a form tested with the widget

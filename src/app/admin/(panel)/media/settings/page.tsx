@@ -2,7 +2,7 @@ import Link from "next/link";
 import { can } from "@/lib/rbac";
 import { requirePermission } from "@/lib/session";
 import { getSettingFresh, maskSecret } from "@/lib/settings";
-import { s3PublicBase } from "@/lib/storage";
+import { neonPublicBase, neonStorageEnv, s3PublicBase } from "@/lib/storage";
 import { env } from "@/lib/env";
 import { ActionForm, Select, TextInput } from "@/components/admin/form";
 import { Badge, Card, Notice, PageHeader } from "@/components/admin/ui";
@@ -19,6 +19,7 @@ export default async function StorageSettings() {
   const prefix = s.s3.prefix || "hotrockhove";
   const bucket = s.s3.bucket || "YOUR-BUCKET";
   const origin = env().APP_URL;
+  const neonEnv = neonStorageEnv();
 
   const policy = JSON.stringify(
     {
@@ -56,18 +57,36 @@ export default async function StorageSettings() {
         }
       />
       <div className="space-y-6">
-        <Card title="Amazon S3" description="Photos and videos are stored in your S3 bucket and served publicly (directly, or through a CloudFront CDN if you add one).">
+        <Card title="Where uploads are stored">
           <ActionForm action={saveStorageAction} disabled={!canEdit}>
             <Select
               name="provider"
               label="Store new uploads in"
               defaultValue={s.provider}
               options={[
-                { value: "s3", label: "Amazon S3 (production)" },
+                { value: "neon", label: "Neon Object Storage (production)" },
+                { value: "s3", label: "Amazon S3 (alternative)" },
                 { value: "local", label: "This computer (development only)" },
                 { value: "cloudinary", label: "Cloudinary (alternative)" },
               ]}
+              hint="Files already uploaded stay where they are; this only affects new uploads."
             />
+            <fieldset className="space-y-4 rounded-md border border-[#e6e3de] p-4">
+              <legend className="px-1 text-sm font-semibold">Neon Object Storage</legend>
+              <p className="text-sm text-[#6b665e]">
+                Uses the Neon project&apos;s bucket. Neon provides and rotates the access keys through environment variables, so there&apos;s nothing secret to
+                enter here. Status:{" "}
+                {neonEnv ? <Badge tone="good">Connected ({new URL(neonEnv.endpoint).host})</Badge> : <Badge tone="warn">Neon storage variables not set</Badge>}
+              </p>
+              <div className="grid gap-4 md:grid-cols-3">
+                <TextInput name="neonBucket" label="Bucket" defaultValue={s.neon.bucket} hint="Declared in neon.ts with public_read access." />
+                <TextInput name="neonPrefix" label="Folder" defaultValue={s.neon.prefix} />
+                <TextInput name="neonPublicBaseUrl" label="CDN address (optional)" defaultValue={s.neon.publicBaseUrl} placeholder="https://media.hotrockhove.com" />
+              </div>
+              {neonEnv && <p className="text-xs text-[#6b665e]">Files are served from {neonPublicBase(s, neonEnv.endpoint)}/…</p>}
+            </fieldset>
+            <fieldset className="space-y-4 rounded-md border border-[#e6e3de] p-4">
+              <legend className="px-1 text-sm font-semibold">Amazon S3 (alternative)</legend>
             <div className="grid gap-4 md:grid-cols-2">
               <TextInput name="s3Bucket" label="Bucket name" defaultValue={s.s3.bucket} placeholder="hotrockhove-media" />
               <TextInput name="s3Region" label="Region" defaultValue={s.s3.region} placeholder="eu-west-2" hint="eu-west-2 is London." />
@@ -96,6 +115,7 @@ export default async function StorageSettings() {
               />
               <TextInput name="s3Endpoint" label="Custom endpoint (S3-compatible only)" defaultValue={s.s3.endpoint} placeholder="Leave empty for AWS" />
             </div>
+            </fieldset>
             {/* Cloudinary values are kept as an alternative provider. */}
             <input type="hidden" name="cloudName" value={s.cloudinary.cloudName} />
             <input type="hidden" name="apiKey" value={s.cloudinary.apiKey} />
@@ -104,14 +124,14 @@ export default async function StorageSettings() {
         </Card>
 
         {canEdit && (
-          <Card title="Test" description="Uploads a tiny file, reads it back from the public URL, then deletes it. Save changes first.">
+          <Card title="Test" description="Uploads a tiny file, reads it back from the public URL, then deletes it. For Neon it also sets the bucket's CORS rules so videos can be uploaded from the browser. Save changes first.">
             <ActionForm action={testStorageAction} submitLabel="Test now" showCancel={false} compact>
               <span />
             </ActionForm>
           </Card>
         )}
 
-        <Card title="Bucket setup (one-time, in the AWS console)">
+        <Card title="Amazon S3 bucket setup (only if you switch to S3)">
           <ol className="list-decimal space-y-4 pl-5 text-sm text-[#3a3733]">
             <li>
               Create the bucket in <strong>eu-west-2 (London)</strong>. Keep <em>Object Ownership: bucket owner enforced</em> (no ACLs). Under <em>Block public

@@ -63,7 +63,7 @@ export default async function MediaAdmin({ searchParams }: PageProps<"/admin/med
       )}
       {storage.provider === "local" && (
         <div className="mb-4">
-          <Notice tone="info">Development mode: files are stored on this computer. Configure the S3 bucket before launch.</Notice>
+          <Notice tone="info">Development mode: files are stored on this computer. Production uses Neon Object Storage.</Notice>
         </div>
       )}
 
@@ -77,9 +77,9 @@ export default async function MediaAdmin({ searchParams }: PageProps<"/admin/med
               </label>
             </ActionForm>
             {storage.provider === "local" ? (
-              <p className="text-sm text-[#6b665e]">Videos upload straight from your browser to the S3 bucket, so they&apos;re available once S3 is configured.</p>
+              <p className="text-sm text-[#6b665e]">Videos upload straight from your browser to the S3 bucket, so they&apos;re available with Neon or S3 storage.</p>
             ) : (
-              <VideoUploader maxMb={storage.provider === "s3" ? 500 : 100} />
+              <VideoUploader maxMb={storage.provider === "cloudinary" ? 100 : 500} />
             )}
           </div>
         </Card>

@@ -36,6 +36,8 @@
     "@aws-sdk/client-s3": "^3.1154.0",
     "@aws-sdk/s3-request-presigner": "^3.1154.0",
     "@electric-sql/pglite": "^0.5.10",
+    "@neon/config": "^1.9.2",
+    "@neon/env": "^1.6.3",
     "@phosphor-icons/react": "^2.1.10",
     "better-auth": "^1.7.12",
     "cloudinary": "^2.11.0",

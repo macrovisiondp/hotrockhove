@@ -102,15 +102,16 @@ export async function readinessChecks(): Promise<Check[]> {
       : "Turnstile keys are not set (Vercel environment variables). Forms still use a honeypot and rate limits.",
     href: "/admin/site",
   });
+  const neonReady = storage.provider === "neon" && Boolean(storage.neon.bucket && process.env.AWS_ENDPOINT_URL_S3 && process.env.AWS_ACCESS_KEY_ID);
   const s3Ready = storage.provider === "s3" && storage.s3.bucket && storage.s3.region && storage.s3.accessKeyId && storage.s3.secretAccessKey;
   const cloudReady = storage.provider === "cloudinary" && storage.cloudinary.cloudName && storage.cloudinary.apiKey && storage.cloudinary.apiSecret;
-  const providerName = storage.provider === "cloudinary" ? "Cloudinary" : "S3";
+  const providerName = storage.provider === "cloudinary" ? "Cloudinary" : storage.provider === "neon" ? "Neon Object Storage" : "S3";
   add({
     id: "storage",
     label: "Media storage",
-    status: (s3Ready || cloudReady) && localMedia.n === 0 ? "ok" : "blocker",
-    detail: !(s3Ready || cloudReady)
-      ? "The S3 bucket is not configured. Uploads only work in local development."
+    status: (neonReady || s3Ready || cloudReady) && localMedia.n === 0 ? "ok" : "blocker",
+    detail: !(neonReady || s3Ready || cloudReady)
+      ? "Media storage is not connected (Neon storage variables or S3 keys missing). Uploads only work in local development."
       : localMedia.n > 0
         ? `${localMedia.n} file(s) are still on local development storage. Run the media import against ${providerName}.`
         : `${providerName} configured; all media is stored there. Use “Test now” on the storage page to confirm public access.`,

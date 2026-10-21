@@ -7,15 +7,16 @@
 | Service | Purpose | Plan | Who owns the account |
 |---|---|---|---|
 | Vercel | Hosting, previews, cron | Hobby works for testing; Pro is needed for commercial use (owner decision, recurring cost) | Owner |
-| Neon | Postgres database | Free tier is enough for this data volume | Owner |
+| Neon | Postgres database **and Object Storage** (project `hotrockhove`, `little-dust-67280624`, aws-us-east-2) | Free tier is enough for this data volume | Owner |
 | Resend | Transactional email | Free tier (a few thousand emails a month, with a daily cap; confirm current limits on resend.com/pricing) | Owner |
-| Amazon S3 (+ optional CloudFront) | Images and video | Pay as you go: storage for ~0.25 GB is pennies a month; data transfer is billed per GB beyond AWS's free allowance | Owner |
+| Amazon S3 (+ optional CloudFront) | Alternative media storage (not used by default) | Pay as you go: storage for ~0.25 GB is pennies a month; data transfer is billed per GB beyond AWS's free allowance | Owner |
 | Cloudflare Turnstile | Bot protection on forms | Free | Owner |
 
 ## 2. Environment variables (Vercel → Project → Settings → Environment Variables)
 
 | Variable | Required | Value |
 |---|---|---|
+| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION` | yes (Neon storage) | Neon Object Storage credentials for the branch, from `neon env pull` / the Neon integration. Neon rotates them |
 | `DATABASE_URL` | yes | Neon **pooled** connection string (`…-pooler…/neondb?sslmode=require`). Use a separate Neon branch for Preview |
 | `APP_URL` | yes | `https://hotrockhove.com` (Production) or the preview URL |
 | `BETTER_AUTH_SECRET` | yes | 32+ random bytes, base64. Different per environment |
@@ -33,8 +34,8 @@ Never commit real values. `.env.example` has placeholders only.
 
 | Question | Answer |
 |---|---|
-| Is a migration required before deploying? | **Yes**, on a new Neon database: `drizzle/0000_init.sql` (creates all tables) then `drizzle/0001_storage_s3.sql` (adds `s3` to the storage-provider type). `npm run db:migrate` applies both in order |
-| Exact files | `drizzle/0000_init.sql`, `drizzle/0001_storage_s3.sql` (journal: `drizzle/meta/_journal.json`) |
+| Is a migration required before deploying? | **Yes**, on a new Neon database: `drizzle/0000_init.sql` (creates all tables) then `drizzle/0001_storage_s3.sql` and `drizzle/0002_storage_neon.sql` (each adds a storage-provider value). `npm run db:migrate` applies all in order. **Applied to Neon `production` on 2026-10-21** |
+| Exact files | `drizzle/0000_init.sql`, `drizzle/0001_storage_s3.sql`, `drizzle/0002_storage_neon.sql` (journal: `drizzle/meta/_journal.json`) |
 | Tested? | Yes: both applied to the local PGlite database (Postgres 17), `0001` as an upgrade on top of existing data; the app and e2e suite ran against it. **Not yet run on Neon.** |
 | Safe order | 1. Create Neon project and branch → 2. `DATABASE_URL=… npm run db:migrate` → 3. `npm run db:seed` → 4. configure S3 in Admin → Media → Storage settings, then `npm run media:import` → 5. `npm run db:seed -- --force=pages,offers,popups,menu` (fresh DB only) → 6. `npm run admin:create -- --email … --role owner` → 7. deploy |
 | Backward compatible? | `0001` only adds an enum value (additive). No earlier version of this app is deployed. Future migrations must be additive (new tables/columns with defaults) so the running version keeps working during deploys |

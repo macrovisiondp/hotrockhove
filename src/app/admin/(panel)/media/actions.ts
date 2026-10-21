@@ -11,6 +11,7 @@ import { db, t } from "@/db";
 import { audit } from "@/lib/audit";
 import { failure, guarded, str, success, zodFailure, type ActionState } from "@/lib/actions";
 import { assertPermission } from "@/lib/session";
+import { deploymentOrigins } from "@/lib/env";
 import { getSettingFresh, mergeSecret, saveSetting, validateSetting } from "@/lib/settings";
 import {
   buildAdapter,
@@ -24,6 +25,8 @@ import {
   MAX_IMAGE_BYTES,
   MAX_VIDEO_BYTES,
   presignS3Upload,
+  neonConfig,
+  applyBucketCors,
   S3_CACHE_CONTROL,
   s3Config,
   s3PublicUrl,
@@ -213,7 +216,7 @@ export async function requestVideoUploadAction(input: { filename: string; conten
     const req = videoRequest.safeParse(input);
     if (!req.success) return { ok: false, message: "Choose an MP4 or WebM video." };
     const s = await getSettingFresh("storage");
-    if (s.provider === "s3") {
+    if (s.provider === "s3" || s.provider === "neon") {
       if (req.data.bytes > MAX_VIDEO_BYTES) return { ok: false, message: "Videos must be under 500 MB. Compress it first (e.g. HandBrake, 1080p, H.264)." };
       const safeName = req.data.filename.replace(/[^A-Za-z0-9.]+/g, "-").toLowerCase().slice(-80);
       const key = `${new Date().getUTCFullYear()}/videos/${randomUUID()}-${safeName}`;
@@ -246,8 +249,8 @@ export async function registerVideoAction(ref: string, filename: string): Promis
     const s = await getSettingFresh("storage");
     let values: typeof t.mediaAssets.$inferInsert;
 
-    if (s.provider === "s3") {
-      const { client, bucket, prefix, publicBase } = s3Config(s);
+    if (s.provider === "s3" || s.provider === "neon") {
+      const { client, bucket, prefix, publicBase } = s.provider === "neon" ? neonConfig(s) : s3Config(s);
       if (!/^[A-Za-z0-9._\-/]{1,400}$/.test(ref) || (prefix && !ref.startsWith(prefix + "/"))) return { ok: false, message: "Invalid upload reference." };
       const head = await client.send(new HeadObjectCommand({ Bucket: bucket, Key: ref }));
       const bytes = head.ContentLength ?? 0;
@@ -258,7 +261,7 @@ export async function registerVideoAction(ref: string, filename: string): Promis
         return { ok: false, message: "That file isn't a supported video, so it was removed." };
       }
       values = {
-        provider: "s3",
+        provider: s.provider,
         storageKey: ref,
         url: s3PublicUrl(publicBase, ref),
         posterUrl: null,
@@ -267,7 +270,7 @@ export async function registerVideoAction(ref: string, filename: string): Promis
         bytes,
         width: null,
         height: null,
-        sha256: createHash("sha256").update(`s3:${bucket}:${ref}:${head.ETag ?? ""}`).digest("hex"),
+        sha256: createHash("sha256").update(`${s.provider}:${bucket}:${ref}:${head.ETag ?? ""}`).digest("hex"),
         altStatus: "missing",
         uploadedById: user.id,
       };
@@ -308,7 +311,7 @@ export async function registerVideoAction(ref: string, filename: string): Promis
     await audit("media.upload", { actorUserId: user.id, entityType: "media", entityId: row?.id, metadata: { filename, bytes: values.bytes, video: true } });
     return {
       ok: true,
-      message: s.provider === "s3" ? "Video uploaded. Open it to choose a poster image and add a description." : "Video uploaded.",
+      message: s.provider !== "cloudinary" ? "Video uploaded. Open it to choose a poster image and add a description." : "Video uploaded.",
       id: row?.id,
     };
   } catch {
@@ -345,22 +348,27 @@ export async function saveStorageAction(_prev: ActionState, fd: FormData): Promi
     const current = await getSettingFresh("storage");
     const newS3Secret = str(fd, "s3SecretAccessKey");
     const newCloudinarySecret = str(fd, "apiSecret");
-    const keyChanged = str(fd, "s3AccessKeyId") !== current.s3.accessKeyId;
+    const keyChanged = fd.has("s3AccessKeyId") && str(fd, "s3AccessKeyId") !== current.s3.accessKeyId;
     if (newS3Secret || newCloudinarySecret || (keyChanged && current.s3.accessKeyId)) {
       const owner = await assertPermission("secrets.edit").catch(() => null);
       if (!owner) return failure("Only the owner can change storage access keys.");
     }
     const provider = str(fd, "provider");
     const next = {
-      provider: (provider === "local" ? "local" : provider === "cloudinary" ? "cloudinary" : "s3") as "s3" | "cloudinary" | "local",
+      provider: (["neon", "s3", "cloudinary", "local"].includes(provider) ? provider : "neon") as "neon" | "s3" | "cloudinary" | "local",
+      neon: {
+        bucket: str(fd, "neonBucket").toLowerCase() || current.neon.bucket,
+        prefix: str(fd, "neonPrefix").replace(/^\/+|\/+$/g, "") || current.neon.prefix,
+        publicBaseUrl: str(fd, "neonPublicBaseUrl").replace(/\/+$/, ""),
+      },
       s3: {
-        bucket: str(fd, "s3Bucket").toLowerCase(),
-        region: str(fd, "s3Region"),
-        accessKeyId: str(fd, "s3AccessKeyId"),
+        bucket: fd.has("s3Bucket") ? str(fd, "s3Bucket").toLowerCase() : current.s3.bucket,
+        region: fd.has("s3Region") ? str(fd, "s3Region") : current.s3.region,
+        accessKeyId: fd.has("s3AccessKeyId") ? str(fd, "s3AccessKeyId") : current.s3.accessKeyId,
         secretAccessKey: mergeSecret(current.s3.secretAccessKey, newS3Secret),
-        prefix: str(fd, "s3Prefix").replace(/^\/+|\/+$/g, "") || "hotrockhove",
-        publicBaseUrl: str(fd, "s3PublicBaseUrl").replace(/\/+$/, ""),
-        endpoint: str(fd, "s3Endpoint").replace(/\/+$/, ""),
+        prefix: fd.has("s3Prefix") ? str(fd, "s3Prefix").replace(/^\/+|\/+$/g, "") || "hotrockhove" : current.s3.prefix,
+        publicBaseUrl: fd.has("s3PublicBaseUrl") ? str(fd, "s3PublicBaseUrl").replace(/\/+$/, "") : current.s3.publicBaseUrl,
+        endpoint: fd.has("s3Endpoint") ? str(fd, "s3Endpoint").replace(/\/+$/, "") : current.s3.endpoint,
       },
       cloudinary: {
         cloudName: str(fd, "cloudName") || current.cloudinary.cloudName,
@@ -390,6 +398,10 @@ export async function testStorageAction(): Promise<ActionState> {
     await assertPermission("settings.edit");
     const s = await getSettingFresh("storage");
     try {
+      if (s.provider === "neon") {
+        // Browser video uploads need the site's origins in the bucket's CORS rules.
+        await applyBucketCors(neonConfig(s), deploymentOrigins());
+      }
       const r = await buildAdapter(s.provider, s).testConnection();
       return r.ok ? success(r.message) : failure(r.message);
     } catch (err) {

@@ -32,6 +32,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**.cloudfront.net" },
       { protocol: "https", hostname: "res.cloudinary.com" },
       ...(process.env.MEDIA_PUBLIC_HOST ? [{ protocol: "https" as const, hostname: process.env.MEDIA_PUBLIC_HOST }] : []),
+      // Neon Object Storage endpoint (public_read bucket), injected by Neon.
+      ...(process.env.AWS_ENDPOINT_URL_S3 ? [{ protocol: "https" as const, hostname: new URL(process.env.AWS_ENDPOINT_URL_S3).hostname }] : []),
     ],
     localPatterns: [{ pathname: "/brand/**" }, { pathname: "/media/**" }],
     formats: ["image/avif", "image/webp"],

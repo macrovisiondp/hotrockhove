@@ -1,7 +1,7 @@
 import "server-only";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { DeleteObjectCommand, HeadBucketCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, HeadBucketCommand, PutBucketCorsCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v2 as cloudinary, type UploadApiResponse } from "cloudinary";
 import type { StorageProviderName } from "@/db/schema";
@@ -132,6 +132,51 @@ function cloudinaryAdapter(s: StorageSettings): StorageAdapter {
 
 type S3Ready = { client: S3Client; bucket: string; prefix: string; publicBase: string };
 
+/* ----------------------------- Neon Object Storage ----------------------------- */
+
+/** True when Neon's AWS_* storage variables are present (after `neon deploy` / `neon env pull`). */
+export function neonStorageEnv() {
+  const e = process.env;
+  if (!e.AWS_ENDPOINT_URL_S3 || !e.AWS_ACCESS_KEY_ID || !e.AWS_SECRET_ACCESS_KEY) return null;
+  return {
+    endpoint: e.AWS_ENDPOINT_URL_S3.replace(/\/+$/, ""),
+    region: e.AWS_REGION || "us-east-1",
+    accessKeyId: e.AWS_ACCESS_KEY_ID,
+    secretAccessKey: e.AWS_SECRET_ACCESS_KEY,
+  };
+}
+
+/** Public base for a `public_read` Neon bucket: `${AWS_ENDPOINT_URL_S3}/<bucket>`, or the configured CDN. */
+export function neonPublicBase(s: StorageSettings, endpoint = process.env.AWS_ENDPOINT_URL_S3 ?? ""): string {
+  if (s.neon.publicBaseUrl) return s.neon.publicBaseUrl.replace(/\/+$/, "");
+  return `${endpoint.replace(/\/+$/, "")}/${s.neon.bucket}`;
+}
+
+export function neonConfig(s: StorageSettings): S3Ready {
+  const env = neonStorageEnv();
+  if (!env) throw new StorageNotConfiguredError("Neon storage variables are missing (AWS_ENDPOINT_URL_S3, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY). Run `neon deploy` / `neon env pull`, or add them in Vercel.");
+  if (!s.neon.bucket) throw new StorageNotConfiguredError("Set the Neon bucket name (Admin → Media → Storage settings).");
+  const client = new S3Client({
+    region: env.region,
+    endpoint: env.endpoint,
+    forcePathStyle: true, // Neon requires path-style addressing
+    credentials: { accessKeyId: env.accessKeyId, secretAccessKey: env.secretAccessKey },
+  });
+  return { client, bucket: s.neon.bucket, prefix: s.neon.prefix.replace(/^\/+|\/+$/g, ""), publicBase: neonPublicBase(s, env.endpoint) };
+}
+
+/** Allow the site's own origins to PUT directly to the bucket (presigned browser video uploads). */
+export async function applyBucketCors(cfg: S3Ready, origins: string[]) {
+  await cfg.client.send(
+    new PutBucketCorsCommand({
+      Bucket: cfg.bucket,
+      CORSConfiguration: {
+        CORSRules: [{ AllowedOrigins: origins, AllowedMethods: ["PUT"], AllowedHeaders: ["Content-Type", "Cache-Control"], MaxAgeSeconds: 3000 }],
+      },
+    }),
+  );
+}
+
 export function s3Config(s: StorageSettings): S3Ready {
   const c = s.s3;
   const secret = revealSecret(c.secretAccessKey);
@@ -164,16 +209,16 @@ export function s3ObjectKey(prefix: string, key: string): string {
 /** Long-lived caching: every upload gets a unique key, and replacements get a new key too. */
 export const S3_CACHE_CONTROL = "public, max-age=31536000, immutable";
 
-function s3Adapter(s: StorageSettings): StorageAdapter {
-  const { client, bucket, prefix, publicBase } = s3Config(s);
+function s3Adapter(s: StorageSettings, which: "s3" | "neon" = "s3"): StorageAdapter {
+  const { client, bucket, prefix, publicBase } = which === "neon" ? neonConfig(s) : s3Config(s);
   return {
-    provider: "s3",
+    provider: which,
     async upload({ key, body, contentType }) {
       const objectKey = s3ObjectKey(prefix, key);
       await client.send(
         new PutObjectCommand({ Bucket: bucket, Key: objectKey, Body: body, ContentType: contentType, CacheControl: S3_CACHE_CONTROL }),
       );
-      return { provider: "s3", storageKey: objectKey, url: s3PublicUrl(publicBase, objectKey), posterUrl: null, width: null, height: null };
+      return { provider: which, storageKey: objectKey, url: s3PublicUrl(publicBase, objectKey), posterUrl: null, width: null, height: null };
     },
     async delete(storageKey) {
       await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: storageKey }));
@@ -210,7 +255,10 @@ function s3Adapter(s: StorageSettings): StorageAdapter {
         ? { ok: true, message: `Connected to bucket "${bucket}". Uploads work and files are publicly served from ${publicBase}.` }
         : {
             ok: false,
-            message: `Uploads work, but files aren't publicly readable at ${publicBase}. Add the bucket policy (or CloudFront) from the storage settings page.`,
+            message:
+              which === "neon"
+                ? `Uploads work, but files aren't publicly readable at ${publicBase}. Set the bucket's access level to public_read in the Neon Console (Object storage tab); for a new bucket, declare access: "public_read" in neon.ts and run neon deploy.`
+                : `Uploads work, but files aren't publicly readable at ${publicBase}. Add the bucket policy (or CloudFront) from the storage settings page.`,
           };
     },
   };
@@ -218,7 +266,7 @@ function s3Adapter(s: StorageSettings): StorageAdapter {
 
 /** Presigned PUT for browser → S3 uploads (large videos). Valid for 15 minutes. */
 export async function presignS3Upload(s: StorageSettings, key: string, contentType: string, bytes: number) {
-  const { client, bucket, prefix, publicBase } = s3Config(s);
+  const { client, bucket, prefix, publicBase } = s.provider === "neon" ? neonConfig(s) : s3Config(s);
   const objectKey = s3ObjectKey(prefix, key);
   const url = await getSignedUrl(
     client,
@@ -234,6 +282,7 @@ export async function presignS3Upload(s: StorageSettings, key: string, contentTy
 
 export function buildAdapter(provider: StorageProviderName, s: StorageSettings): StorageAdapter {
   if (provider === "local") return localAdapter();
+  if (provider === "neon") return s3Adapter(s, "neon");
   if (provider === "s3") return s3Adapter(s);
   return cloudinaryAdapter(s);
 }

@@ -51,7 +51,7 @@ export default async function MediaDetail({ params }: PageProps<"/admin/media/[i
                 {m.width && m.height ? ` · ${m.width}×${m.height}` : ""}
               </dd>
               <dt className="text-[#6b665e]">Stored on</dt>
-              <dd>{m.provider === "s3" ? "Amazon S3" : m.provider === "cloudinary" ? "Cloudinary" : "Local (development)"}</dd>
+              <dd>{m.provider === "neon" ? "Neon Object Storage" : m.provider === "s3" ? "Amazon S3" : m.provider === "cloudinary" ? "Cloudinary" : "Local (development)"}</dd>
               <dt className="text-[#6b665e]">Added</dt>
               <dd>{formatDateTime(m.createdAt)}</dd>
               {m.sourceUrl && (
