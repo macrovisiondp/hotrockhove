@@ -27,6 +27,7 @@ export type Offer = {
   priceText: string;
   promoCode: string;
   stage: string;
+  imageId: string | null;
 };
 
 export type SectionContext = {
@@ -207,7 +208,20 @@ function VideoFeature({ s, ctx }: { s: SectionOf<"video">; ctx: SectionContext }
   );
 }
 
-function PriceRow({ name, price, description }: { name: string; price: string; description: string }) {
+function PriceRow({ name, price, description, image }: { name: string; price: string; description: string; image?: PublicMedia }) {
+  // Items without a photo keep the plain text layout.
+  if (image) {
+    return (
+      <div className="flex gap-4 sm:gap-5">
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden bg-ink-900 sm:h-24 sm:w-24">
+          <MediaImage media={image} sizes="96px" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <PriceRow name={name} price={price} description={description} />
+        </div>
+      </div>
+    );
+  }
   return (
     <div>
       <div className="flex items-baseline gap-3">
@@ -280,7 +294,13 @@ function FullMenu({ s, ctx, first }: { s: SectionOf<"menu">; ctx: SectionContext
                   </div>
                   <div className="grid gap-x-14 gap-y-9 md:grid-cols-2">
                     {c.items.map((i) => (
-                      <PriceRow key={i.id} name={i.name} price={i.priceText} description={i.description} />
+                      <PriceRow
+                        key={i.id}
+                        name={i.name}
+                        price={i.priceText}
+                        description={i.description}
+                        image={i.imageId ? ctx.media.get(i.imageId) : undefined}
+                      />
                     ))}
                   </div>
                 </div>
@@ -305,21 +325,33 @@ function Offers({ s, ctx }: { s: SectionOf<"offers">; ctx: SectionContext }) {
       <Heading eyebrow={s.eyebrow} heading={s.heading} className="max-w-3xl" />
       {s.body && <RichText text={s.body} className="mt-6 max-w-[62ch] leading-relaxed text-stone" />}
       <div className="mt-14 grid gap-px bg-ink-700 md:grid-cols-2">
-        {current.map((o) => (
-          <article key={o.id} className="flex flex-col bg-ink-950 p-8 lg:p-10">
-            <h3 className="display text-3xl text-bone lg:text-4xl">{o.title}</h3>
-            {o.tagline && <p className="mt-2 text-bronze">{o.tagline}</p>}
-            {o.body && <RichText text={o.body} className="mt-5 flex-1 leading-relaxed text-stone" />}
-            {(o.priceText || o.promoCode) && <div className="mt-8 flex flex-wrap items-end justify-between gap-4 border-t border-ink-800 pt-6">
-              {o.priceText ? <p className="display text-4xl text-bone">{o.priceText}</p> : <span />}
-              {o.promoCode && (
-                <p className="text-sm text-stone">
-                  Code <span className="ml-1 border border-bronze/60 px-2 py-1 font-semibold tracking-[0.14em] text-bone">{o.promoCode}</span>
-                </p>
+        {current.map((o) => {
+          const img = o.imageId ? ctx.media.get(o.imageId) : undefined;
+          return (
+            <article key={o.id} className="flex flex-col bg-ink-950">
+              {img && (
+                <div className="relative aspect-[5/4] overflow-hidden bg-ink-900">
+                  <MediaImage media={img} sizes="(min-width: 768px) 50vw, 100vw" />
+                </div>
               )}
-            </div>}
-          </article>
-        ))}
+              <div className="flex flex-1 flex-col p-8 lg:p-10">
+                <h3 className="display text-3xl text-bone lg:text-4xl">{o.title}</h3>
+                {o.tagline && <p className="mt-2 text-bronze">{o.tagline}</p>}
+                {o.body && <RichText text={o.body} className="mt-5 flex-1 leading-relaxed text-stone" />}
+                {(o.priceText || o.promoCode) && (
+                  <div className="mt-8 flex flex-wrap items-end justify-between gap-4 border-t border-ink-800 pt-6">
+                    {o.priceText ? <p className="display text-4xl text-bone">{o.priceText}</p> : <span />}
+                    {o.promoCode && (
+                      <p className="text-sm text-stone">
+                        Code <span className="ml-1 border border-bronze/60 px-2 py-1 font-semibold tracking-[0.14em] text-bone">{o.promoCode}</span>
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </article>
+          );
+        })}
       </div>
       {upcoming.length > 0 && (
         <div className="mt-14">

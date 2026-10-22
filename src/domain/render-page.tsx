@@ -85,7 +85,11 @@ export async function PageContent({ page }: { page: Pick<PublicPage, "slug" | "t
     formKeys.length ? db.select().from(t.forms).where(inArray(t.forms.key, formKeys)) : Promise.resolve([]),
   ]);
 
-  const mediaIds = [...sectionMediaIds(page.sections), ...menu.flatMap((c) => c.items.map((i) => i.imageId ?? ""))];
+  const mediaIds = [
+    ...sectionMediaIds(page.sections),
+    ...menu.flatMap((c) => c.items.map((i) => i.imageId ?? "")),
+    ...offers.map((o) => o.imageId ?? ""),
+  ];
   const media = await getMediaByIds(mediaIds);
 
   const ctx: SectionContext = {

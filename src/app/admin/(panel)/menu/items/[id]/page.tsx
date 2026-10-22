@@ -106,7 +106,7 @@ export default async function MenuItemPage({ params, searchParams }: PageProps<"
                 ]}
               />
             </div>
-            <MediaField name="imageId" label="Photo (optional)" defaultId={item?.imageId} type="image" hint="Used beside menu highlights." />
+            <MediaField name="imageId" label="Photo (optional)" defaultId={item?.imageId} type="image" hint="Shown as a small photo beside the item on the menu page (and used by the homepage menu highlights). Leave empty to show the item as text only." />
           </div>
           {item?.reviewNote && (
             <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-3">
