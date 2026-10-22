@@ -9,6 +9,7 @@ import type { Cta, Section, SectionOf } from "@/domain/sections";
 import type { BusinessSettings, FeatureSettings } from "@/lib/settings";
 import { formatAddress, groupHours, telHref } from "@/lib/settings";
 import { submitFormAction, subscribeAction } from "@/app/(site)/actions";
+import { ConsentFrame } from "./consent-frame";
 import { GalleryGrid } from "./gallery-grid";
 import { HeroVideo } from "./hero-video";
 import { MediaImage, MediaVideo, cloudinaryTransform } from "./media";
@@ -69,6 +70,30 @@ function Hero({ s, ctx, first }: { s: SectionOf<"hero">; ctx: SectionContext; fi
   const vid = s.videoId ? ctx.media.get(s.videoId) : undefined;
   const hasMedia = Boolean(img || vid);
   const H = first ? "h1" : "h2";
+  if (img && s.mediaStyle === "float") {
+    // Cut-out image (e.g. Daisy's balloon) drifting beside the text. "lighten" blends a
+    // black photo background into the dark page so only the subject shows.
+    return (
+      <section className="relative isolate overflow-hidden">
+        {/* Opaque base: the section is an isolated layer, so the blend needs a solid backdrop inside it. */}
+        <div className="absolute inset-0 -z-10 bg-ink-950 bg-[radial-gradient(ellipse_at_70%_45%,rgb(160_82_45/0.18),transparent_60%)]" />
+        <div className={`${wrap} grid min-h-[80dvh] items-center gap-8 pb-16 pt-32 lg:grid-cols-[1.1fr_1fr] lg:pb-20 lg:pt-36`}>
+          <div className="max-w-3xl animate-rise">
+            {s.eyebrow && <p className="eyebrow mb-5">{s.eyebrow}</p>}
+            <H className="display text-5xl text-bone sm:text-6xl lg:text-[5.2rem]">{s.heading}</H>
+            {s.body && <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-bone/85">{s.body}</p>}
+            <div className="mt-9 flex flex-wrap gap-3">
+              <CtaLink cta={s.primaryCta} ctx={ctx} variant="primary" />
+              <CtaLink cta={s.secondaryCta} ctx={ctx} variant="ghost" />
+            </div>
+          </div>
+          <div className="relative mx-auto aspect-[4/5] w-full max-w-[520px] animate-float mix-blend-lighten">
+            <MediaImage media={img} sizes="(min-width: 1024px) 40vw, 90vw" priority={first} fit="contain" />
+          </div>
+        </div>
+      </section>
+    );
+  }
   if (!hasMedia) {
     return (
       <section className={`${wrap} pb-12 pt-32 lg:pb-16 lg:pt-40`}>
@@ -396,7 +421,8 @@ function ContactDetails({ business, compact = false }: { business: BusinessSetti
 function Visit({ s, ctx }: { s: SectionOf<"visit">; ctx: SectionContext }) {
   const img = s.mediaId ? ctx.media.get(s.mediaId) : undefined;
   const b = ctx.business;
-  if (!formatAddress(b) && !b.phone && b.hours.length === 0) return null;
+  const address = formatAddress(b);
+  if (!address && !b.phone && b.hours.length === 0) return null;
   return (
     <section className="relative isolate overflow-hidden border-t border-ink-800">
       <div className={`grid lg:grid-cols-2`}>
@@ -416,11 +442,51 @@ function Visit({ s, ctx }: { s: SectionOf<"visit">; ctx: SectionContext }) {
             )}
           </div>
         </div>
-        {img && (
-          <div className="relative min-h-[360px] lg:min-h-full">
-            <MediaImage media={img} sizes="(min-width: 1024px) 50vw, 100vw" />
+        {s.showMap && address ? (
+          <div className="relative h-[420px] lg:h-auto lg:min-h-full">
+            <ConsentFrame
+              src={googleMapEmbed(address)}
+              title={`Map: ${address}`}
+              loadLabel="Show map"
+              notice="The map is provided by Google, which may set its own cookies."
+              className="absolute inset-0 grayscale-[35%]"
+            />
           </div>
+        ) : (
+          img && (
+            <div className="relative min-h-[360px] lg:min-h-full">
+              <MediaImage media={img} sizes="(min-width: 1024px) 50vw, 100vw" />
+            </div>
+          )
         )}
+      </div>
+    </section>
+  );
+}
+
+/** Keyless Google Maps embed for an address (same kind of map the old site used). */
+function googleMapEmbed(address: string) {
+  return `https://www.google.com/maps?q=${encodeURIComponent(address)}&z=15&output=embed`;
+}
+
+function Tour({ s, ctx }: { s: SectionOf<"tour">; ctx: SectionContext }) {
+  const { vrTourEnabled, vrTourUrl } = ctx.features;
+  if (!vrTourEnabled || !vrTourUrl) return null;
+  return (
+    <section className={`${wrap} py-24 lg:py-32`}>
+      <div className="max-w-3xl">
+        <Heading eyebrow={s.eyebrow} heading={s.heading} />
+        {s.body && <p className="mt-6 max-w-[56ch] text-lg leading-relaxed text-stone">{s.body}</p>}
+      </div>
+      <div className="reveal relative mt-12 aspect-[4/5] w-full overflow-hidden border border-ink-800 bg-ink-900 sm:aspect-video">
+        <ConsentFrame
+          src={vrTourUrl}
+          title={s.heading ? `${s.heading}: 360° virtual tour` : "360° virtual tour"}
+          loadLabel="Start the 3D tour"
+          notice="The 360° tour is hosted by a third party, which may set its own cookies."
+          allow="fullscreen; gyroscope; accelerometer; xr-spatial-tracking"
+          className="absolute inset-0"
+        />
       </div>
     </section>
   );
@@ -543,6 +609,8 @@ export function RenderSections({ sections, ctx }: { sections: Section[]; ctx: Se
             return <Reviews key={s.id} s={s} ctx={ctx} />;
           case "visit":
             return <Visit key={s.id} s={s} ctx={ctx} />;
+          case "tour":
+            return <Tour key={s.id} s={s} ctx={ctx} />;
           case "cta":
             return <CtaBand key={s.id} s={s} ctx={ctx} />;
           case "form":

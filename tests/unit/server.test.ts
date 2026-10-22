@@ -132,3 +132,31 @@ test("storage settings: Neon is the default and http URLs are rejected", () => {
   assert.equal(validateSetting("storage", DEFAULTS.storage).success, true);
   assert.equal(validateSetting("storage", { ...DEFAULTS.storage, s3: { ...DEFAULTS.storage.s3, publicBaseUrl: "http://insecure.example" } }).success, false);
 });
+
+test("sections saved before the hero style / map / tour options still parse, with safe defaults", async () => {
+  const { parseSections } = await import("../../src/domain/sections");
+  const cta = { label: "", href: "" };
+  const { sections, invalid } = parseSections([
+    { id: "h", hidden: false, type: "hero", eyebrow: "", heading: "Hi", body: "", mediaId: "", videoId: "", primaryCta: cta, secondaryCta: cta },
+    { id: "v", hidden: false, type: "visit", eyebrow: "", heading: "Our location", body: "", mediaId: "" },
+    { id: "t", hidden: false, type: "tour", eyebrow: "", heading: "See what's coming", body: "" },
+  ]);
+  assert.equal(invalid, 0);
+  assert.equal(sections[0].type === "hero" && sections[0].mediaStyle, "cover");
+  assert.equal(sections[1].type === "visit" && sections[1].showMap, false);
+  assert.equal(sections[2].type, "tour");
+  assert.equal(parseSections([{ id: "h", hidden: false, type: "hero", eyebrow: "", heading: "", body: "", mediaId: "", videoId: "", mediaStyle: "spin", primaryCta: cta, secondaryCta: cta }]).invalid, 1);
+});
+
+test("CSP allows the Google map frame, and the tour host only when given", async () => {
+  const { buildCsp } = await import("../../src/lib/csp");
+  const frameSrc = (csp: string) => csp.split("; ").find((d) => d.startsWith("frame-src")) ?? "";
+  assert.match(frameSrc(buildCsp("n", { isDev: false })), /https:\/\/www\.google\.com/);
+  assert.doesNotMatch(frameSrc(buildCsp("n", { isDev: false })), /3d66/);
+  assert.match(frameSrc(buildCsp("n", { isDev: false, frameOrigins: ["https://vr.3d66.com"] })), /https:\/\/vr\.3d66\.com/);
+});
+
+test("homepage sound URLs must be https", () => {
+  assert.equal(validateSetting("features", { ...DEFAULTS.features, homeSoundsEnabled: true, sizzleSoundUrl: "https://x.example/s.mp3" }).success, true);
+  assert.equal(validateSetting("features", { ...DEFAULTS.features, mooSoundUrl: "http://x.example/m.mp3" }).success, false);
+});

@@ -26,6 +26,15 @@ const FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "body", label: "Intro (max ~20 words works best)", kind: "textarea", max: 400, rows: 2 },
     { key: "mediaId", label: "Background image", kind: "media", type: "image" },
     { key: "videoId", label: "Background video (optional, muted loop)", kind: "media", type: "video", hint: "Plays only for visitors without reduced-motion or data-saver settings." },
+    {
+      key: "mediaStyle",
+      label: "Image style",
+      kind: "select",
+      options: [
+        { value: "cover", label: "Fill the banner" },
+        { value: "float", label: "Floating cut-out beside the text" },
+      ],
+    },
     { key: "primaryCta", label: "Main button", kind: "cta" },
     { key: "secondaryCta", label: "Second button", kind: "cta" },
   ],
@@ -88,6 +97,12 @@ const FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "heading", label: "Heading", kind: "text", max: 140 },
     { key: "body", label: "Intro", kind: "textarea", max: 400, rows: 2 },
     { key: "mediaId", label: "Image", kind: "media", type: "image" },
+    { key: "showMap", label: "Show a Google map of the address instead of the image", kind: "checkbox" },
+  ],
+  tour: [
+    { key: "eyebrow", label: "Small label", kind: "text", max: 80 },
+    { key: "heading", label: "Heading", kind: "text", max: 140 },
+    { key: "body", label: "Intro", kind: "textarea", max: 400, rows: 2 },
   ],
   cta: [
     { key: "heading", label: "Heading", kind: "text", max: 140 },

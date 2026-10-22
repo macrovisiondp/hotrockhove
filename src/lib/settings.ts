@@ -131,6 +131,10 @@ export const featuresSchema = z.object({
   /** 360° tour — disabled until ownership and licensing are confirmed (audit C8). */
   vrTourEnabled: z.boolean(),
   vrTourUrl: optionalHttps,
+  /** Homepage sounds (sizzle loop + a moo on arrival). Start on load where the browser allows, else on first tap; visitors can mute. */
+  homeSoundsEnabled: z.boolean(),
+  sizzleSoundUrl: optionalHttps,
+  mooSoundUrl: optionalHttps,
 });
 
 export const storageSchema = z.object({
@@ -260,6 +264,9 @@ export const DEFAULTS: SettingsMap = {
     reviewsEmbedSrc: "",
     vrTourEnabled: false,
     vrTourUrl: "",
+    homeSoundsEnabled: false,
+    sizzleSoundUrl: "",
+    mooSoundUrl: "",
   },
   storage: {
     provider: "neon",

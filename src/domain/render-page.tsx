@@ -5,6 +5,7 @@ import { inArray } from "drizzle-orm";
 import { db, t } from "@/db";
 import { env, turnstileConfigured } from "@/lib/env";
 import { formatAddress, getSetting, type BusinessSettings } from "@/lib/settings";
+import { HomeSounds } from "@/components/site/home-sounds";
 import { PageTitle, RenderSections, type SectionContext } from "@/components/site/sections";
 import { getMediaByIds, getMenu, getOffers, getPublishedPage, sectionMediaIds, type PublicPage } from "./content";
 import { parseFields } from "./forms/fields";
@@ -114,6 +115,9 @@ export async function PageContent({ page }: { page: Pick<PublicPage, "slug" | "t
       )}
       {needsTitle && <PageTitle title={page.title} />}
       <RenderSections sections={page.sections} ctx={ctx} />
+      {slug === "" && features.homeSoundsEnabled && (features.sizzleSoundUrl || features.mooSoundUrl) && (
+        <HomeSounds sizzleUrl={features.sizzleSoundUrl} mooUrl={features.mooSoundUrl} />
+      )}
     </>
   );
 }

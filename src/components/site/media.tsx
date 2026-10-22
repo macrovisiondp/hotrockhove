@@ -12,20 +12,24 @@ export function MediaImage({
   className = "",
   priority = false,
   fill = true,
+  fit = "cover",
 }: {
   media: PublicMedia;
   sizes: string;
   className?: string;
   priority?: boolean;
   fill?: boolean;
+  /** How a filled image sits in its box: cropped to cover it, or whole (contain). */
+  fit?: "cover" | "contain";
 }) {
+  const fitClass = fit === "contain" ? "object-contain" : "object-cover";
   if (media.mimeType.startsWith("video/")) {
     return media.posterUrl ? (
-      <Image src={media.posterUrl} alt={media.alt} fill sizes={sizes} className={`object-cover ${className}`} priority={priority} />
+      <Image src={media.posterUrl} alt={media.alt} fill sizes={sizes} className={`${fitClass} ${className}`} priority={priority} />
     ) : null;
   }
   if (fill) {
-    return <Image src={media.url} alt={media.alt} fill sizes={sizes} priority={priority} className={`object-cover ${className}`} />;
+    return <Image src={media.url} alt={media.alt} fill sizes={sizes} priority={priority} className={`${fitClass} ${className}`} />;
   }
   return (
     <Image

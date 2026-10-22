@@ -34,10 +34,19 @@
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --animate-rise: rise 0.9s var(--ease-out-expo) both;
+  --animate-float: float 7s ease-in-out infinite;
 
   @keyframes rise {
     from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: none; }
+  }
+
+  /* A balloon drifting on a breeze: bob, sway and a slight tilt. */
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) rotate(-2deg); }
+    25% { transform: translate(14px, -18px) rotate(1.5deg); }
+    50% { transform: translate(28px, -6px) rotate(3deg); }
+    75% { transform: translate(12px, -22px) rotate(0deg); }
   }
 }
 

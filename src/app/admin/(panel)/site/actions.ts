@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidateTag } from "next/cache";
 import { audit } from "@/lib/audit";
 import { bool, failure, guarded, str, success, zodFailure, type ActionState } from "@/lib/actions";
 import { assertPermission } from "@/lib/session";
@@ -20,6 +21,9 @@ export async function saveFeaturesAction(_prev: ActionState, fd: FormData): Prom
       reviewsEmbedSrc: str(fd, "reviewsEmbedSrc"),
       vrTourEnabled: bool(fd, "vrTourEnabled"),
       vrTourUrl: str(fd, "vrTourUrl"),
+      homeSoundsEnabled: bool(fd, "homeSoundsEnabled"),
+      sizzleSoundUrl: str(fd, "sizzleSoundUrl"),
+      mooSoundUrl: str(fd, "mooSoundUrl"),
     });
     if (!parsed.success) return zodFailure(parsed.error);
     if (parsed.data.announcementEnabled && !parsed.data.announcementText)
@@ -37,6 +41,21 @@ export async function saveFeaturesAction(_prev: ActionState, fd: FormData): Prom
         ? "Saved. Maintenance mode is ON: visitors see the maintenance page (signed-in staff still see the site). Takes effect within a minute."
         : "Saved.",
     );
+  });
+}
+
+/**
+ * Clears every public cache so the site shows the database as it is now. Admin saves
+ * already do this for what they change; this covers edits made outside the admin
+ * (scripts, imports).
+ */
+export async function refreshSiteCacheAction(): Promise<ActionState> {
+  return guarded(async () => {
+    const user = await assertPermission("settings.edit");
+    invalidate("pages", "nav", "menu", "offers", "media", "popups", "redirects");
+    revalidateTag("settings", { expire: 0 });
+    await audit("settings.update", { actorUserId: user.id, entityType: "settings", entityId: "cache", metadata: { action: "refresh" } });
+    return success("Site content refreshed. Visitors see the latest content on their next page load.");
   });
 }
 

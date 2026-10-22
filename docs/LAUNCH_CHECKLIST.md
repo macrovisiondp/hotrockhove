@@ -15,7 +15,8 @@ Live status is on the admin **Dashboard → Launch readiness**, which checks rea
 | 7 | Menu review notes (5 items) and offer notes (3) | Menu, Offers | Review |
 | 8 | Image rights: 8 theme stock photos + 1 video unconfirmed; confirm the random-named food photos are Hot Rock's own | Media | Review |
 | 9 | About Us: approve the draft (verified founder text only) or supply new copy | Pages → About Us | No (302 to /wagyu meanwhile) |
-| 10 | 360° tour: confirm ownership before enabling | Site settings | No (off) |
+| 10 | 360° tour: switched on at the owner's request (2026-10-22); it's a render hosted on vr.3d66.com, labelled "RonGroup" | Site settings → 3D tour | No |
+| 10a | Homepage sizzle sound: a 45 s cut of the old site's track, which appears to be ripped from a YouTube video (Applebee's ASMR). Replace it with a licensed sound (the moo is a Pixabay-style file) | Site settings → Homepage sounds | Review (rights) |
 | 11 | Old submissions (~441) and the 271 newsletter addresses: archive or import as legacy | MIGRATION_PLAN §2 | No |
 | 12 | Re-permission email to legacy subscribers | Needs separate approval | No |
 | 13 | Booking-system URL (separate project) | Business settings | No (form fallback) |

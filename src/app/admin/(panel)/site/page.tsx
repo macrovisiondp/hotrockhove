@@ -3,8 +3,8 @@ import { can } from "@/lib/rbac";
 import { requirePermission } from "@/lib/session";
 import { getSettingFresh } from "@/lib/settings";
 import { ActionForm, Select, TextArea, TextInput, Toggle } from "@/components/admin/form";
-import { Badge, Card, Notice, PageHeader } from "@/components/admin/ui";
-import { saveConsentAction, saveFeaturesAction } from "./actions";
+import { Badge, Card, PageHeader } from "@/components/admin/ui";
+import { refreshSiteCacheAction, saveConsentAction, saveFeaturesAction } from "./actions";
 
 export const metadata = { title: "Site settings" };
 
@@ -33,17 +33,30 @@ export default async function SiteSettings() {
             <Toggle name="reviewsEnabled" label="Show reviews where a page has a Reviews section" defaultChecked={f.reviewsEnabled} />
             <TextInput name="reviewsEmbedSrc" label="Trustindex script URL" defaultValue={f.reviewsEmbedSrc} placeholder="https://cdn.trustindex.io/loader.js?…" wrapClass="mt-3" />
           </Card>
-          <Card title="360° tour">
-            <Notice>
-              The old homepage embedded a 360° tour hosted on vr.3d66.com (labelled “RonGroup”). Keep this off until you&apos;ve confirmed the tour shows Hot Rock
-              Hove and that you have permission to embed it.
-            </Notice>
-            <div className="mt-3">
-              <Toggle name="vrTourEnabled" label="Allow the tour embed" defaultChecked={f.vrTourEnabled} />
-              <TextInput name="vrTourUrl" label="Tour URL" defaultValue={f.vrTourUrl} wrapClass="mt-3" />
+          <Card
+            title="3D tour"
+            description="The 360° venue tour shown by a page's 3D tour section. It's hosted by a third party (vr.3d66.com), so it loads after cookie consent or when the visitor clicks to start it."
+          >
+            <Toggle name="vrTourEnabled" label="Show the tour" defaultChecked={f.vrTourEnabled} />
+            <TextInput name="vrTourUrl" label="Tour URL" defaultValue={f.vrTourUrl} placeholder="https://vr.3d66.com/vr/index_detail_….asp" wrapClass="mt-3" />
+          </Card>
+          <Card
+            title="Homepage sounds"
+            description="A looping sizzle and a moo when visitors open the homepage, as on the old site. Browsers usually hold sound back until the visitor taps or clicks; a speaker button lets them mute it."
+          >
+            <Toggle name="homeSoundsEnabled" label="Play homepage sounds" defaultChecked={f.homeSoundsEnabled} />
+            <div className="mt-3 grid gap-4 md:grid-cols-2">
+              <TextInput name="sizzleSoundUrl" label="Sizzle loop (MP3 URL)" defaultValue={f.sizzleSoundUrl} />
+              <TextInput name="mooSoundUrl" label="Moo (MP3 URL)" defaultValue={f.mooSoundUrl} />
             </div>
           </Card>
         </ActionForm>
+
+        <Card title="Refresh site content" description="The site keeps content cached for speed, and admin saves refresh it automatically. Use this if a change made outside the admin isn't showing.">
+          <ActionForm action={refreshSiteCacheAction} disabled={!canEdit} submitLabel="Refresh now" showCancel={false} compact>
+            <p className="text-sm text-[#6b665e]">Safe to use at any time; it doesn&apos;t change any content.</p>
+          </ActionForm>
+        </Card>
 
         <Card title="Cookies and analytics" description="The site uses one essential cookie for the visitor's choice. Optional content and analytics load only after 'Accept all'.">
           <ActionForm action={saveConsentAction} disabled={!canEdit} compact>

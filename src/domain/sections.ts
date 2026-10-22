@@ -34,6 +34,8 @@ export const sectionSchemas = {
     mediaId,
     /** Optional looping background video (muted, no audio). Image is the poster/fallback. */
     videoId: mediaId,
+    /** "cover" fills the banner; "float" shows the image as a gently floating cut-out beside the text (e.g. Daisy's balloon). */
+    mediaStyle: z.enum(["cover", "float"]).default("cover"),
     primaryCta: cta,
     secondaryCta: cta,
   }),
@@ -118,6 +120,15 @@ export const sectionSchemas = {
     heading: text(140),
     body: text(400),
     mediaId,
+    /** Show a Google map of the business address instead of the image (loads after cookie consent or a click). */
+    showMap: z.boolean().default(false),
+  }),
+  tour: z.object({
+    ...base,
+    type: z.literal("tour"),
+    eyebrow: text(80),
+    heading: text(140),
+    body: text(400),
   }),
   cta: z.object({
     ...base,
@@ -161,6 +172,7 @@ export const sectionSchema = z.discriminatedUnion("type", [
   sectionSchemas.gallery,
   sectionSchemas.reviews,
   sectionSchemas.visit,
+  sectionSchemas.tour,
   sectionSchemas.cta,
   sectionSchemas.form,
   sectionSchemas.newsletter,
@@ -192,7 +204,7 @@ export function blankSection(type: SectionType, id: string): Section {
   const common = { id, hidden: false };
   switch (type) {
     case "hero":
-      return { ...common, type, eyebrow: "", heading: "", body: "", mediaId: "", videoId: "", primaryCta: emptyCta, secondaryCta: emptyCta };
+      return { ...common, type, eyebrow: "", heading: "", body: "", mediaId: "", videoId: "", mediaStyle: "cover", primaryCta: emptyCta, secondaryCta: emptyCta };
     case "story":
       return { ...common, type, eyebrow: "", heading: "", body: "", signature: "", signatureRole: "", mediaId: "", imageSide: "left", cta: emptyCta };
     case "text":
@@ -212,7 +224,9 @@ export function blankSection(type: SectionType, id: string): Section {
     case "reviews":
       return { ...common, type, eyebrow: "", heading: "" };
     case "visit":
-      return { ...common, type, eyebrow: "", heading: "", body: "", mediaId: "" };
+      return { ...common, type, eyebrow: "", heading: "", body: "", mediaId: "", showMap: false };
+    case "tour":
+      return { ...common, type, eyebrow: "", heading: "", body: "" };
     case "cta":
       return { ...common, type, heading: "", body: "", mediaId: "", primaryCta: emptyCta, secondaryCta: emptyCta };
     case "form":
@@ -233,7 +247,8 @@ export const SECTION_LABELS: Record<SectionType, { label: string; hint: string }
   offers: { label: "Offers", hint: "Lists the offers from the Offers module" },
   gallery: { label: "Gallery", hint: "Grid of selected photos and videos" },
   reviews: { label: "Reviews", hint: "Google reviews widget (after cookie consent)" },
-  visit: { label: "Visit us", hint: "Address, hours and contact from Business settings" },
+  visit: { label: "Visit us", hint: "Address, hours and contact from Business settings, with an image or map" },
+  tour: { label: "3D tour", hint: "The 360° venue tour set in Site settings (loads on click or after cookie consent)" },
   cta: { label: "Call to action", hint: "Banner with buttons" },
   form: { label: "Form", hint: "Contact, fan club or table request form" },
   newsletter: { label: "Newsletter", hint: "Email sign-up with consent and double opt-in" },

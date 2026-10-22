@@ -9,6 +9,8 @@
  *  - cdn.trustindex.io (+ its image/style hosts) — Google reviews widget, only
  *    injected after the visitor accepts optional cookies.
  *  - Optional 360° tour host, only while that feature is switched on.
+ *  - www.google.com / maps.google.com — the "Visit us" map embed (frame only; it
+ *    loads after cookie consent or a click).
  *
  * Documented exceptions:
  *  - style-src-attr 'unsafe-inline': Turnstile and the reviews widget size
@@ -26,6 +28,7 @@ const MEDIA_HOST = [
   ...(process.env.AWS_ENDPOINT_URL_S3 ? [new URL(process.env.AWS_ENDPOINT_URL_S3).origin] : []),
 ];
 export const TRUSTINDEX_ORIGINS = ["https://cdn.trustindex.io", "https://*.trustindex.io"];
+export const GOOGLE_MAPS_FRAME_ORIGINS = ["https://www.google.com", "https://maps.google.com"];
 
 export function buildCsp(nonce: string, opts: { isDev: boolean; frameOrigins?: string[] }): string {
   const directives: Record<string, string[]> = {
@@ -37,7 +40,7 @@ export function buildCsp(nonce: string, opts: { isDev: boolean; frameOrigins?: s
     "media-src": ["'self'", "blob:", ...S3_ORIGINS, ...MEDIA_HOST, CLOUDINARY_ORIGIN],
     "font-src": ["'self'", ...TRUSTINDEX_ORIGINS],
     "connect-src": ["'self'", TURNSTILE_ORIGIN, ...S3_ORIGINS, ...MEDIA_HOST, "https://api.cloudinary.com", ...TRUSTINDEX_ORIGINS],
-    "frame-src": [TURNSTILE_ORIGIN, ...(opts.frameOrigins ?? [])],
+    "frame-src": [TURNSTILE_ORIGIN, ...GOOGLE_MAPS_FRAME_ORIGINS, ...(opts.frameOrigins ?? [])],
     "worker-src": ["'self'", "blob:"],
     "object-src": ["'none'"],
     "base-uri": ["'self'"],
