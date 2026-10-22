@@ -169,6 +169,33 @@ export const storageSchema = z.object({
   }),
 });
 
+/**
+ * Google reviews shown on the site, copied from Google (the old site showed them via
+ * the Trustindex WordPress plugin). Real reviews only: each one should match a review
+ * on the business's Google profile. Rendered first-party, so no third-party cookies.
+ */
+export const reviewsSchema = z.object({
+  /** e.g. "Excellent" — the label Google/Trustindex shows for the overall rating. */
+  summaryLabel: z.string().trim().max(30),
+  /** Total number of Google reviews (update from Google from time to time). 0 hides the count. */
+  totalCount: z.number().int().min(0).max(100000),
+  /** Link to the reviews on Google (Google Maps profile). */
+  googleUrl: optionalHttps,
+  items: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(40),
+        author: z.string().trim().min(1).max(80),
+        rating: z.number().int().min(1).max(5),
+        text: z.string().trim().min(1).max(2000),
+        /** Optional, as shown on Google (e.g. "February 2026"). */
+        date: z.string().trim().max(40),
+        hidden: z.boolean(),
+      }),
+    )
+    .max(60),
+});
+
 const SCHEMAS = {
   business: businessSchema,
   brand: brandSchema,
@@ -178,6 +205,7 @@ const SCHEMAS = {
   consent: consentSchema,
   features: featuresSchema,
   storage: storageSchema,
+  reviews: reviewsSchema,
 };
 
 export type BusinessSettings = z.infer<typeof businessSchema>;
@@ -188,6 +216,8 @@ export type SeoSettings = z.infer<typeof seoSchema>;
 export type ConsentSettings = z.infer<typeof consentSchema>;
 export type FeatureSettings = z.infer<typeof featuresSchema>;
 export type StorageSettings = z.infer<typeof storageSchema>;
+export type ReviewsSettings = z.infer<typeof reviewsSchema>;
+export type Review = ReviewsSettings["items"][number];
 export type OpeningHours = BusinessSettings["hours"];
 
 type SettingsMap = {
@@ -199,6 +229,7 @@ type SettingsMap = {
   consent: ConsentSettings;
   features: FeatureSettings;
   storage: StorageSettings;
+  reviews: ReviewsSettings;
 };
 export type SettingsKey = keyof SettingsMap;
 
@@ -274,6 +305,7 @@ export const DEFAULTS: SettingsMap = {
     s3: { bucket: "", region: "eu-west-2", accessKeyId: "", secretAccessKey: "", prefix: "hotrockhove", publicBaseUrl: "", endpoint: "" },
     cloudinary: { cloudName: "", apiKey: "", apiSecret: "", folder: "hotrockhove" },
   },
+  reviews: { summaryLabel: "", totalCount: 0, googleUrl: "", items: [] },
 };
 
 /* -------------------------------------------------------------------------- */

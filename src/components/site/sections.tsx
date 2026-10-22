@@ -7,7 +7,7 @@ import type { BookTarget } from "@/domain/links";
 import { resolveHref } from "@/domain/links";
 import { NEWSLETTER_CONSENT } from "@/domain/newsletter";
 import type { Cta, Section, SectionOf } from "@/domain/sections";
-import type { BusinessSettings, FeatureSettings } from "@/lib/settings";
+import type { BusinessSettings, FeatureSettings, ReviewsSettings } from "@/lib/settings";
 import { formatAddress, groupHours, telHref } from "@/lib/settings";
 import { submitFormAction, subscribeAction } from "@/app/(site)/actions";
 import { ConsentFrame } from "./consent-frame";
@@ -18,6 +18,7 @@ import { MenuNav } from "./menu-nav";
 import { NewsletterForm } from "./newsletter-form";
 import { PublicForm } from "./public-form";
 import { ReviewsEmbed } from "./reviews-embed";
+import { GoogleG, ReviewsList, Stars } from "./reviews-list";
 import { RichText } from "./rich-text";
 
 export type Offer = {
@@ -36,6 +37,9 @@ export type SectionContext = {
   book: BookTarget;
   business: BusinessSettings;
   features: FeatureSettings;
+  reviews: ReviewsSettings;
+  /** The homepage: its hero shows the Google rating badge. */
+  isHome: boolean;
   privacyHref: string | null;
   turnstileSiteKey: string | null;
   menu: PublicMenuCategory[];
@@ -125,9 +129,25 @@ function Hero({ s, ctx, first }: { s: SectionOf<"hero">; ctx: SectionContext; fi
             <CtaLink cta={s.primaryCta} ctx={ctx} variant="primary" />
             <CtaLink cta={s.secondaryCta} ctx={ctx} variant="ghost" />
           </div>
+          {ctx.isHome && first && <RatingBadge reviews={ctx.reviews} />}
         </div>
       </div>
     </section>
+  );
+}
+
+/** "Google ★★★★★ Excellent · 125 Google reviews", linking to the reviews section. */
+function RatingBadge({ reviews }: { reviews: ReviewsSettings }) {
+  if (!reviews.summaryLabel || reviews.items.every((r) => r.hidden)) return null;
+  return (
+    <a href="#reviews" className="mt-8 inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-bone/90 hover:text-bone">
+      <GoogleG size={18} />
+      <Stars rating={5} size={15} label={false} />
+      <span>
+        <strong className="font-semibold">{reviews.summaryLabel}</strong>
+        {reviews.totalCount > 0 && <> · {reviews.totalCount} Google reviews</>}
+      </span>
+    </a>
   );
 }
 
@@ -404,11 +424,37 @@ function Gallery({ s, ctx, first }: { s: SectionOf<"gallery">; ctx: SectionConte
 }
 
 function Reviews({ s, ctx }: { s: SectionOf<"reviews">; ctx: SectionContext }) {
-  if (!ctx.features.reviewsEnabled || !ctx.features.reviewsEmbedSrc) return null;
+  const { features, reviews } = ctx;
+  const widget = Boolean(features.reviewsEnabled && features.reviewsEmbedSrc);
+  const items = reviews.items.filter((r) => !r.hidden);
+  if (!widget && items.length === 0) return null;
   return (
-    <section className={`${wrap} py-24 lg:py-28`}>
-      <Heading eyebrow={s.eyebrow} heading={s.heading} className="mb-10 max-w-3xl" />
-      <ReviewsEmbed src={ctx.features.reviewsEmbedSrc} />
+    <section id="reviews" className="scroll-mt-24 border-y border-ink-800 py-24 lg:py-32">
+      <div className={wrap}>
+        <div className="mb-12 flex flex-wrap items-end justify-between gap-8">
+          <Heading eyebrow={s.eyebrow} heading={s.heading} className="max-w-2xl" />
+          {!widget && reviews.summaryLabel && (
+            <div className="flex items-center gap-4">
+              <GoogleG size={34} />
+              <div>
+                <p className="flex items-center gap-2">
+                  <span className="text-lg font-semibold uppercase tracking-[0.14em] text-bone">{reviews.summaryLabel}</span>
+                  <Stars rating={5} size={18} label={false} />
+                </p>
+                {reviews.totalCount > 0 && <p className="text-sm text-stone">Based on {reviews.totalCount} Google reviews</p>}
+              </div>
+            </div>
+          )}
+        </div>
+        {widget ? <ReviewsEmbed src={features.reviewsEmbedSrc} /> : <ReviewsList items={items} />}
+        {!widget && reviews.googleUrl && (
+          <div className="mt-10">
+            <a href={reviews.googleUrl} target="_blank" rel="noopener" className="btn btn-ghost">
+              Read all reviews on Google
+            </a>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
@@ -509,9 +555,81 @@ function googleMapEmbed(address: string) {
   return `https://www.google.com/maps?q=${encodeURIComponent(address)}&z=15&output=embed`;
 }
 
+/** A photo story: alternating rows of photos (or a video) and a numbered caption. */
+function Journey({ s, ctx }: { s: SectionOf<"journey">; ctx: SectionContext }) {
+  const steps = s.steps
+    .map((st) => ({ ...st, media: st.mediaIds.map((id) => ctx.media.get(id)).filter(Boolean) as PublicMedia[] }))
+    .filter((st) => st.media.length > 0 || st.caption);
+  if (steps.length === 0) return null;
+  return (
+    <section className="relative overflow-hidden bg-ink-900 py-24 lg:py-36">
+      <div className={wrap}>
+        <div className="mx-auto max-w-3xl text-center">
+          <Heading eyebrow={s.eyebrow} heading={s.heading} />
+          {s.body && <RichText text={s.body} className="mx-auto mt-6 max-w-[56ch] text-lg leading-relaxed text-stone" />}
+        </div>
+        <div className="relative mt-16 lg:mt-24">
+          {/* Thin timeline down the middle on large screens. */}
+          <span aria-hidden className="absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-ink-600 to-transparent lg:block" />
+          <ol className="relative space-y-20 lg:space-y-32">
+            {steps.map((st, i) => {
+              const flip = i % 2 === 1;
+              return (
+                <li key={st.id} className="grid items-center gap-8 lg:grid-cols-2 lg:gap-24">
+                  <div className={`reveal ${flip ? "lg:order-2" : ""}`}>
+                    <JourneyMedia media={st.media} />
+                  </div>
+                  <div className={flip ? "lg:order-1 lg:text-right" : ""}>
+                    <p className="display text-6xl leading-none text-bronze/70 lg:text-7xl" aria-hidden>
+                      {String(i + 1).padStart(2, "0")}
+                    </p>
+                    {st.caption && <p className={`display mt-4 max-w-[22ch] text-3xl leading-snug text-bone lg:text-4xl ${flip ? "lg:ml-auto" : ""}`}>{st.caption}</p>}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function JourneyMedia({ media }: { media: PublicMedia[] }) {
+  const video = media.find((m) => m.mimeType.startsWith("video/"));
+  if (video) {
+    const portrait = (video.height ?? 0) > (video.width ?? 0);
+    return (
+      <div className={`overflow-hidden bg-ink-950 ${portrait ? "mx-auto aspect-[9/16] w-full max-w-[380px]" : "aspect-video"}`}>
+        <MediaVideo media={video} />
+      </div>
+    );
+  }
+  const tall = (m: PublicMedia) => (m.height ?? 0) > (m.width ?? 0);
+  if (media.length === 1) {
+    const m = media[0];
+    return (
+      <div className={`relative overflow-hidden bg-ink-950 ${tall(m) ? "mx-auto aspect-[4/5] w-full max-w-[460px]" : "aspect-[16/9]"}`}>
+        <MediaImage media={m} sizes="(min-width: 1024px) 45vw, 100vw" />
+      </div>
+    );
+  }
+  // Two or three photos: a staggered set of tall frames.
+  return (
+    <div className={`grid gap-3 pb-10 sm:gap-4 ${media.length === 3 ? "grid-cols-3" : "mx-auto max-w-[560px] grid-cols-2"}`}>
+      {media.map((m, i) => (
+        <div key={m.id} className={`relative aspect-[9/16] overflow-hidden bg-ink-950 ${i % 2 === 1 ? "translate-y-6 lg:translate-y-10" : ""}`}>
+          <MediaImage media={m} sizes="(min-width: 1024px) 22vw, 45vw" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Tour({ s, ctx }: { s: SectionOf<"tour">; ctx: SectionContext }) {
   const { vrTourEnabled, vrTourUrl } = ctx.features;
   if (!vrTourEnabled || !vrTourUrl) return null;
+  const poster = s.mediaId ? ctx.media.get(s.mediaId) : undefined;
   return (
     <section className={`${wrap} py-24 lg:py-32`}>
       <div className="max-w-3xl">
@@ -526,6 +644,7 @@ function Tour({ s, ctx }: { s: SectionOf<"tour">; ctx: SectionContext }) {
           notice="The 360° tour is hosted by a third party, which may set its own cookies."
           allow="fullscreen; gyroscope; accelerometer; xr-spatial-tracking"
           className="absolute inset-0"
+          backdrop={poster ? <MediaImage media={poster} sizes="(min-width: 1400px) 1320px, 100vw" /> : undefined}
         />
       </div>
     </section>
@@ -651,6 +770,8 @@ export function RenderSections({ sections, ctx }: { sections: Section[]; ctx: Se
             return <Visit key={s.id} s={s} ctx={ctx} />;
           case "tour":
             return <Tour key={s.id} s={s} ctx={ctx} />;
+          case "journey":
+            return <Journey key={s.id} s={s} ctx={ctx} />;
           case "cta":
             return <CtaBand key={s.id} s={s} ctx={ctx} />;
           case "form":

@@ -15,7 +15,8 @@ type FieldDef =
   | { key: string; label: string; kind: "select"; options: { value: string; label: string }[] }
   | { key: string; label: string; kind: "checkbox"; hint?: string }
   | { key: string; label: string; kind: "number"; min: number; max: number; hint?: string }
-  | { key: string; label: string; kind: "form" };
+  | { key: string; label: string; kind: "form" }
+  | { key: string; label: string; kind: "steps" };
 
 const BODY_HINT = "Blank line = new paragraph. **bold**, *italic*.";
 
@@ -103,6 +104,13 @@ const FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "eyebrow", label: "Small label", kind: "text", max: 80 },
     { key: "heading", label: "Heading", kind: "text", max: 140 },
     { key: "body", label: "Intro", kind: "textarea", max: 400, rows: 2 },
+    { key: "mediaId", label: "Preview image", kind: "media", type: "image", hint: "Shown behind the 'Start the 3D tour' button until the tour loads." },
+  ],
+  journey: [
+    { key: "eyebrow", label: "Small label", kind: "text", max: 80 },
+    { key: "heading", label: "Heading", kind: "text", max: 140 },
+    { key: "body", label: "Intro (optional)", kind: "textarea", max: 1000, rows: 2 },
+    { key: "steps", label: "Steps", kind: "steps" },
   ],
   cta: [
     { key: "heading", label: "Heading", kind: "text", max: 140 },
@@ -336,7 +344,62 @@ function FieldInput({
       return <MediaFieldBridge name={id} label={def.label} type={def.type} value={String(value ?? "")} hint={"hint" in def ? def.hint : undefined} onChange={onChange} />;
     case "mediaList":
       return <MediaListBridge name={id} label={def.label} value={(value as string[]) ?? []} onChange={onChange} />;
+    case "steps":
+      return <StepsField sectionId={sectionId} value={(value as Step[]) ?? []} onChange={onChange} />;
   }
+}
+
+type Step = { id: string; caption: string; mediaIds: string[] };
+
+/** Journey steps: each is a caption with 1–3 photos or a video, in order. */
+function StepsField({ sectionId, value, onChange }: { sectionId: string; value: Step[]; onChange: (v: Step[]) => void }) {
+  const set = (i: number, patch: Partial<Step>) => onChange(value.map((st, j) => (j === i ? { ...st, ...patch } : st)));
+  const move = (i: number, d: number) => {
+    const j = i + d;
+    if (j < 0 || j >= value.length) return;
+    const n = [...value];
+    [n[i], n[j]] = [n[j], n[i]];
+    onChange(n);
+  };
+  return (
+    <fieldset className="space-y-3">
+      <legend className="mb-1 text-sm font-medium text-[#3a3733]">Steps</legend>
+      {value.map((st, i) => (
+        <div key={st.id} className="rounded-md border border-[#ece9e4] p-3">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[#8a847b]">Step {i + 1}</span>
+            <span className="flex-1" />
+            <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="rounded p-1.5 hover:bg-[#efece7] disabled:opacity-30" aria-label={`Move step ${i + 1} up`}>
+              <ArrowUp size={14} />
+            </button>
+            <button type="button" onClick={() => move(i, 1)} disabled={i === value.length - 1} className="rounded p-1.5 hover:bg-[#efece7] disabled:opacity-30" aria-label={`Move step ${i + 1} down`}>
+              <ArrowDown size={14} />
+            </button>
+            <button type="button" onClick={() => onChange(value.filter((_, j) => j !== i))} className="rounded p-1.5 text-[#b42318] hover:bg-red-50" aria-label={`Remove step ${i + 1}`}>
+              <Trash size={14} />
+            </button>
+          </div>
+          <label htmlFor={`s-${sectionId}-step-${st.id}`} className="mb-1 block text-sm font-medium text-[#3a3733]">
+            Caption
+          </label>
+          <textarea
+            id={`s-${sectionId}-step-${st.id}`}
+            className="admin-input leading-relaxed"
+            rows={2}
+            maxLength={400}
+            value={st.caption}
+            onChange={(e) => set(i, { caption: e.target.value })}
+          />
+          <div className="mt-3">
+            <MediaListBridge name={`s-${sectionId}-step-${st.id}-media`} label="Photos or video (up to 3)" value={st.mediaIds} onChange={(ids) => set(i, { mediaIds: ids.slice(0, 3) })} />
+          </div>
+        </div>
+      ))}
+      <button type="button" className="admin-btn admin-btn-secondary" onClick={() => onChange([...value, { id: newId(), caption: "", mediaIds: [] }])}>
+        <Plus size={14} /> Add step
+      </button>
+    </fieldset>
+  );
 }
 
 /** MediaField/MediaListField write to hidden inputs; mirror their value into section state. */

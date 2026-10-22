@@ -160,3 +160,25 @@ test("homepage sound URLs must be https", () => {
   assert.equal(validateSetting("features", { ...DEFAULTS.features, homeSoundsEnabled: true, sizzleSoundUrl: "https://x.example/s.mp3" }).success, true);
   assert.equal(validateSetting("features", { ...DEFAULTS.features, mooSoundUrl: "http://x.example/m.mp3" }).success, false);
 });
+
+test("reviews settings: imported Google reviews validate; empty text or a 6-star rating is rejected", async () => {
+  const { GOOGLE_REVIEWS } = await import("../../scripts/data/google-reviews");
+  assert.equal(validateSetting("reviews", GOOGLE_REVIEWS).success, true);
+  assert.equal(GOOGLE_REVIEWS.items.length, 8);
+  const one = GOOGLE_REVIEWS.items[0];
+  assert.equal(validateSetting("reviews", { ...GOOGLE_REVIEWS, items: [{ ...one, text: "" }] }).success, false);
+  assert.equal(validateSetting("reviews", { ...GOOGLE_REVIEWS, items: [{ ...one, rating: 6 }] }).success, false);
+  assert.equal(validateSetting("reviews", DEFAULTS.reviews).success, true);
+});
+
+test("journey section: steps carry up to 3 media each and count as page media", async () => {
+  const { parseSections } = await import("../../src/domain/sections");
+  const { sectionMediaIds } = await import("../../src/domain/content");
+  const a = "00000000-0000-4000-8000-000000000001";
+  const b = "00000000-0000-4000-8000-000000000002";
+  const ok = parseSections([{ id: "j", hidden: false, type: "journey", eyebrow: "", heading: "Wagyu journey", body: "", steps: [{ id: "s1", caption: "One", mediaIds: [a, b] }] }]);
+  assert.equal(ok.invalid, 0);
+  assert.deepEqual(sectionMediaIds(ok.sections), [a, b]);
+  const tooMany = parseSections([{ id: "j", hidden: false, type: "journey", eyebrow: "", heading: "", body: "", steps: [{ id: "s1", caption: "", mediaIds: [a, b, a, b] }] }]);
+  assert.equal(tooMany.invalid, 1);
+});

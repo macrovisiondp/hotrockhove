@@ -15,6 +15,7 @@ export function ConsentFrame({
   notice,
   allow,
   className = "",
+  backdrop,
 }: {
   src: string;
   title: string;
@@ -22,6 +23,8 @@ export function ConsentFrame({
   notice: string;
   allow?: string;
   className?: string;
+  /** Optional preview (e.g. an image) shown behind the placeholder. */
+  backdrop?: React.ReactNode;
 }) {
   const choice = useConsent();
   const [clicked, setClicked] = useState(false);
@@ -40,11 +43,17 @@ export function ConsentFrame({
     );
   }
   return (
-    <div className={`flex h-full w-full flex-col items-center justify-center gap-4 bg-ink-900 p-8 text-center ${className}`}>
-      <p className="max-w-[42ch] text-sm leading-relaxed text-stone">{notice}</p>
-      <button type="button" onClick={() => setClicked(true)} className="btn btn-ghost">
+    <div className={`isolate flex h-full w-full flex-col items-center justify-center gap-4 bg-ink-900 p-8 text-center ${className}`}>
+      {backdrop && (
+        <div className="absolute inset-0 -z-10" aria-hidden>
+          {backdrop}
+          <div className="absolute inset-0 bg-ink-950/55" />
+        </div>
+      )}
+      <button type="button" onClick={() => setClicked(true)} className={`btn ${backdrop ? "btn-primary" : "btn-ghost"}`}>
         {loadLabel}
       </button>
+      <p className={`max-w-[42ch] text-sm leading-relaxed ${backdrop ? "text-bone/85" : "text-stone"}`}>{notice}</p>
     </div>
   );
 }

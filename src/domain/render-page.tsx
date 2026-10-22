@@ -75,9 +75,10 @@ export async function PageContent({ page }: { page: Pick<PublicPage, "slug" | "t
   const formKeys = page.sections.flatMap((s) => (s.type === "form" ? [s.formKey] : []));
   const needsMenu = types.has("menu") || types.has("menuHighlights");
 
-  const [business, features, book, privacyHref, menu, offers, formRows] = await Promise.all([
+  const [business, features, reviews, book, privacyHref, menu, offers, formRows] = await Promise.all([
     getSetting("business"),
     getSetting("features"),
+    getSetting("reviews"),
     getBookTarget(),
     getPrivacyHref(),
     needsMenu ? getMenu() : Promise.resolve([]),
@@ -97,6 +98,8 @@ export async function PageContent({ page }: { page: Pick<PublicPage, "slug" | "t
     book,
     business,
     features,
+    reviews,
+    isHome: slug === "",
     privacyHref,
     turnstileSiteKey: turnstileConfigured() ? env().NEXT_PUBLIC_TURNSTILE_SITE_KEY! : null,
     menu,

@@ -14,7 +14,8 @@ export async function mediaUsage(id: string, url: string): Promise<Usage[]> {
     const { sections } = parseSections(p.sections);
     const used =
       p.ogImageId === id ||
-      sections.some((s) => ("mediaId" in s && s.mediaId === id) || ("videoId" in s && s.videoId === id) || (s.type === "gallery" && s.mediaIds.includes(id)));
+      sections.some((s) => ("mediaId" in s && s.mediaId === id) || ("videoId" in s && s.videoId === id) || (s.type === "gallery" && s.mediaIds.includes(id)) ||
+          (s.type === "journey" && s.steps.some((st) => st.mediaIds.includes(id))));
     if (used) out.push({ kind: "Page", label: p.title, href: `/admin/pages/${p.id}` });
   }
   const items = await db.select({ id: t.menuItems.id, name: t.menuItems.name }).from(t.menuItems).where(eq(t.menuItems.imageId, id));

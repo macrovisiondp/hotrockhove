@@ -129,6 +129,25 @@ export const sectionSchemas = {
     eyebrow: text(80),
     heading: text(140),
     body: text(400),
+    /** Preview image shown behind the "Start the 3D tour" button. */
+    mediaId: mediaId.default(""),
+  }),
+  journey: z.object({
+    ...base,
+    type: z.literal("journey"),
+    eyebrow: text(80),
+    heading: text(140),
+    body: text(1000),
+    /** A photo story: each step is 1–3 photos (or a video) with a caption. */
+    steps: z
+      .array(
+        z.object({
+          id: z.string().min(1).max(40),
+          caption: text(400),
+          mediaIds: z.array(z.string().uuid()).max(3),
+        }),
+      )
+      .max(20),
   }),
   cta: z.object({
     ...base,
@@ -173,6 +192,7 @@ export const sectionSchema = z.discriminatedUnion("type", [
   sectionSchemas.reviews,
   sectionSchemas.visit,
   sectionSchemas.tour,
+  sectionSchemas.journey,
   sectionSchemas.cta,
   sectionSchemas.form,
   sectionSchemas.newsletter,
@@ -226,7 +246,9 @@ export function blankSection(type: SectionType, id: string): Section {
     case "visit":
       return { ...common, type, eyebrow: "", heading: "", body: "", mediaId: "", showMap: false };
     case "tour":
-      return { ...common, type, eyebrow: "", heading: "", body: "" };
+      return { ...common, type, eyebrow: "", heading: "", body: "", mediaId: "" };
+    case "journey":
+      return { ...common, type, eyebrow: "", heading: "", body: "", steps: [] };
     case "cta":
       return { ...common, type, heading: "", body: "", mediaId: "", primaryCta: emptyCta, secondaryCta: emptyCta };
     case "form":
@@ -248,6 +270,7 @@ export const SECTION_LABELS: Record<SectionType, { label: string; hint: string }
   gallery: { label: "Gallery", hint: "Grid of selected photos and videos" },
   reviews: { label: "Reviews", hint: "Google reviews widget (after cookie consent)" },
   visit: { label: "Visit us", hint: "Address, hours and contact from Business settings, with an image or map" },
+  journey: { label: "Journey", hint: "A photo story: steps of photos or a video, each with a caption" },
   tour: { label: "3D tour", hint: "The 360° venue tour set in Site settings (loads on click or after cookie consent)" },
   cta: { label: "Call to action", hint: "Banner with buttons" },
   form: { label: "Form", hint: "Contact, fan club or table request form" },

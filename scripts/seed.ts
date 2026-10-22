@@ -18,6 +18,7 @@ import type { Section } from "../src/domain/sections";
 import { sectionsSchema } from "../src/domain/sections";
 import { fieldsSchema, type FormField } from "../src/domain/forms/fields";
 import { DEFAULTS, saveSetting, type BusinessSettings } from "../src/lib/settings";
+import { GOOGLE_REVIEWS } from "./data/google-reviews";
 import { MEDIA_ALT } from "./data/media-alt";
 import { classifyRights, GALLERY_PATHS, WP_UPLOADS } from "./data/media-manifest";
 
@@ -130,6 +131,7 @@ async function seedSettings() {
   });
   await put("consent", DEFAULTS.consent);
   await put("features", DEFAULTS.features);
+  await put("reviews", GOOGLE_REVIEWS);
   // Local disk in development (ALLOW_LOCAL_STORAGE=true); Neon Object Storage otherwise.
   await put("storage", { ...DEFAULTS.storage, provider: process.env.ALLOW_LOCAL_STORAGE === "true" ? "local" : "neon" });
 }
@@ -438,7 +440,7 @@ function pages(): PageSeed[] {
           secondaryCta: cta("See Our Menu", "/our-menus"),
         },
         // Shown only when the tour is switched on in Site settings.
-        { id: id(), hidden: false, type: "tour", eyebrow: "", heading: "See what's coming", body: "" },
+        { id: id(), hidden: false, type: "tour", eyebrow: "", heading: "See what's coming", body: "", mediaId: "" },
         {
           id: id(),
           hidden: false,
@@ -452,15 +454,25 @@ function pages(): PageSeed[] {
           imageSide: "left",
           cta: cta("Learn More", "/wagyu"),
         },
+        // The old homepage's "Wagyu journey": six steps, captions exactly as on the old site.
         {
           id: id(),
           hidden: false,
-          type: "video",
-          eyebrow: "",
+          type: "journey",
+          eyebrow: "From farm to Hot Rock",
           heading: "Wagyu journey",
-          body: "I travelled to the other side of the world to find the very best beef and Wagyu just for you!\n\nA5 +9 Full Blood Wagyu. GM free, grass-fed cattle, just as mother nature intended!\n\nThis is the video of the Wagyu being cut. The 10-thousand-mile journey was 10 thousand percent worth it! This is the Premium Wagyu fillet served at Hot Rock Steakhouse!",
-          videoId: m("2026/02/WhatsApp-Video-2026-02-07-at-10.09.54-PM.mp4"),
-          mediaId: m("2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-1.jpeg"),
+          body: "",
+          steps: [
+            ["I travelled to the other side of the world to find the very best beef and Wagyu just for you!", ["2026/02/Media.jpg"]],
+            ["Dressed and ready to audit a $1M Wagyu Slaughter.", ["2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-2.jpeg", "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM.jpeg"]],
+            ["$1M Premium Wagyu Slaughter", ["2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-4.jpeg"]],
+            ["A5 +9 FULL BLOOD WAGYU", ["2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-3.jpeg", "2026/02/WhatsApp-Image-2026-02-07-at-10.09.58-PM-1.jpeg"]],
+            ["GM free, Grass-fed cattle, just as mother nature intended!", ["2026/02/Media-3.jpg"]],
+            [
+              "This is the video of the Wagyu being cut. The 10-thousand-mile journey was 10 thousand percent worth it! This is the Premium Wagyu fillet served at Hot Rock Steakhouse!",
+              ["2026/02/WhatsApp-Video-2026-02-07-at-10.09.54-PM.mp4"],
+            ],
+          ].map(([caption, paths]) => ({ id: id(), caption: caption as string, mediaIds: (paths as string[]).map(m).filter(Boolean) })),
         },
         {
           id: id(),

@@ -128,6 +128,7 @@ export function sectionMediaIds(sections: Section[]): string[] {
     if ("mediaId" in s && s.mediaId) ids.push(s.mediaId);
     if ("videoId" in s && s.videoId) ids.push(s.videoId);
     if (s.type === "gallery") ids.push(...s.mediaIds);
+    if (s.type === "journey") ids.push(...s.steps.flatMap((st) => st.mediaIds));
   }
   return ids;
 }

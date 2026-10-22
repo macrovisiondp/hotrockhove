@@ -18,6 +18,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; perm: Per
       { href: "/admin/pages", label: "Pages", perm: "content.view" },
       { href: "/admin/menu", label: "Menu", perm: "content.view" },
       { href: "/admin/offers", label: "Offers", perm: "content.view" },
+      { href: "/admin/reviews", label: "Reviews", perm: "content.view" },
       { href: "/admin/media", label: "Media", perm: "content.view" },
       { href: "/admin/navigation", label: "Navigation", perm: "content.view" },
       { href: "/admin/popups", label: "Pop-ups", perm: "content.view" },
