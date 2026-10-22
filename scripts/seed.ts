@@ -19,6 +19,7 @@ import { sectionsSchema } from "../src/domain/sections";
 import { fieldsSchema, type FormField } from "../src/domain/forms/fields";
 import { DEFAULTS, saveSetting, type BusinessSettings } from "../src/lib/settings";
 import { GOOGLE_REVIEWS } from "./data/google-reviews";
+import { MENU_PHOTOS } from "./data/menu-photos";
 import { MEDIA_ALT } from "./data/media-alt";
 import { classifyRights, GALLERY_PATHS, WP_UPLOADS } from "./data/media-manifest";
 
@@ -285,7 +286,7 @@ async function seedMenu() {
         prices: it.prices,
         sourcePriceText: it.sourcePriceText,
         featured,
-        imageId: it.name === "Premium A5+9 Wagyu Fillet Steak" ? m("2026/02/ourm-h.jpg") || null : null,
+        imageId: MENU_PHOTOS[it.name] ? m(MENU_PHOTOS[it.name]) || null : null,
         sortOrder: ii * 10,
         reviewNote: [it.reviewNote, extraNote].filter(Boolean).join(" "),
       });
