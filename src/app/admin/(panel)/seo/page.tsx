@@ -4,7 +4,7 @@ import { can } from "@/lib/rbac";
 import { requirePermission } from "@/lib/session";
 import { getSettingFresh } from "@/lib/settings";
 import { ActionForm, ConfirmButton, Select, TextArea, TextInput, Toggle } from "@/components/admin/form";
-import { Badge, Card, Notice, PageHeader } from "@/components/admin/ui";
+import { Badge, Card, PageHeader } from "@/components/admin/ui";
 import { deleteRedirectAction, saveRedirectAction, saveSeoAction } from "./actions";
 
 export const metadata = { title: "SEO & redirects" };
@@ -37,7 +37,7 @@ export default async function Seo() {
               <Toggle
                 name="allowIndexing"
                 label="Allow search engines to index the site"
-                hint="Leave off until launch. When off, every page is 'noindex', robots.txt blocks crawling and the sitemap is empty. Preview deployments never index."
+                hint="Turn on once the site is live on hotrockhove.com, so Google can list it. While off, search engines are asked not to list any page."
                 defaultChecked={seo.allowIndexing}
               />
             </div>
@@ -48,10 +48,6 @@ export default async function Seo() {
           title="Redirects"
           description="Old addresses from the WordPress site and their new destinations. Changes apply within a minute. 'Include sub-pages' also matches everything below the address."
         >
-          <Notice tone="info">
-            The old site&apos;s SEO plugin (Rank Math) redirect list couldn&apos;t be checked during the audit. If Google Search Console reports 404s for old
-            addresses after launch, add them here.
-          </Notice>
           <ul className="mt-4 space-y-3">
             {redirects.map((r) => (
               <li key={r.id} className="rounded-md border border-[#ece9e4] p-3">

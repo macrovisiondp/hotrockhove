@@ -38,7 +38,7 @@ Run on 2026-10-20 against the local development build (PGlite database seeded wi
 - API key encrypted, shown only masked, never in the page HTML, removable.
 - Draft pages aren't public; staff preview works.
 - Viewer role can't open Users, can't export, and sees settings read-only.
-- Dashboard readiness list.
+- Dashboard connection status and the Connections page.
 - Media storage page shows the S3 setup (bucket policy, CORS); video detail offers a poster picker.
 
 ## Bugs found and fixed by testing

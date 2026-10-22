@@ -73,7 +73,3 @@ export function env(): Env {
   return cached;
 }
 
-export function turnstileConfigured(): boolean {
-  const e = env();
-  return Boolean(e.NEXT_PUBLIC_TURNSTILE_SITE_KEY && e.TURNSTILE_SECRET_KEY);
-}

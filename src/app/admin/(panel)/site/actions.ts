@@ -62,11 +62,9 @@ export async function refreshSiteCacheAction(): Promise<ActionState> {
 export async function saveConsentAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   return guarded(async () => {
     const user = await assertPermission("settings.edit");
-    const parsed = validateSetting("consent", {
-      bannerText: str(fd, "bannerText"),
-      analyticsProvider: str(fd, "analyticsProvider"),
-      analyticsId: str(fd, "analyticsId"),
-    });
+    const current = await getSettingFresh("consent");
+    // Analytics is set under Connections; keep it as stored.
+    const parsed = validateSetting("consent", { ...current, bannerText: str(fd, "bannerText") });
     if (!parsed.success) return zodFailure(parsed.error);
     await saveSetting("consent", parsed.data, user.id);
     await audit("settings.update", { actorUserId: user.id, entityType: "settings", entityId: "consent", metadata: { analytics: parsed.data.analyticsProvider } });

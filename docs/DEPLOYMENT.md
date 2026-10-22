@@ -21,7 +21,7 @@
 | `APP_URL` | yes | `https://hotrockhove.com` (Production) or the preview URL |
 | `BETTER_AUTH_SECRET` | yes | 32+ random bytes, base64. Different per environment |
 | `SETTINGS_ENCRYPTION_KEY` | yes | 32 random bytes, base64. **Store a copy in a password manager**: losing it means re-entering every API key in the admin |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | recommended | From Cloudflare Turnstile (widget for hotrockhove.com + preview domain) |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | optional | Fallback only. Normally the owner pastes the Turnstile keys in Admin → Connections |
 | `CRON_SECRET` | yes | Random string; Vercel sends it to `/api/cron/retention` |
 | `RESEND_API_KEY` | optional | Fallback only. Normally the owner pastes the key in Admin → Email |
 | `MEDIA_PUBLIC_HOST` | only with a custom CDN domain | Hostname of a CloudFront alias, e.g. `media.hotrockhove.com`; allows image optimisation and CSP for that host (set before building) |
@@ -66,7 +66,7 @@ The old WP Mail SMTP Outlook connection (expired Azure secret, sender on the non
 
 On the preview URL:
 
-- Sign in, run through [ACCEPTANCE_TESTS.md](ACCEPTANCE_TESTS.md) and the dashboard's launch-readiness list.
+- Sign in, run through [ACCEPTANCE_TESTS.md](ACCEPTANCE_TESTS.md) and check Admin → Connections.
 - `E2E_BASE_URL=https://<preview> npm run test:e2e` (needs a dev owner on that database; don't run it against production data).
 
 ## 7. Cutover (owner approval required at each step)

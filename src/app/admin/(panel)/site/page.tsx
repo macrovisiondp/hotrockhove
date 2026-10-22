@@ -1,9 +1,9 @@
-import { turnstileConfigured } from "@/lib/env";
+import Link from "next/link";
 import { can } from "@/lib/rbac";
 import { requirePermission } from "@/lib/session";
 import { getSettingFresh } from "@/lib/settings";
-import { ActionForm, Select, TextArea, TextInput, Toggle } from "@/components/admin/form";
-import { Badge, Card, PageHeader } from "@/components/admin/ui";
+import { ActionForm, TextArea, TextInput, Toggle } from "@/components/admin/form";
+import { Card, PageHeader } from "@/components/admin/ui";
 import { refreshSiteCacheAction, saveConsentAction, saveFeaturesAction } from "./actions";
 
 export const metadata = { title: "Site settings" };
@@ -58,34 +58,19 @@ export default async function SiteSettings() {
           </ActionForm>
         </Card>
 
-        <Card title="Cookies and analytics" description="The site uses one essential cookie for the visitor's choice. Optional content and analytics load only after 'Accept all'.">
+        <Card title="Cookie banner" description="The site uses one essential cookie for the visitor's choice. Optional content (maps, tour, analytics) loads only after 'Accept all'.">
           <ActionForm action={saveConsentAction} disabled={!canEdit} compact>
             <TextArea name="bannerText" label="Cookie banner text" defaultValue={consent.bannerText} rows={3} maxLength={400} />
-            <div className="grid gap-4 md:grid-cols-2">
-              <Select
-                name="analyticsProvider"
-                label="Analytics"
-                defaultValue={consent.analyticsProvider}
-                options={[
-                  { value: "none", label: "None" },
-                  { value: "ga4", label: "Google Analytics 4" },
-                  { value: "plausible", label: "Plausible" },
-                ]}
-              />
-              <TextInput name="analyticsId" label="Measurement ID / site" defaultValue={consent.analyticsId} placeholder="G-XXXXXXX or hotrockhove.com" />
-            </div>
+            <p className="text-sm text-[#6b665e]">
+              Google Analytics is set up under{" "}
+              <Link href="/admin/connections" className="underline">
+                Connections
+              </Link>
+              .
+            </p>
           </ActionForm>
         </Card>
 
-        <Card title="Spam protection">
-          <p className="text-sm">
-            Cloudflare Turnstile: {turnstileConfigured() ? <Badge tone="good">Active</Badge> : <Badge tone="warn">Not configured</Badge>}
-          </p>
-          <p className="mt-2 text-xs text-[#6b665e]">
-            Turnstile keys are platform settings, set as Vercel environment variables (NEXT_PUBLIC_TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY). Every form also
-            has a hidden trap field and per-connection rate limits.
-          </p>
-        </Card>
       </div>
     </>
   );

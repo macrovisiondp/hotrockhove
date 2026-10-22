@@ -196,6 +196,12 @@ export const reviewsSchema = z.object({
     .max(60),
 });
 
+/** Cloudflare Turnstile (bot protection on forms). Secret stored encrypted. */
+export const turnstileSchema = z.object({
+  siteKey: z.union([z.literal(""), z.string().trim().regex(/^[0-9A-Za-z_-]{10,100}$/, "That doesn't look like a Turnstile site key")]),
+  secretKey: z.string(), // encrypted at rest
+});
+
 const SCHEMAS = {
   business: businessSchema,
   brand: brandSchema,
@@ -206,6 +212,7 @@ const SCHEMAS = {
   features: featuresSchema,
   storage: storageSchema,
   reviews: reviewsSchema,
+  turnstile: turnstileSchema,
 };
 
 export type BusinessSettings = z.infer<typeof businessSchema>;
@@ -217,6 +224,7 @@ export type ConsentSettings = z.infer<typeof consentSchema>;
 export type FeatureSettings = z.infer<typeof featuresSchema>;
 export type StorageSettings = z.infer<typeof storageSchema>;
 export type ReviewsSettings = z.infer<typeof reviewsSchema>;
+export type TurnstileSettings = z.infer<typeof turnstileSchema>;
 export type Review = ReviewsSettings["items"][number];
 export type OpeningHours = BusinessSettings["hours"];
 
@@ -230,6 +238,7 @@ type SettingsMap = {
   features: FeatureSettings;
   storage: StorageSettings;
   reviews: ReviewsSettings;
+  turnstile: TurnstileSettings;
 };
 export type SettingsKey = keyof SettingsMap;
 
@@ -306,6 +315,7 @@ export const DEFAULTS: SettingsMap = {
     cloudinary: { cloudName: "", apiKey: "", apiSecret: "", folder: "hotrockhove" },
   },
   reviews: { summaryLabel: "", totalCount: 0, googleUrl: "", items: [] },
+  turnstile: { siteKey: "", secretKey: "" },
 };
 
 /* -------------------------------------------------------------------------- */

@@ -1,25 +1,24 @@
 import Link from "next/link";
 import { and, count, desc, eq, gt, sql } from "drizzle-orm";
 import { db, t } from "@/db";
-import { readinessChecks } from "@/domain/readiness";
 import { can } from "@/lib/rbac";
 import { requirePermission } from "@/lib/session";
+import { getSettingFresh } from "@/lib/settings";
+import { turnstileKeys } from "@/lib/turnstile";
 import { Badge, Card, Notice, PageHeader, formatDateTime } from "@/components/admin/ui";
 
 export const metadata = { title: "Dashboard" };
 
-const STATUS = {
-  blocker: { tone: "bad", label: "Blocker" },
-  warn: { tone: "warn", label: "Review" },
-  ok: { tone: "good", label: "Done" },
-  info: { tone: "info", label: "Optional" },
-} as const;
-
 export default async function Dashboard({ searchParams }: PageProps<"/admin">) {
   const user = await requirePermission("dashboard.view");
   const sp = await searchParams;
-  const checks = await readinessChecks();
-  const blockers = checks.filter((c) => c.status === "blocker").length;
+  const [email, business, consent, ts] = await Promise.all([getSettingFresh("email"), getSettingFresh("business"), getSettingFresh("consent"), turnstileKeys(true)]);
+  const connections = [
+    { label: "Email (Resend)", on: email.deliveryEnabled && Boolean(email.resendApiKey && email.fromAddress) },
+    { label: "Spam protection (Turnstile)", on: Boolean(ts.source) },
+    { label: "Booking system", on: Boolean(business.bookTableUrl) },
+    { label: "Google Analytics", on: consent.analyticsProvider === "ga4" && Boolean(consent.analyticsId) },
+  ];
 
   const [[newSubs], [subscribers], [emailFailed], [published], [drafts], [popups], [media]] = await Promise.all([
     db.select({ n: count() }).from(t.formSubmissions).where(eq(t.formSubmissions.status, "new")),
@@ -64,7 +63,7 @@ export default async function Dashboard({ searchParams }: PageProps<"/admin">) {
 
   return (
     <>
-      <PageHeader title="Dashboard" description="Website status, launch readiness and recent activity. Figures come from this site's own data; no analytics are estimated." />
+      <PageHeader title="Dashboard" />
       {sp.error === "forbidden" && (
         <div className="mb-4">
           <Notice tone="bad">You don&apos;t have permission to open that page.</Notice>
@@ -93,25 +92,18 @@ export default async function Dashboard({ searchParams }: PageProps<"/admin">) {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
-        <Card
-          title="Launch readiness"
-          description={blockers ? `${blockers} item(s) must be resolved before the new site replaces WordPress.` : "No blockers. Review the remaining items, then request launch approval."}
-        >
+        <Card title="Connections" description="Services the website uses. Set them up under Connections.">
           <ul className="divide-y divide-[#f0ede8]">
-            {checks.map((c) => (
-              <li key={c.id} className="flex items-start gap-3 py-2.5">
-                <span className="w-[70px] shrink-0 pt-0.5">
-                  <Badge tone={STATUS[c.status].tone}>{STATUS[c.status].label}</Badge>
-                </span>
-                <div className="min-w-0 flex-1">
-                  <Link href={c.href} className="text-sm font-medium hover:underline">
-                    {c.label}
-                  </Link>
-                  <p className="text-xs leading-relaxed text-[#6b665e]">{c.detail}</p>
-                </div>
+            {connections.map((c) => (
+              <li key={c.label} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+                <span>{c.label}</span>
+                {c.on ? <Badge tone="good">Connected</Badge> : <Badge tone="neutral">Not connected</Badge>}
               </li>
             ))}
           </ul>
+          <Link href="/admin/connections" className="admin-btn admin-btn-secondary mt-4 inline-flex">
+            Open Connections
+          </Link>
         </Card>
 
         <div className="space-y-6">

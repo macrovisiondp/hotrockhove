@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { inArray } from "drizzle-orm";
 import { db, t } from "@/db";
-import { env, turnstileConfigured } from "@/lib/env";
+import { env } from "@/lib/env";
+import { turnstileSiteKey } from "@/lib/turnstile";
 import { formatAddress, getSetting, type BusinessSettings } from "@/lib/settings";
 import { HomeSounds } from "@/components/site/home-sounds";
 import { PageTitle, RenderSections, type SectionContext } from "@/components/site/sections";
@@ -101,7 +102,7 @@ export async function PageContent({ page }: { page: Pick<PublicPage, "slug" | "t
     reviews,
     isHome: slug === "",
     privacyHref,
-    turnstileSiteKey: turnstileConfigured() ? env().NEXT_PUBLIC_TURNSTILE_SITE_KEY! : null,
+    turnstileSiteKey: await turnstileSiteKey(),
     menu,
     offers,
     forms: Object.fromEntries(

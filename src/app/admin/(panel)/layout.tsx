@@ -9,7 +9,10 @@ export const metadata = { title: { default: "Admin", template: "%s · Admin" }, 
 const SECTIONS: { title: string; items: { href: string; label: string; perm: Permission }[] }[] = [
   {
     title: "Overview",
-    items: [{ href: "/admin", label: "Dashboard", perm: "dashboard.view" }],
+    items: [
+      { href: "/admin", label: "Dashboard", perm: "dashboard.view" },
+      { href: "/admin/connections", label: "Connections", perm: "settings.view" },
+    ],
   },
   {
     title: "Website",
@@ -35,7 +38,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; perm: Per
   {
     title: "Configuration",
     items: [
-      { href: "/admin/email", label: "Email & notifications", perm: "settings.view" },
+      { href: "/admin/email", label: "Email log", perm: "settings.view" },
       { href: "/admin/seo", label: "SEO & redirects", perm: "settings.view" },
       { href: "/admin/site", label: "Site settings", perm: "settings.view" },
       { href: "/admin/users", label: "Users", perm: "users.manage" },

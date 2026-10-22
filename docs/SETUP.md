@@ -64,7 +64,7 @@ src/app/admin/         admin: login, (panel)/… modules, preview, CSV exports
 src/app/api/           popup events, cron retention, internal routing, admin media search
 src/components/site/   public UI (header, footer, sections, forms, consent, pop-ups)
 src/components/admin/  admin UI (forms, media picker, section editor, field editor)
-src/domain/            content queries, sections, forms, newsletter, readiness, migration helpers
+src/domain/            content queries, sections, forms, newsletter, migration helpers
 src/lib/               auth, RBAC, settings, crypto, email, storage, rate limits, CSP, audit
 src/db/                Drizzle schema + client
 drizzle/               SQL migrations (committed)

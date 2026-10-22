@@ -162,11 +162,16 @@ test("role permissions are enforced on the server", async ({ page, browser, base
   await expect(card.getByRole("status")).toContainText(/signed out/);
 });
 
-test("dashboard shows launch blockers from real configuration", async ({ page }) => {
+test("dashboard shows connection status; Connections page has a form per service", async ({ page }) => {
   await signIn(page);
-  await expect(page.getByRole("heading", { name: "Launch readiness" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Notification recipients" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Email delivery" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Connections" })).toBeVisible();
+  await expect(page.getByText("Email (Resend)")).toBeVisible();
+  await page.getByRole("link", { name: "Open Connections" }).click();
+  await waitForForms(page);
+  await expect(page.getByLabel("Resend API key")).toBeVisible();
+  await expect(page.getByLabel("Secret key")).toBeVisible();
+  await expect(page.getByLabel("Booking page address")).toBeVisible();
+  await expect(page.getByLabel("Measurement ID")).toBeVisible();
 });
 
 test("media storage settings explain the S3 setup; videos accept a poster", async ({ page }) => {

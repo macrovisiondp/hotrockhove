@@ -12,7 +12,7 @@ export function PageHeader({ title, description, actions }: { title: string; des
   );
 }
 
-export function Card({ title, description, children, className = "" }: { title?: string; description?: ReactNode; children: ReactNode; className?: string }) {
+export function Card({ title, description, children, className = "" }: { title?: ReactNode; description?: ReactNode; children: ReactNode; className?: string }) {
   return (
     <section className={`admin-card p-5 ${className}`}>
       {title && <h2 className="text-base font-semibold">{title}</h2>}

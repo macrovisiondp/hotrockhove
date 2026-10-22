@@ -43,7 +43,8 @@ export async function saveBusinessAction(_prev: ActionState, fd: FormData): Prom
       instagramUrl: str(fd, "instagramUrl"),
       tiktokUrl: str(fd, "tiktokUrl"),
       footerBlurb: str(fd, "footerBlurb"),
-      confirmed: { contact: bool(fd, "confirmed.contact"), hours: bool(fd, "confirmed.hours"), socials: bool(fd, "confirmed.socials") },
+      // No longer edited in the admin; kept as stored.
+      confirmed: current.confirmed,
     };
 
     const parsed = validateSetting("business", next);

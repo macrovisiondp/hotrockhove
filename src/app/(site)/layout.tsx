@@ -1,3 +1,4 @@
+import { turnstileSiteKey as turnstileSiteKey_ } from "@/lib/turnstile";
 import Link from "next/link";
 import { getNav } from "@/domain/content";
 import { getBookTarget, resolveHref } from "@/domain/links";
@@ -27,7 +28,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const { popups, forms } = await getClientPopups(book);
   const phoneHref = business.phone ? telHref(business.phone) : null;
   const bookLink = headerNav.find((l) => l.href === "book");
-  const turnstileSiteKey = env().TURNSTILE_SECRET_KEY ? (env().NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? null) : null;
+  const turnstileSiteKey = await turnstileSiteKey_();
   const submitForm = Object.fromEntries(Object.keys(forms).map((k) => [k, submitFormAction.bind(null, k)]));
   const announcement = features.announcementEnabled && features.announcementText ? features : null;
 

@@ -182,3 +182,9 @@ test("journey section: steps carry up to 3 media each and count as page media", 
   const tooMany = parseSections([{ id: "j", hidden: false, type: "journey", eyebrow: "", heading: "", body: "", steps: [{ id: "s1", caption: "", mediaIds: [a, b, a, b] }] }]);
   assert.equal(tooMany.invalid, 1);
 });
+
+test("Turnstile keys: admin settings first, environment as fallback, none when unset", async () => {
+  assert.equal(validateSetting("turnstile", { siteKey: "0x4AAAAAAABBBBBBB", secretKey: encryptSecret("0x4AAAAAAA-secret-value") }).success, true);
+  assert.equal(validateSetting("turnstile", { siteKey: "<script>", secretKey: "" }).success, false);
+  assert.equal(validateSetting("turnstile", DEFAULTS.turnstile).success, true);
+});

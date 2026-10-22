@@ -11,6 +11,8 @@
  *  - Optional 360° tour host, only while that feature is switched on.
  *  - www.google.com / maps.google.com — the "Visit us" map embed (frame only; it
  *    loads after cookie consent or a click).
+ *  - Google Analytics 4 / Plausible — analytics beacons, only sent after the visitor
+ *    accepts optional cookies (the script is added by the consent component).
  *
  * Documented exceptions:
  *  - style-src-attr 'unsafe-inline': Turnstile and the reviews widget size
@@ -29,6 +31,7 @@ const MEDIA_HOST = [
 ];
 export const TRUSTINDEX_ORIGINS = ["https://cdn.trustindex.io", "https://*.trustindex.io"];
 export const GOOGLE_MAPS_FRAME_ORIGINS = ["https://www.google.com", "https://maps.google.com"];
+export const ANALYTICS_ORIGINS = ["https://www.googletagmanager.com", "https://*.google-analytics.com", "https://*.analytics.google.com", "https://plausible.io"];
 
 export function buildCsp(nonce: string, opts: { isDev: boolean; frameOrigins?: string[] }): string {
   const directives: Record<string, string[]> = {
@@ -36,10 +39,10 @@ export function buildCsp(nonce: string, opts: { isDev: boolean; frameOrigins?: s
     "script-src": ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'", TURNSTILE_ORIGIN, ...(opts.isDev ? ["'unsafe-eval'"] : [])],
     "style-src": ["'self'", `'nonce-${nonce}'`, ...TRUSTINDEX_ORIGINS],
     "style-src-attr": ["'unsafe-inline'"],
-    "img-src": ["'self'", "data:", "blob:", ...S3_ORIGINS, ...MEDIA_HOST, CLOUDINARY_ORIGIN, ...TRUSTINDEX_ORIGINS, "https://lh3.googleusercontent.com"],
+    "img-src": ["'self'", "data:", "blob:", ...S3_ORIGINS, ...MEDIA_HOST, CLOUDINARY_ORIGIN, ...TRUSTINDEX_ORIGINS, "https://lh3.googleusercontent.com", ...ANALYTICS_ORIGINS],
     "media-src": ["'self'", "blob:", ...S3_ORIGINS, ...MEDIA_HOST, CLOUDINARY_ORIGIN],
     "font-src": ["'self'", ...TRUSTINDEX_ORIGINS],
-    "connect-src": ["'self'", TURNSTILE_ORIGIN, ...S3_ORIGINS, ...MEDIA_HOST, "https://api.cloudinary.com", ...TRUSTINDEX_ORIGINS],
+    "connect-src": ["'self'", TURNSTILE_ORIGIN, ...S3_ORIGINS, ...MEDIA_HOST, "https://api.cloudinary.com", ...TRUSTINDEX_ORIGINS, ...ANALYTICS_ORIGINS],
     "frame-src": [TURNSTILE_ORIGIN, ...GOOGLE_MAPS_FRAME_ORIGINS, ...(opts.frameOrigins ?? [])],
     "worker-src": ["'self'", "blob:"],
     "object-src": ["'none'"],

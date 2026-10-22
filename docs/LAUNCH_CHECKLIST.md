@@ -1,6 +1,6 @@
 # Launch Checklist and Outstanding Issues
 
-Live status is on the admin **Dashboard → Launch readiness**, which checks real configuration. This page lists what can't be checked automatically, plus decisions only the owner can make.
+Service connections (email, spam protection, booking link, analytics) are entered and checked in **Admin → Connections**. This page lists what can't be checked there, plus decisions only the owner can make.
 
 ## A. Owner decisions and information needed
 
@@ -31,7 +31,7 @@ Live status is on the admin **Dashboard → Launch readiness**, which checks rea
 | Neon project | Production database (`DATABASE_URL`) |
 | Resend account + API key | Email (owner pastes it in Admin → Email) |
 | Hostinger hPanel DNS access (or someone to apply records) | Resend DKIM, then the domain cutover |
-| Cloudflare Turnstile keys | Form bot protection |
+| Cloudflare Turnstile keys (paste in Admin → Connections) | Form bot protection |
 | Trustindex account | Reviews widget |
 | Rank Math redirects export from WordPress (couldn't be read: HTTP 403) | Confirm no other old URLs need redirects |
 | Microsoft 365 / `hotrocksteaks.com` status | Only to understand the old mail setup; not needed for the new site |

@@ -103,7 +103,7 @@ export default async function MediaDetail({ params }: PageProps<"/admin/media/[i
                 defaultValue={m.rightsStatus}
                 options={[
                   { value: "cleared", label: "Cleared: we own it or have permission" },
-                  { value: "unconfirmed", label: "Unconfirmed: check before launch" },
+                  { value: "unconfirmed", label: "Unconfirmed: check before using" },
                   { value: "excluded", label: "Excluded: never show on the site" },
                 ]}
               />
