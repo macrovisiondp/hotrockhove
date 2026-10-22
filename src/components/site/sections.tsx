@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MapPin } from "@phosphor-icons/react/dist/ssr";
 import type { PublicMedia, PublicMenuCategory } from "@/domain/content";
@@ -328,19 +329,26 @@ function Offers({ s, ctx }: { s: SectionOf<"offers">; ctx: SectionContext }) {
         {current.map((o) => {
           const img = o.imageId ? ctx.media.get(o.imageId) : undefined;
           return (
-            <article key={o.id} className="flex flex-col bg-ink-950">
-              {img && (
-                <div className="relative aspect-[5/4] overflow-hidden bg-ink-900">
-                  <MediaImage media={img} sizes="(min-width: 768px) 50vw, 100vw" />
-                </div>
-              )}
-              <div className="flex flex-1 flex-col p-8 lg:p-10">
-                <h3 className="display text-3xl text-bone lg:text-4xl">{o.title}</h3>
-                {o.tagline && <p className="mt-2 text-bronze">{o.tagline}</p>}
-                {o.body && <RichText text={o.body} className="mt-5 flex-1 leading-relaxed text-stone" />}
+            <article key={o.id} className="flex gap-5 bg-ink-950 p-6 sm:gap-7 lg:p-8">
+              {/* Small square thumbnail; offers without a photo get the brand mark instead. */}
+              <div className="relative aspect-square w-24 shrink-0 self-start overflow-hidden bg-ink-900 sm:w-36 lg:w-40">
+                {img ? (
+                  <MediaImage media={img} sizes="(min-width: 1024px) 160px, (min-width: 640px) 144px, 96px" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center border border-ink-800" aria-hidden>
+                    <div className="relative h-1/2 w-1/2 opacity-40">
+                      <Image src="/brand/logo-white.png" alt="" fill sizes="80px" className="object-contain" />
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col">
+                <h3 className="display text-2xl text-bone sm:text-3xl">{o.title}</h3>
+                {o.tagline && <p className="mt-1.5 text-bronze">{o.tagline}</p>}
+                {o.body && <RichText text={o.body} className="mt-4 flex-1 text-[0.95rem] leading-relaxed text-stone" />}
                 {(o.priceText || o.promoCode) && (
-                  <div className="mt-8 flex flex-wrap items-end justify-between gap-4 border-t border-ink-800 pt-6">
-                    {o.priceText ? <p className="display text-4xl text-bone">{o.priceText}</p> : <span />}
+                  <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t border-ink-800 pt-5">
+                    {o.priceText ? <p className="display text-3xl text-bone">{o.priceText}</p> : <span />}
                     {o.promoCode && (
                       <p className="text-sm text-stone">
                         Code <span className="ml-1 border border-bronze/60 px-2 py-1 font-semibold tracking-[0.14em] text-bone">{o.promoCode}</span>

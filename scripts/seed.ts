@@ -314,8 +314,8 @@ async function seedOffers() {
       body: "Our hand-selected Tenderloin is the most tender cut of all,\nsizzled exactly how you like it on your very own Hot Rock.\nTreat yourself this and EVERY Tuesday.\nBook Now and ask about our Tenderloin Tuesday offer",
       priceText: "",
       promoCode: "",
-      // The old site used the Fillet Friday photo for this offer too.
-      imageId: m("2026/02/fillet-fri-enh.jpg") || null,
+      // No photo of its own (the old site reused Fillet Friday's); the site shows the brand placeholder.
+      imageId: null,
       reviewNote: "",
     },
     {
