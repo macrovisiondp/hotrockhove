@@ -10,3 +10,7 @@ test-results/
 *.tsbuildinfo
 next-env.d.ts
 .neon
+
+.vercel
+.env*
+!.env.example
