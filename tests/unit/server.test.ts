@@ -188,3 +188,63 @@ test("Turnstile keys: admin settings first, environment as fallback, none when u
   assert.equal(validateSetting("turnstile", { siteKey: "<script>", secretKey: "" }).success, false);
   assert.equal(validateSetting("turnstile", DEFAULTS.turnstile).success, true);
 });
+
+test("marketing: phone numbers become E.164 (UK by default); junk is rejected", async () => {
+  const { normalisePhone, normaliseEmail } = await import("../../src/domain/marketing");
+  assert.equal(normalisePhone("07700 900123"), "+447700900123");
+  assert.equal(normalisePhone("+44 (0)7700-900123".replace("(0)", "")), "+447700900123");
+  assert.equal(normalisePhone("0044 7700 900123"), "+447700900123");
+  assert.equal(normalisePhone("447700900123"), "+447700900123");
+  assert.equal(normalisePhone("+1 415 555 2671"), "+14155552671");
+  assert.equal(normalisePhone("12345"), null);
+  assert.equal(normalisePhone("+44 7700 9001"), null);
+  assert.equal(normaliseEmail(" Jane@Example.COM "), "jane@example.com");
+  assert.equal(normaliseEmail("not an email"), null);
+});
+
+test("marketing: contact uploads with or without a header row", async () => {
+  const { parseContacts } = await import("../../src/domain/marketing");
+  const withHeader = parseContacts('Name,Email,Mobile\n"Smith, Jane",jane@example.com,07700 900123\nSam,,07700900456\nNobody,,\n');
+  assert.deepEqual(withHeader.contacts, [
+    { name: "Smith, Jane", email: "jane@example.com", phone: "+447700900123" },
+    { name: "Sam", email: null, phone: "+447700900456" },
+  ]);
+  assert.equal(withHeader.invalid, 1);
+  const pasted = parseContacts("Jane Smith, jane@example.com, 07700 900123\nsam@example.com\n07700 900456\nhello");
+  assert.equal(pasted.contacts.length, 3);
+  assert.deepEqual(pasted.contacts[0], { name: "Jane Smith", email: "jane@example.com", phone: "+447700900123" });
+  assert.equal(pasted.invalid, 1);
+});
+
+test("marketing: unsubscribe links are signed per address and can't be forged", async () => {
+  const { unsubscribeToken, emailFromUnsubscribeToken } = await import("../../src/domain/marketing");
+  const tok = unsubscribeToken("jane@example.com");
+  assert.equal(emailFromUnsubscribeToken(tok), "jane@example.com");
+  const forged = `${Buffer.from("sam@example.com").toString("base64url")}.${tok.split(".")[1]}`;
+  assert.equal(emailFromUnsubscribeToken(forged), null);
+  assert.equal(emailFromUnsubscribeToken("garbage"), null);
+});
+
+test("SMS: part counting and Twilio signature validation", async () => {
+  const { smsSegments } = await import("../../src/lib/sms/segments");
+  assert.deepEqual(smsSegments("a".repeat(160)), { chars: 160, segments: 1, unicode: false });
+  assert.equal(smsSegments("a".repeat(161)).segments, 2);
+  assert.equal(smsSegments("Steak night 🔥").unicode, true);
+  const { validTwilioSignature } = await import("../../src/lib/sms/twilio");
+  const { createHmac } = await import("node:crypto");
+  const params = { From: "+447700900123", Body: "STOP" };
+  const url = "https://hotrockhove.com/api/twilio/inbound";
+  const sig = createHmac("sha1", "secret-token").update(url + "BodySTOPFrom+447700900123").digest("base64");
+  assert.equal(validTwilioSignature("secret-token", url, params, sig), true);
+  assert.equal(validTwilioSignature("secret-token", url, { ...params, Body: "START" }, sig), false);
+});
+
+test("marketing email: button and unsubscribe links are https-only and escaped", () => {
+  const ok = layout({ brandName: "Hot Rock", heading: "Offer", paragraphs: ["<b>hi</b>"], cta: { label: "Book", url: "https://x.example/a?b=1&c=2" }, unsubscribeUrl: "https://x.example/unsubscribe?t=abc" });
+  assert.ok(ok.html.includes('href="https://x.example/a?b=1&amp;c=2"'));
+  assert.ok(ok.html.includes(">Unsubscribe</a>"));
+  assert.ok(!ok.html.includes("<b>hi</b>"));
+  assert.ok(ok.text.includes("Unsubscribe: https://x.example/unsubscribe?t=abc"));
+  const bad = layout({ brandName: "H", heading: "x", paragraphs: [], cta: { label: "Go", url: "javascript:alert(1)" }, unsubscribeUrl: "http://insecure" });
+  assert.ok(!bad.html.includes("javascript:") && !bad.html.includes("http://insecure"));
+});

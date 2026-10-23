@@ -15,7 +15,7 @@ Change your password under **My account** (bottom left).
 
 ## Everyday tasks
 
-**Change phone, email, address or opening hours.** Go to Business settings, edit, then press **Save changes**. Every page, the footer, contact page and Google data update immediately. Tick "confirmed" once you've checked a section.
+**Change phone, email, address or opening hours.** Go to Business settings, edit, then press **Save changes**. Every page, the footer, contact page and Google data update immediately.
 
 **Change a price or dish.** Menu → click the dish → edit → Save. Untick "Available" to hide something temporarily. "Featured" puts it in the homepage highlights. Items marked **Review** came from the old website with something odd (e.g. "£5:99"); fix them and tick "Mark as reviewed".
 
@@ -25,15 +25,21 @@ Change your password under **My account** (bottom left).
 
 **Edit a page.** Pages → choose the page. Each block (hero, story, gallery…) opens when clicked. Use the arrows to reorder and the eye to hide a block. Press **Save changes**. Use **Preview** to check a draft. Published pages update at once.
 
-**Book Table button.** When the new booking system is ready, paste its web address in Business settings → Book Table. Until then, the button opens the table-request form.
+**Book Table button.** When the new booking system is ready, paste its web address in Connections → Booking system. Until then, the button opens the table-request form.
+
+**Connections (owner).** One page for the services the site uses: email (Resend), text messages (Twilio), spam protection (Cloudflare Turnstile), the booking link and Google Analytics. Paste the details, press **Save** and it takes effect straight away. Keys are stored encrypted and only the last 4 characters are ever shown.
 
 **Pop-ups.** Pop-ups → choose one. Set where it shows, when (delay, scroll or leaving the page), how often, and start and end dates. Keep them rare.
 
 **Read enquiries.** Form submissions. New ones are bold; opening one marks it read. "Reply by email" opens your email app. Use Delete for erasure requests. Submissions are deleted automatically after the retention period set on each form.
 
-**Newsletter.** People are only "Subscribed" after clicking the link in their confirmation email. Export confirmed subscribers as CSV for your email-marketing service. The website itself doesn't send campaigns.
+**Newsletter.** People are only "Subscribed" after clicking the link in their confirmation email. Confirmed subscribers are included automatically in Marketing emails; legacy addresses (no consent record) never are.
 
-**Email settings (owner/admin).** Email & notifications: who gets notified, the sender, the Resend API key (owner only, never shown again after saving), the master on/off switch and a **Send test** button. The delivery log shows what was sent or why it failed.
+**Marketing (owner/admin).** Marketing → **New email** or **New text message**. Write it, choose who gets it, press **Save**, send yourself a test, then **Send to N people**. Keep the page open while it sends (it shows progress; if you close it, open the campaign again to carry on — nobody gets it twice). Every email has an unsubscribe link and every text ends with "Reply STOP to opt out"; people who opt out are left out of everything from then on.
+
+**Marketing contacts.** Marketing → Contacts → upload a CSV (columns like name, email, phone) or paste one contact per line. Only upload people who agreed to hear from you, and say how they agreed. Anyone who unsubscribed stays unsubscribed even if they're in a new upload. Texts cost money per message part (shown as you type).
+
+**Email log.** Shows what the site emailed (notifications, confirmations) and why anything failed.
 
 **Holiday hours or news.** Site settings → Announcement bar.
 

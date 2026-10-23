@@ -20,7 +20,7 @@ export default async function Dashboard({ searchParams }: PageProps<"/admin">) {
     { label: "Google Analytics", on: consent.analyticsProvider === "ga4" && Boolean(consent.analyticsId) },
   ];
 
-  const [[newSubs], [subscribers], [emailFailed], [published], [drafts], [popups], [media]] = await Promise.all([
+  const [[newSubs], [subscribers], [emailFailed], [published], [drafts], [popups], [media], [marketing]] = await Promise.all([
     db.select({ n: count() }).from(t.formSubmissions).where(eq(t.formSubmissions.status, "new")),
     db.select({ n: count() }).from(t.newsletterSubscribers).where(eq(t.newsletterSubscribers.status, "subscribed")),
     db
@@ -31,6 +31,7 @@ export default async function Dashboard({ searchParams }: PageProps<"/admin">) {
     db.select({ n: count() }).from(t.pages).where(eq(t.pages.status, "draft")),
     db.select({ n: count() }).from(t.popups).where(eq(t.popups.enabled, true)),
     db.select({ n: count(), bytes: sql<number>`coalesce(sum(${t.mediaAssets.bytes}), 0)` }).from(t.mediaAssets),
+    db.select({ n: count() }).from(t.marketingContacts),
   ]);
 
   const canSubs = can(user.role, "submissions.view");
@@ -59,6 +60,9 @@ export default async function Dashboard({ searchParams }: PageProps<"/admin">) {
     { label: "Pages", value: `${published.n} live`, note: `${drafts.n} draft`, href: "/admin/pages" },
     { label: "Active pop-ups", value: popups.n, href: "/admin/popups" },
     { label: "Media", value: media.n, note: `${(Number(media.bytes) / 1024 / 1024).toFixed(0)} MB`, href: "/admin/media" },
+    ...(can(user.role, "marketing.view")
+      ? [{ label: "Marketing contacts", value: marketing.n, note: "uploaded / added", href: "/admin/marketing" }]
+      : []),
   ];
 
   return (
@@ -70,7 +74,7 @@ export default async function Dashboard({ searchParams }: PageProps<"/admin">) {
         </div>
       )}
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
         {stats.map((s) => {
           const inner = (
             <>

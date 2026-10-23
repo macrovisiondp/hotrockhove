@@ -32,6 +32,10 @@ export const PERMISSIONS = {
   "subscribers.view": ["owner", "admin"],
   "subscribers.manage": ["owner", "admin"],
   "email.configure": ["owner", "admin"],
+  /** Marketing contacts and campaigns (contacting customers; SMS cost money). */
+  "marketing.view": ["owner", "admin"],
+  "marketing.manage": ["owner", "admin"],
+  "marketing.send": ["owner", "admin"],
   "secrets.edit": ["owner"],
   "users.manage": ["owner"],
   "audit.view": ["owner", "admin"],

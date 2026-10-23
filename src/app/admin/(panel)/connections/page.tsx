@@ -1,11 +1,22 @@
 import { can } from "@/lib/rbac";
 import { requirePermission } from "@/lib/session";
 import { getSettingFresh, maskSecret } from "@/lib/settings";
+import { env } from "@/lib/env";
+import { twilioReady } from "@/lib/sms/twilio";
 import { turnstileKeys } from "@/lib/turnstile";
 import { ActionForm, ConfirmButton, TextArea, TextInput } from "@/components/admin/form";
 import { Badge, Card, PageHeader } from "@/components/admin/ui";
 import { sendTestEmailAction } from "../email/actions";
-import { disconnectEmailAction, saveAnalyticsAction, saveBookingAction, saveEmailConnectionAction, saveTurnstileAction } from "./actions";
+import {
+  disconnectEmailAction,
+  disconnectTwilioAction,
+  saveAnalyticsAction,
+  saveBookingAction,
+  saveEmailConnectionAction,
+  saveTurnstileAction,
+  saveTwilioAction,
+  sendTestSmsAction,
+} from "./actions";
 
 export const metadata = { title: "Connections" };
 
@@ -15,14 +26,17 @@ function Status({ on, onText = "Connected", offText = "Not connected" }: { on: b
 
 export default async function ConnectionsPage() {
   const user = await requirePermission("settings.view");
-  const [email, notifications, turnstile, business, consent, tsKeys] = await Promise.all([
+  const [email, notifications, turnstile, business, consent, tsKeys, twilio] = await Promise.all([
     getSettingFresh("email"),
     getSettingFresh("notifications"),
     getSettingFresh("turnstile"),
     getSettingFresh("business"),
     getSettingFresh("consent"),
     turnstileKeys(true),
+    getSettingFresh("twilio"),
   ]);
+  const smsOn = twilioReady(twilio);
+  const tokenMask = maskSecret(twilio.authToken);
   const canEdit = can(user.role, "settings.edit");
   const isOwner = can(user.role, "secrets.edit");
   const emailOn = email.deliveryEnabled && Boolean(email.resendApiKey && email.fromAddress);
@@ -66,6 +80,41 @@ export default async function ConnectionsPage() {
                 </ActionForm>
               </div>
               {isOwner && <ConfirmButton action={disconnectEmailAction} label="Disconnect" confirmLabel="Yes, disconnect" question="Stop sending emails and remove the API key?" className="admin-btn admin-btn-secondary" />}
+            </div>
+          )}
+        </Card>
+
+        <Card
+          title={<span className="flex items-center gap-2">Text messages (Twilio) <Status on={smsOn} /></span>}
+          description="Sends marketing text messages from Admin → Marketing. Find these details in the Twilio Console (console.twilio.com) under Account Info."
+        >
+          <ActionForm action={saveTwilioAction} disabled={!canEdit} compact>
+            <div className="grid gap-4 md:grid-cols-2">
+              <TextInput name="accountSid" label="Account SID" defaultValue={twilio.accountSid} autoComplete="off" placeholder="AC…" disabled={!isOwner} />
+              <TextInput name="authToken" label="Auth Token" type="password" autoComplete="off" placeholder={tokenMask ? "••••••••" : ""} hint={keepHint(tokenMask)} disabled={!isOwner} />
+              <TextInput
+                name="sender"
+                label="Send texts from"
+                defaultValue={twilio.sender}
+                placeholder="+447700900123 or HotRock"
+                hint="Your Twilio phone number (with +44), a sender name of up to 11 letters (customers can't reply to it), or a Messaging Service SID (MG…)."
+                disabled={!isOwner}
+              />
+              <TextInput name="optOutText" label="Opt-out line added to every text" defaultValue={twilio.optOutText} maxLength={60} hint="Required for marketing texts. Keep it if you send from a phone number." />
+            </div>
+            <p className="text-xs text-[#6b665e]">
+              So that STOP replies are recorded automatically: in Twilio, open your phone number → Messaging → &quot;A message comes in&quot; → Webhook, and paste{" "}
+              <code className="rounded bg-[#f3f1ed] px-1 py-0.5">{env().APP_URL}/api/twilio/inbound</code> (HTTP POST).
+            </p>
+          </ActionForm>
+          {smsOn && (
+            <div className="mt-5 flex flex-wrap items-end gap-6 border-t border-[#f0ede8] pt-5">
+              <div className="min-w-[260px] flex-1">
+                <ActionForm action={sendTestSmsAction} submitLabel="Send a test text" showCancel={false} compact>
+                  <TextInput name="to" label="Send a test text to" type="tel" placeholder="07700 900123" />
+                </ActionForm>
+              </div>
+              {isOwner && <ConfirmButton action={disconnectTwilioAction} label="Disconnect" confirmLabel="Yes, disconnect" question="Stop sending texts and remove the Twilio details?" className="admin-btn admin-btn-secondary" />}
             </div>
           )}
         </Card>

@@ -202,6 +202,24 @@ export const turnstileSchema = z.object({
   secretKey: z.string(), // encrypted at rest
 });
 
+/**
+ * Twilio (marketing SMS). Auth token stored encrypted. The sender is a Twilio phone
+ * number (E.164), an alphanumeric sender ID (UK: up to 11 letters/digits, replies not
+ * possible) or a Messaging Service SID (MG…).
+ */
+export const twilioSchema = z.object({
+  accountSid: z.union([z.literal(""), z.string().trim().regex(/^AC[0-9a-fA-F]{32}$/, "An Account SID starts with AC followed by 32 characters")]),
+  authToken: z.string(), // encrypted at rest
+  sender: z.union([
+    z.literal(""),
+    z.string().trim().regex(/^\+[1-9]\d{7,14}$/, "Use the full number with country code, e.g. +447700900123"),
+    z.string().trim().regex(/^MG[0-9a-fA-F]{32}$/),
+    z.string().trim().regex(/^(?=.*[A-Za-z])[A-Za-z0-9 ]{1,11}$/, "A sender name is up to 11 letters or digits"),
+  ]),
+  /** Added to every marketing SMS. */
+  optOutText: z.string().trim().max(60),
+});
+
 const SCHEMAS = {
   business: businessSchema,
   brand: brandSchema,
@@ -213,6 +231,7 @@ const SCHEMAS = {
   storage: storageSchema,
   reviews: reviewsSchema,
   turnstile: turnstileSchema,
+  twilio: twilioSchema,
 };
 
 export type BusinessSettings = z.infer<typeof businessSchema>;
@@ -225,6 +244,7 @@ export type FeatureSettings = z.infer<typeof featuresSchema>;
 export type StorageSettings = z.infer<typeof storageSchema>;
 export type ReviewsSettings = z.infer<typeof reviewsSchema>;
 export type TurnstileSettings = z.infer<typeof turnstileSchema>;
+export type TwilioSettings = z.infer<typeof twilioSchema>;
 export type Review = ReviewsSettings["items"][number];
 export type OpeningHours = BusinessSettings["hours"];
 
@@ -239,6 +259,7 @@ type SettingsMap = {
   storage: StorageSettings;
   reviews: ReviewsSettings;
   turnstile: TurnstileSettings;
+  twilio: TwilioSettings;
 };
 export type SettingsKey = keyof SettingsMap;
 
@@ -316,6 +337,7 @@ export const DEFAULTS: SettingsMap = {
   },
   reviews: { summaryLabel: "", totalCount: 0, googleUrl: "", items: [] },
   turnstile: { siteKey: "", secretKey: "" },
+  twilio: { accountSid: "", authToken: "", sender: "", optOutText: "Reply STOP to opt out" },
 };
 
 /* -------------------------------------------------------------------------- */

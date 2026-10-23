@@ -363,6 +363,90 @@ export const newsletterSubscribers = pgTable(
 );
 
 /* -------------------------------------------------------------------------- */
+/* Marketing (email + SMS campaigns)                                          */
+/* -------------------------------------------------------------------------- */
+
+export const marketingChannel = pgEnum("marketing_channel", ["email", "sms"]);
+export const optInStatus = pgEnum("opt_in_status", ["subscribed", "unsubscribed"]);
+export const campaignStatus = pgEnum("campaign_status", ["draft", "sending", "sent", "cancelled"]);
+export const sendStatus = pgEnum("send_status", ["pending", "sending", "sent", "failed", "skipped"]);
+
+/**
+ * Marketing contacts uploaded or added by staff (newsletter sign-ups stay in
+ * newsletter_subscribers and are included at send time). Email and SMS consent are
+ * tracked separately; an unsubscribed contact is never re-subscribed by an upload.
+ */
+export const marketingContacts = pgTable(
+  "marketing_contacts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull().default(""),
+    /** Lower-case. Null when only a phone number is known. */
+    email: text("email"),
+    /** E.164 (e.g. +447700900123). Null when only an email is known. */
+    phone: text("phone"),
+    emailStatus: optInStatus("email_status").notNull().default("subscribed"),
+    smsStatus: optInStatus("sms_status").notNull().default("subscribed"),
+    /** upload:<file>, manual, … */
+    source: text("source").notNull().default(""),
+    /** What the person agreed to and when/where, as confirmed by staff at upload. */
+    consentNote: text("consent_note").notNull().default(""),
+    unsubscribedAt: timestamp("unsubscribed_at", { withTimezone: true }),
+    createdById: text("created_by_id").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("marketing_contacts_email_idx").on(t.email), uniqueIndex("marketing_contacts_phone_idx").on(t.phone)],
+);
+
+export const marketingCampaigns = pgTable(
+  "marketing_campaigns",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    channel: marketingChannel("channel").notNull(),
+    name: text("name").notNull(),
+    /** Email only. */
+    subject: text("subject").notNull().default(""),
+    /** Plain text (email: paragraphs separated by blank lines). */
+    body: text("body").notNull().default(""),
+    /** Optional button in emails. */
+    ctaLabel: text("cta_label").notNull().default(""),
+    ctaUrl: text("cta_url").notNull().default(""),
+    /** Which lists to send to. */
+    audience: jsonb("audience").$type<{ newsletter: boolean; contacts: boolean }>().notNull().default({ newsletter: true, contacts: true }),
+    status: campaignStatus("status").notNull().default("draft"),
+    total: integer("total").notNull().default(0),
+    sent: integer("sent").notNull().default(0),
+    failed: integer("failed").notNull().default(0),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    finishedAt: timestamp("finished_at", { withTimezone: true }),
+    createdById: text("created_by_id").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [index("marketing_campaigns_created_idx").on(t.createdAt)],
+);
+
+/** One row per recipient per campaign: the send queue and its outcome. */
+export const marketingSends = pgTable(
+  "marketing_sends",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    campaignId: uuid("campaign_id")
+      .notNull()
+      .references(() => marketingCampaigns.id, { onDelete: "cascade" }),
+    /** Email address or E.164 phone number. */
+    recipient: text("recipient").notNull(),
+    status: sendStatus("status").notNull().default("pending"),
+    /** When a batch claimed this row (status "sending"); stale claims are released. */
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    providerMessageId: text("provider_message_id"),
+    error: text("error"),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("marketing_sends_campaign_recipient_idx").on(t.campaignId, t.recipient), index("marketing_sends_status_idx").on(t.campaignId, t.status)],
+);
+
+/* -------------------------------------------------------------------------- */
 /* Pop-ups                                                                    */
 /* -------------------------------------------------------------------------- */
 

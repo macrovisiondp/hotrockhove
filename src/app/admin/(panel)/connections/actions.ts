@@ -6,6 +6,9 @@ import { assertPermission } from "@/lib/session";
 import { encryptSecret } from "@/lib/crypto";
 import { getSettingFresh, saveSetting, validateSetting } from "@/lib/settings";
 import { invalidate } from "@/domain/content";
+import { normalisePhone } from "@/domain/marketing";
+import { RATE_LIMITS, rateLimit } from "@/lib/rate-limit";
+import { sendSms } from "@/lib/sms/twilio";
 
 /** Secrets (API keys) belong to the owner's accounts: only owners may change them. */
 async function ownerFor(secretChanged: boolean) {
@@ -118,5 +121,50 @@ export async function saveAnalyticsAction(_prev: ActionState, fd: FormData): Pro
     await saveSetting("consent", parsed.data, user.id);
     await audit("settings.update", { actorUserId: user.id, entityType: "settings", entityId: "consent", metadata: { analytics: parsed.data.analyticsProvider } });
     return success(id ? "Saved. Google Analytics is on for visitors who accept cookies." : "Saved. Google Analytics is off.");
+  });
+}
+
+/** Twilio (marketing SMS): Account SID, Auth Token (encrypted) and sender. */
+export async function saveTwilioAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  return guarded(async () => {
+    const user = await assertPermission("settings.edit");
+    const current = await getSettingFresh("twilio");
+    const accountSid = str(fd, "accountSid");
+    const newToken = str(fd, "authToken");
+    const sender = str(fd, "sender").replace(/\s+(?=\d)/g, "");
+    const changed = Boolean(newToken) || accountSid !== current.accountSid || sender !== current.sender;
+    if (!(await ownerFor(changed))) return failure("Only the owner can change the Twilio account details.");
+    const authToken = newToken ? encryptSecret(newToken) : current.authToken;
+    if (newToken && !/^[0-9a-fA-F]{32}$/.test(newToken)) return failure("An Auth Token is 32 letters and digits.", { authToken: "Check the token" });
+    const parsed = validateSetting("twilio", { accountSid, authToken: accountSid ? authToken : "", sender, optOutText: str(fd, "optOutText") });
+    if (!parsed.success) return zodFailure(parsed.error);
+    await saveSetting("twilio", parsed.data, user.id);
+    await audit(newToken ? "secret.update" : "settings.update", { actorUserId: user.id, entityType: "settings", entityId: "twilio", metadata: { connected: Boolean(parsed.data.accountSid && parsed.data.authToken && parsed.data.sender) } });
+    const ready = Boolean(parsed.data.accountSid && parsed.data.authToken && parsed.data.sender);
+    return success(ready ? "Saved. Text messages can now be sent. Use “Send a test text” to check." : "Saved. Add the Account SID, Auth Token and sender to start sending texts.");
+  });
+}
+
+export async function sendTestSmsAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  return guarded(async () => {
+    const user = await assertPermission("marketing.send");
+    if (!(await rateLimit(RATE_LIMITS.testEmailPerUser, `sms:${user.id}`)).allowed) return failure("Too many test texts. Wait a few minutes.");
+    const to = normalisePhone(str(fd, "to"));
+    if (!to) return failure("Enter a mobile number, e.g. 07700 900123.", { to: "Check the number" });
+    const business = await getSettingFresh("business");
+    const res = await sendSms(to, `Test text from the ${business.name} website admin.`);
+    await audit("email.test", { actorUserId: user.id, entityType: "settings", entityId: "twilio", metadata: { ok: res.ok } });
+    return res.ok ? { ok: true, message: `Sent to ${to}.`, at: Date.now() } : failure(res.error);
+  });
+}
+
+export async function disconnectTwilioAction(): Promise<ActionState> {
+  return guarded(async () => {
+    const user = await assertPermission("settings.edit");
+    if (!(await ownerFor(true))) return failure("Only the owner can remove the Twilio details.");
+    const current = await getSettingFresh("twilio");
+    await saveSetting("twilio", { ...current, accountSid: "", authToken: "", sender: "" }, user.id);
+    await audit("secret.update", { actorUserId: user.id, entityType: "settings", entityId: "twilio", metadata: { removed: true } });
+    return success("Twilio disconnected. The site no longer sends texts.");
   });
 }

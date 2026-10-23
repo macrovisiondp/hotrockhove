@@ -33,6 +33,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; perm: Per
       { href: "/admin/submissions", label: "Form submissions", perm: "submissions.view" },
       { href: "/admin/forms", label: "Forms", perm: "settings.view" },
       { href: "/admin/newsletter", label: "Newsletter", perm: "subscribers.view" },
+      { href: "/admin/marketing", label: "Marketing", perm: "marketing.view" },
     ],
   },
   {

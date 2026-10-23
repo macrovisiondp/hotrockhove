@@ -11,6 +11,8 @@ export type OutgoingEmail = {
   text: string;
   replyTo?: string;
   idempotencyKey: string;
+  /** Extra headers, e.g. List-Unsubscribe on marketing emails. */
+  headers?: Record<string, string>;
 };
 
 export type SendResult = { ok: true; id: string | null } | { ok: false; error: string };
@@ -42,6 +44,7 @@ export function resendProvider(apiKey: string, s: EmailSettings): EmailProvider 
           html: msg.html,
           text: msg.text,
           replyTo: msg.replyTo || s.replyTo || undefined,
+          headers: msg.headers,
         },
         { idempotencyKey: msg.idempotencyKey.slice(0, 256) },
       );
@@ -85,7 +88,7 @@ export function smtpProvider(s: EmailSettings): EmailProvider {
           text: msg.text,
           replyTo: msg.replyTo || s.replyTo || undefined,
           messageId: undefined,
-          headers: { "X-Entity-Ref-ID": msg.idempotencyKey.slice(0, 120) },
+          headers: { "X-Entity-Ref-ID": msg.idempotencyKey.slice(0, 120), ...msg.headers },
         });
         return { ok: true, id: info.messageId ?? null };
       } catch (err) {

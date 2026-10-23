@@ -51,9 +51,12 @@ export default async function Newsletter({ searchParams }: PageProps<"/admin/new
           )
         }
       />
-      <Notice>
-        This site doesn&apos;t send marketing campaigns. Export confirmed subscribers to an email-marketing service when you&apos;re ready. Bulk sending, and anything
-        sent to legacy addresses, needs a separate decision about consent.
+      <Notice tone="info">
+        Confirmed subscribers are included automatically when you send an email from{" "}
+        <Link href="/admin/marketing" className="underline">
+          Marketing
+        </Link>
+        . Legacy addresses (no consent record) are never included.
       </Notice>
 
       <div className="my-6 grid grid-cols-2 gap-3 md:grid-cols-4">

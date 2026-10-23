@@ -35,7 +35,8 @@ Never commit real values. `.env.example` has placeholders only.
 | Question | Answer |
 |---|---|
 | Is a migration required before deploying? | **Yes**, on a new Neon database: `drizzle/0000_init.sql` (creates all tables) then `drizzle/0001_storage_s3.sql` and `drizzle/0002_storage_neon.sql` (each adds a storage-provider value). `npm run db:migrate` applies all in order. **Applied to Neon `production` on 2026-10-21** |
-| Exact files | `drizzle/0000_init.sql`, `drizzle/0001_storage_s3.sql`, `drizzle/0002_storage_neon.sql` (journal: `drizzle/meta/_journal.json`) |
+| Exact files | `drizzle/0000_init.sql`, `drizzle/0001_storage_s3.sql`, `drizzle/0002_storage_neon.sql`, `drizzle/0003_marketing.sql` (journal: `drizzle/meta/_journal.json`) |
+| `0003_marketing.sql` (Marketing module) | Additive only: 4 new enum types and 3 new tables (`marketing_contacts`, `marketing_campaigns`, `marketing_sends`); no existing table changes. Must be applied **before** deploying the code that uses it (the dashboard counts marketing contacts). Tested on the local PGlite database. |
 | Tested? | Yes: both applied to the local PGlite database (Postgres 17), `0001` as an upgrade on top of existing data; the app and e2e suite ran against it. **Not yet run on Neon.** |
 | Safe order | 1. Create Neon project and branch → 2. `DATABASE_URL=… npm run db:migrate` → 3. `npm run db:seed` → 4. configure S3 in Admin → Media → Storage settings, then `npm run media:import` → 5. `npm run db:seed -- --force=pages,offers,popups,menu` (fresh DB only) → 6. `npm run admin:create -- --email … --role owner` → 7. deploy |
 | Backward compatible? | `0001` only adds an enum value (additive). No earlier version of this app is deployed. Future migrations must be additive (new tables/columns with defaults) so the running version keeps working during deploys |
