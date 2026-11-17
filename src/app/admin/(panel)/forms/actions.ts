@@ -1,12 +1,13 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db, t } from "@/db";
 import { audit } from "@/lib/audit";
 import { bool, failure, guarded, lines, str, success, zodFailure, type ActionState } from "@/lib/actions";
 import { assertPermission } from "@/lib/session";
-import { fieldsSchema } from "@/domain/forms/fields";
+import { fieldsSchema, formKeyFromName, type FormField } from "@/domain/forms/fields";
 import { invalidate } from "@/domain/content";
 
 const formSchema = z.object({
@@ -22,6 +23,37 @@ const formSchema = z.object({
   ackBody: z.string().trim().max(5000),
   retentionDays: z.number().int().min(30, "Keep submissions at least 30 days").max(3650).nullable(),
 });
+
+/** Starter fields for a new form; editors change them on the next screen. */
+const STARTER_FIELDS: FormField[] = [
+  { name: "full_name", label: "Full name", type: "text", required: true, placeholder: "", help: "", options: [], maxLength: 120, half: true },
+  { name: "email", label: "Email", type: "email", required: true, placeholder: "", help: "", options: [], maxLength: 200, half: true },
+  { name: "phone", label: "Phone", type: "tel", required: true, placeholder: "", help: "", options: [], maxLength: 30, half: true },
+  { name: "message", label: "Message", type: "textarea", required: false, placeholder: "", help: "", options: [], maxLength: 2000, half: false },
+];
+
+export async function createFormAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  return guarded(async () => {
+    const user = await assertPermission("forms.edit");
+    const name = str(fd, "name");
+    if (!name || name.length > 80) return failure("Give the form a name (max 80 characters).", { name: "Required" });
+    const key = formKeyFromName(name);
+    if (!key) return failure("Use letters in the name, e.g. 'Birthday enquiry'.", { name: "Needs letters" });
+    if (await db.query.forms.findFirst({ where: eq(t.forms.key, key), columns: { key: true } }))
+      return failure("A form with this name already exists.", { name: "Choose another name" });
+    await db.insert(t.forms).values({
+      key,
+      name,
+      fields: STARTER_FIELDS,
+      submitLabel: "Send",
+      successMessage: "Thank you. We've received your enquiry and will be in touch soon.",
+      adminSubject: `New ${name}: {{full_name}}`,
+      retentionDays: 365,
+    });
+    await audit("form.create", { actorUserId: user.id, entityType: "form", entityId: key, metadata: { name } });
+    redirect(`/admin/forms/${key}?created=1`);
+  });
+}
 
 export async function saveFormAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   return guarded(async () => {

@@ -11,6 +11,7 @@ export const TAGS = {
   nav: "nav",
   menu: "menu",
   offers: "offers",
+  products: "products",
   media: "media",
   popups: "popups",
   redirects: "redirects",
@@ -200,7 +201,43 @@ export const getOffers = unstable_cache(
 );
 
 /* -------------------------------------------------------------------------- */
-/* Pop-ups                                                                    */
+/* Products                                                                   */
+/* -------------------------------------------------------------------------- */
+
+export type PublicProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  /** Display text; empty means no price is shown. */
+  priceText: string;
+  /** Media asset ids; the first is the main image. */
+  imageIds: string[];
+  available: boolean;
+};
+
+/** Published products in admin order. pricePence and sku stay private until the shop launches. */
+export const getProducts = unstable_cache(
+  async (): Promise<PublicProduct[]> =>
+    db
+      .select({
+        id: t.products.id,
+        name: t.products.name,
+        slug: t.products.slug,
+        description: t.products.description,
+        priceText: t.products.priceText,
+        imageIds: t.products.imageIds,
+        available: t.products.available,
+      })
+      .from(t.products)
+      .where(eq(t.products.status, "published"))
+      .orderBy(asc(t.products.sortOrder)),
+  ["products"],
+  { tags: [TAGS.products] },
+);
+
+/* -------------------------------------------------------------------------- */
+/* Pop-ups                                                                   */
 /* -------------------------------------------------------------------------- */
 
 export const getEnabledPopups = unstable_cache(

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useActionState, useEffect, useRef } from "react";
 import { CheckCircle } from "@phosphor-icons/react";
-import type { FormField } from "@/domain/forms/fields";
+import { NUMBER_FIELD_MAX, type FormField } from "@/domain/forms/fields";
 import type { PublicFormState } from "@/domain/forms/submit";
 import { submitWithoutReset } from "@/lib/submit";
 import { Turnstile } from "./turnstile";
@@ -133,10 +133,13 @@ export function PublicForm({
                 <input
                   {...common}
                   type={f.type}
-                  maxLength={f.type === "date" || f.type === "time" ? undefined : f.maxLength}
+                  maxLength={f.type === "date" || f.type === "time" || f.type === "number" ? undefined : f.maxLength}
                   placeholder={f.placeholder || undefined}
                   autoComplete={f.type === "email" ? "email" : f.type === "tel" ? "tel" : f.name.includes("name") ? "name" : undefined}
-                  min={f.type === "date" ? new Date().toISOString().slice(0, 10) : undefined}
+                  min={f.type === "date" ? new Date().toISOString().slice(0, 10) : f.type === "number" ? 1 : undefined}
+                  max={f.type === "number" ? NUMBER_FIELD_MAX : undefined}
+                  step={f.type === "number" ? 1 : undefined}
+                  inputMode={f.type === "number" ? "numeric" : undefined}
                 />
               )}
               {f.help && (

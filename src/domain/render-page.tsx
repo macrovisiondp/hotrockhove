@@ -8,7 +8,7 @@ import { turnstileSiteKey } from "@/lib/turnstile";
 import { formatAddress, getSetting, type BusinessSettings } from "@/lib/settings";
 import { HomeSounds } from "@/components/site/home-sounds";
 import { PageTitle, RenderSections, type SectionContext } from "@/components/site/sections";
-import { getMediaByIds, getMenu, getOffers, getPublishedPage, sectionMediaIds, type PublicPage } from "./content";
+import { getMediaByIds, getMenu, getOffers, getProducts, getPublishedPage, sectionMediaIds, type PublicPage } from "./content";
 import { parseFields } from "./forms/fields";
 import { getBookTarget } from "./links";
 import { getPrivacyHref } from "./site-chrome";
@@ -76,7 +76,7 @@ export async function PageContent({ page }: { page: Pick<PublicPage, "slug" | "t
   const formKeys = page.sections.flatMap((s) => (s.type === "form" ? [s.formKey] : []));
   const needsMenu = types.has("menu") || types.has("menuHighlights");
 
-  const [business, features, reviews, book, privacyHref, menu, offers, formRows] = await Promise.all([
+  const [business, features, reviews, book, privacyHref, menu, offers, products, formRows] = await Promise.all([
     getSetting("business"),
     getSetting("features"),
     getSetting("reviews"),
@@ -84,6 +84,7 @@ export async function PageContent({ page }: { page: Pick<PublicPage, "slug" | "t
     getPrivacyHref(),
     needsMenu ? getMenu() : Promise.resolve([]),
     types.has("offers") ? getOffers() : Promise.resolve([]),
+    types.has("products") ? getProducts() : Promise.resolve([]),
     formKeys.length ? db.select().from(t.forms).where(inArray(t.forms.key, formKeys)) : Promise.resolve([]),
   ]);
 
@@ -91,6 +92,8 @@ export async function PageContent({ page }: { page: Pick<PublicPage, "slug" | "t
     ...sectionMediaIds(page.sections),
     ...menu.flatMap((c) => c.items.map((i) => i.imageId ?? "")),
     ...offers.map((o) => o.imageId ?? ""),
+    ...products.flatMap((p) => p.imageIds.slice(0, 1)),
+    ...page.sections.flatMap((s) => (s.type === "cards" ? s.cards.map((c) => c.mediaId) : [])),
   ];
   const media = await getMediaByIds(mediaIds);
 
@@ -105,6 +108,7 @@ export async function PageContent({ page }: { page: Pick<PublicPage, "slug" | "t
     turnstileSiteKey: await turnstileSiteKey(),
     menu,
     offers,
+    products,
     forms: Object.fromEntries(
       formRows.filter((f) => f.enabled).map((f) => [f.key, { name: f.name, fields: parseFields(f.fields), submitLabel: f.submitLabel }]),
     ),

@@ -16,7 +16,8 @@ type FieldDef =
   | { key: string; label: string; kind: "checkbox"; hint?: string }
   | { key: string; label: string; kind: "number"; min: number; max: number; hint?: string }
   | { key: string; label: string; kind: "form" }
-  | { key: string; label: string; kind: "steps" };
+  | { key: string; label: string; kind: "steps" }
+  | { key: string; label: string; kind: "cards" };
 
 const BODY_HINT = "Blank line = new paragraph. **bold**, *italic*.";
 
@@ -129,6 +130,18 @@ const FIELDS: Record<SectionType, FieldDef[]> = {
   newsletter: [
     { key: "heading", label: "Heading", kind: "text", max: 140 },
     { key: "body", label: "Text", kind: "textarea", max: 400, rows: 2 },
+  ],
+  cards: [
+    { key: "eyebrow", label: "Small label", kind: "text", max: 80 },
+    { key: "heading", label: "Heading", kind: "text", max: 140 },
+    { key: "body", label: "Intro (optional)", kind: "textarea", max: 1000, rows: 3, hint: BODY_HINT },
+    { key: "cards", label: "Cards", kind: "cards" },
+  ],
+  products: [
+    { key: "eyebrow", label: "Small label", kind: "text", max: 80 },
+    { key: "heading", label: "Heading", kind: "text", max: 140 },
+    { key: "body", label: "Intro (optional)", kind: "textarea", max: 1000, rows: 3, hint: BODY_HINT },
+    { key: "cta", label: "Button under each product (e.g. Ask in the restaurant)", kind: "cta" },
   ],
 };
 
@@ -346,6 +359,8 @@ function FieldInput({
       return <MediaListBridge name={id} label={def.label} value={(value as string[]) ?? []} onChange={onChange} />;
     case "steps":
       return <StepsField sectionId={sectionId} value={(value as Step[]) ?? []} onChange={onChange} />;
+    case "cards":
+      return <CardsField sectionId={sectionId} value={(value as Card[]) ?? []} onChange={onChange} />;
   }
 }
 
@@ -398,6 +413,71 @@ function StepsField({ sectionId, value, onChange }: { sectionId: string; value: 
       <button type="button" className="admin-btn admin-btn-secondary" onClick={() => onChange([...value, { id: newId(), caption: "", mediaIds: [] }])}>
         <Plus size={14} /> Add step
       </button>
+    </fieldset>
+  );
+}
+
+type Card = { id: string; title: string; body: string; priceText: string; mediaId: string; cta: { label: string; href: string } };
+
+/** Package cards: title, text, price line, optional photo and button, in order. */
+function CardsField({ sectionId, value, onChange }: { sectionId: string; value: Card[]; onChange: (v: Card[]) => void }) {
+  const set = (i: number, patch: Partial<Card>) => onChange(value.map((c, j) => (j === i ? { ...c, ...patch } : c)));
+  const move = (i: number, d: number) => {
+    const j = i + d;
+    if (j < 0 || j >= value.length) return;
+    const n = [...value];
+    [n[i], n[j]] = [n[j], n[i]];
+    onChange(n);
+  };
+  return (
+    <fieldset className="space-y-3">
+      <legend className="mb-1 text-sm font-medium text-[#3a3733]">Cards</legend>
+      {value.map((c, i) => {
+        const fid = (k: string) => `s-${sectionId}-card-${c.id}-${k}`;
+        return (
+          <div key={c.id} className="space-y-3 rounded-md border border-[#ece9e4] p-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-[#8a847b]">Card {i + 1}</span>
+              <span className="flex-1" />
+              <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="rounded p-1.5 hover:bg-[#efece7] disabled:opacity-30" aria-label={`Move card ${i + 1} up`}>
+                <ArrowUp size={14} />
+              </button>
+              <button type="button" onClick={() => move(i, 1)} disabled={i === value.length - 1} className="rounded p-1.5 hover:bg-[#efece7] disabled:opacity-30" aria-label={`Move card ${i + 1} down`}>
+                <ArrowDown size={14} />
+              </button>
+              <button type="button" onClick={() => onChange(value.filter((_, j) => j !== i))} className="rounded p-1.5 text-[#b42318] hover:bg-red-50" aria-label={`Remove card ${i + 1}`}>
+                <Trash size={14} />
+              </button>
+            </div>
+            <div className="grid gap-3 md:grid-cols-[2fr_1fr]">
+              <div>
+                <label htmlFor={fid("title")} className="mb-1 block text-sm font-medium text-[#3a3733]">Title</label>
+                <input id={fid("title")} className="admin-input" maxLength={120} value={c.title} onChange={(e) => set(i, { title: e.target.value })} />
+              </div>
+              <div>
+                <label htmlFor={fid("price")} className="mb-1 block text-sm font-medium text-[#3a3733]">Price line (optional)</label>
+                <input id={fid("price")} className="admin-input" maxLength={60} placeholder="e.g. £45 per person" value={c.priceText} onChange={(e) => set(i, { priceText: e.target.value })} />
+              </div>
+            </div>
+            <div>
+              <label htmlFor={fid("body")} className="mb-1 block text-sm font-medium text-[#3a3733]">Text</label>
+              <textarea id={fid("body")} className="admin-input leading-relaxed" rows={4} maxLength={1500} value={c.body} onChange={(e) => set(i, { body: e.target.value })} />
+              <p className="mt-1 text-xs text-[#78736b]">{BODY_HINT}</p>
+            </div>
+            <MediaFieldBridge name={fid("media")} label="Photo (optional)" type="image" value={c.mediaId} onChange={(v) => set(i, { mediaId: v })} />
+            <FieldInput def={{ key: "cta", label: "Button (optional)", kind: "cta" }} sectionId={`${sectionId}-card-${c.id}`} value={c.cta} forms={[]} onChange={(v) => set(i, { cta: v as Card["cta"] })} />
+          </div>
+        );
+      })}
+      {value.length < 12 && (
+        <button
+          type="button"
+          className="admin-btn admin-btn-secondary"
+          onClick={() => onChange([...value, { id: newId(), title: "", body: "", priceText: "", mediaId: "", cta: { label: "", href: "" } }])}
+        >
+          <Plus size={14} /> Add card
+        </button>
+      )}
     </fieldset>
   );
 }

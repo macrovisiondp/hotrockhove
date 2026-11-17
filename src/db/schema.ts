@@ -301,7 +301,37 @@ export const offers = pgTable("offers", {
 });
 
 /* -------------------------------------------------------------------------- */
-/* Forms, submissions & newsletter                                            */
+/* Products (merchandise showcase; shaped for a future online shop)           */
+/* -------------------------------------------------------------------------- */
+
+export const products = pgTable(
+  "products",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
+    description: text("description").notNull().default(""),
+    /** Price as displayed, e.g. "£12.99" or "Available in the restaurant". Empty = no price shown. */
+    priceText: text("price_text").notNull().default(""),
+    /** Price in pence for a future checkout. Not shown on the site yet. */
+    pricePence: integer("price_pence"),
+    sku: text("sku").notNull().default(""),
+    /** Media asset ids; the first is the main image. */
+    imageIds: jsonb("image_ids").$type<string[]>().notNull().default([]),
+    available: boolean("available").notNull().default(true),
+    status: publishStatus("status").notNull().default("draft"),
+    sortOrder: integer("sort_order").notNull().default(0),
+    /** Data-quality flag for owner review. Never auto-corrected. */
+    reviewNote: text("review_note").notNull().default(""),
+    ...timestamps,
+  },
+  (t) => [index("products_status_sort_idx").on(t.status, t.sortOrder)],
+);
+
+export type Product = typeof products.$inferSelect;
+
+/* -------------------------------------------------------------------------- */
+/* Forms, submissions & newsletter                                           */
 /* -------------------------------------------------------------------------- */
 
 export const forms = pgTable("forms", {

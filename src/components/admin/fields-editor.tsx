@@ -13,6 +13,7 @@ const TYPE_LABELS: Record<(typeof FIELD_TYPES)[number], string> = {
   select: "Dropdown",
   date: "Date",
   time: "Time",
+  number: "Number (e.g. guests)",
   checkbox: "Tick box (e.g. consent)",
   note: "Note (text only, no input)",
 };

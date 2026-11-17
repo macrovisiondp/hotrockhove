@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-export const FIELD_TYPES = ["text", "email", "tel", "textarea", "select", "date", "time", "checkbox", "note"] as const;
+export const FIELD_TYPES = ["text", "email", "tel", "textarea", "select", "date", "time", "number", "checkbox", "note"] as const;
+
+/** Whole numbers accepted by "number" fields (e.g. number of guests). */
+export const NUMBER_FIELD_MAX = 1000;
 export type FieldType = (typeof FIELD_TYPES)[number];
 
 export const fieldSchema = z
@@ -24,6 +27,17 @@ export const fieldsSchema = z
   .array(fieldSchema)
   .max(30)
   .refine((fs) => new Set(fs.map((f) => f.name)).size === fs.length, "Field names must be unique");
+
+/** "Birthday enquiry" → "birthday_enquiry": the stable key used by page sections and submissions. */
+export function formKeyFromName(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^[^a-z]+/, "")
+    .slice(0, 40)
+    .replace(/_+$/, "");
+}
 
 /** Parse stored field definitions; invalid definitions are dropped. */
 export function parseFields(raw: unknown): FormField[] {
@@ -60,12 +74,17 @@ export function submissionValidator(fields: FormField[]) {
       case "time":
         s = s.regex(/^$|^([01]\d|2[0-3]):[0-5]\d$/, "Choose a time");
         break;
+      case "number":
+        s = s.regex(/^$|^\d{1,4}$/, "Enter a whole number");
+        break;
     }
     let field: z.ZodType<string> = s;
     if (f.type === "email") field = s.refine((v) => v === "" || z.string().email().safeParse(v).success, "Enter a valid email address");
     if (f.type === "select") field = s.refine((v) => v === "" || f.options.includes(v), "Choose one of the options");
     if (f.type === "date")
       field = field.refine((v) => v === "" || !Number.isNaN(Date.parse(`${v}T00:00:00Z`)), "Choose a valid date");
+    if (f.type === "number")
+      field = field.refine((v) => v === "" || (Number(v) >= 1 && Number(v) <= NUMBER_FIELD_MAX), `Enter a number from 1 to ${NUMBER_FIELD_MAX}`);
     if (f.required) field = field.refine((v) => v.length > 0, `${f.label.replace(/[*:]\s*$/, "")} is required`);
     shape[f.name] = field;
   }

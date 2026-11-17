@@ -174,6 +174,37 @@ export const sectionSchemas = {
     heading: text(140),
     body: text(400),
   }),
+  /** Packages, menus or experiences shown as cards (e.g. birthday or Christmas packages). */
+  cards: z.object({
+    ...base,
+    type: z.literal("cards"),
+    eyebrow: text(80),
+    heading: text(140),
+    body: text(1000),
+    cards: z
+      .array(
+        z.object({
+          id: z.string().min(1).max(40),
+          title: text(120),
+          body: text(1500),
+          /** Shown as written, e.g. "£45 per person" or "From £30". Empty = no price line. */
+          priceText: text(60),
+          mediaId,
+          cta,
+        }),
+      )
+      .max(12),
+  }),
+  /** Published products from the Products module (merchandise showcase, future shop). */
+  products: z.object({
+    ...base,
+    type: z.literal("products"),
+    eyebrow: text(80),
+    heading: text(140),
+    body: text(1000),
+    /** Button under each product until online ordering exists, e.g. "Ask in the restaurant" → /contact. */
+    cta,
+  }),
 } as const;
 
 export type SectionType = keyof typeof sectionSchemas;
@@ -196,6 +227,8 @@ export const sectionSchema = z.discriminatedUnion("type", [
   sectionSchemas.cta,
   sectionSchemas.form,
   sectionSchemas.newsletter,
+  sectionSchemas.cards,
+  sectionSchemas.products,
 ]);
 
 export type Section = z.infer<typeof sectionSchema>;
@@ -255,6 +288,10 @@ export function blankSection(type: SectionType, id: string): Section {
       return { ...common, type, eyebrow: "", heading: "", body: "", formKey: "contact", showContact: true };
     case "newsletter":
       return { ...common, type, heading: "", body: "" };
+    case "cards":
+      return { ...common, type, eyebrow: "", heading: "", body: "", cards: [] };
+    case "products":
+      return { ...common, type, eyebrow: "", heading: "", body: "", cta: emptyCta };
   }
 }
 
@@ -275,4 +312,6 @@ export const SECTION_LABELS: Record<SectionType, { label: string; hint: string }
   cta: { label: "Call to action", hint: "Banner with buttons" },
   form: { label: "Form", hint: "Contact, fan club or table request form" },
   newsletter: { label: "Newsletter", hint: "Email sign-up with consent and double opt-in" },
+  cards: { label: "Packages / cards", hint: "Cards with a title, text, price and button, e.g. birthday or Christmas packages" },
+  products: { label: "Products", hint: "Shows the published products from the Products module" },
 };

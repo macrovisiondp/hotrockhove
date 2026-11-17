@@ -44,7 +44,19 @@ export type SectionContext = {
   turnstileSiteKey: string | null;
   menu: PublicMenuCategory[];
   offers: Offer[];
+  /** Published products, loaded only when the page has a Products section. */
+  products: ShowcaseProduct[];
   forms: Record<string, { name: string; fields: FormField[]; submitLabel: string }>;
+};
+
+export type ShowcaseProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  priceText: string;
+  imageIds: string[];
+  available: boolean;
 };
 
 const wrap = "mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-10";
@@ -677,7 +689,8 @@ function FormSection({ s, ctx, first }: { s: SectionOf<"form">; ctx: SectionCont
   const form = ctx.forms[s.formKey];
   const H = first ? "h1" : "h2";
   return (
-    <section className={`${wrap} ${first ? "pb-24 pt-32 lg:pb-32 lg:pt-40" : "py-24 lg:py-32"}`}>
+    // Anchor so buttons can link straight to the form, e.g. "Enquire Now" → #form-birthday_enquiry.
+    <section id={`form-${s.formKey}`} className={`${wrap} scroll-mt-24 ${first ? "pb-24 pt-32 lg:pb-32 lg:pt-40" : "py-24 lg:py-32"}`}>
       <div className={`grid gap-14 ${s.showContact ? "lg:grid-cols-[1fr_1.15fr] lg:gap-24" : "max-w-3xl"}`}>
         <div>
           {s.eyebrow && <p className="eyebrow mb-4">{s.eyebrow}</p>}
@@ -738,6 +751,86 @@ function Newsletter({ s, ctx }: { s: SectionOf<"newsletter">; ctx: SectionContex
   );
 }
 
+/** Brand mark shown where a card or product has no photo yet. */
+function PhotoPlaceholder() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center border border-ink-800 bg-ink-900" aria-hidden>
+      <div className="relative h-1/3 w-1/3 opacity-40">
+        <Image src="/brand/logo-white.png" alt="" fill sizes="120px" className="object-contain" />
+      </div>
+    </div>
+  );
+}
+
+function Cards({ s, ctx }: { s: SectionOf<"cards">; ctx: SectionContext }) {
+  if (s.cards.length === 0 && !s.heading) return null;
+  return (
+    <section className={`${wrap} py-24 lg:py-32`}>
+      <Heading eyebrow={s.eyebrow} heading={s.heading} className="max-w-3xl" />
+      {s.body && <RichText text={s.body} className="mt-6 max-w-[62ch] leading-relaxed text-stone" />}
+      {s.cards.length > 0 && (
+        <div className="mt-14 grid gap-px bg-ink-700 sm:grid-cols-2 lg:grid-cols-3">
+          {s.cards.map((c) => {
+            const img = c.mediaId ? ctx.media.get(c.mediaId) : undefined;
+            return (
+              <article key={c.id} className="flex flex-col bg-ink-950">
+                {img && (
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <MediaImage media={img} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
+                  </div>
+                )}
+                <div className="flex flex-1 flex-col p-6 lg:p-8">
+                  {c.title && <h3 className="display text-2xl text-bone sm:text-3xl">{c.title}</h3>}
+                  {c.body && <RichText text={c.body} className="mt-4 flex-1 text-[0.95rem] leading-relaxed text-stone" />}
+                  {(c.priceText || (c.cta.label && c.cta.href)) && (
+                    <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-ink-800 pt-5">
+                      {c.priceText ? <p className="display text-2xl text-bone">{c.priceText}</p> : <span />}
+                      <CtaLink cta={c.cta} ctx={ctx} variant="ghost" />
+                    </div>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function Products({ s, ctx }: { s: SectionOf<"products">; ctx: SectionContext }) {
+  if (ctx.products.length === 0) return null;
+  return (
+    <section className={`${wrap} py-24 lg:py-32`}>
+      <Heading eyebrow={s.eyebrow} heading={s.heading} className="max-w-3xl" />
+      {s.body && <RichText text={s.body} className="mt-6 max-w-[62ch] leading-relaxed text-stone" />}
+      <ul className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+        {ctx.products.map((p) => {
+          const img = p.imageIds.map((id) => ctx.media.get(id)).find(Boolean);
+          return (
+            <li key={p.id} id={`product-${p.slug}`} className="flex flex-col">
+              <div className="relative aspect-square overflow-hidden bg-ink-900">
+                {img ? <MediaImage media={img} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" /> : <PhotoPlaceholder />}
+              </div>
+              <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <h3 className="display text-2xl text-bone sm:text-3xl">{p.name}</h3>
+                {p.priceText && <p className="text-lg text-bronze">{p.priceText}</p>}
+              </div>
+              {!p.available && <p className="mt-1 text-sm uppercase tracking-[0.18em] text-mute">Currently unavailable</p>}
+              {p.description && <RichText text={p.description} className="mt-3 flex-1 text-[0.95rem] leading-relaxed text-stone" />}
+              {p.available && s.cta.label && s.cta.href && (
+                <div className="mt-5">
+                  <CtaLink cta={s.cta} ctx={ctx} variant="ghost" />
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 /* -------------------------------------------------------------------------- */
 
 export function RenderSections({ sections, ctx }: { sections: Section[]; ctx: SectionContext }) {
@@ -778,6 +871,10 @@ export function RenderSections({ sections, ctx }: { sections: Section[]; ctx: Se
             return <FormSection key={s.id} s={s} ctx={ctx} first={first} />;
           case "newsletter":
             return <Newsletter key={s.id} s={s} ctx={ctx} />;
+          case "cards":
+            return <Cards key={s.id} s={s} ctx={ctx} />;
+          case "products":
+            return <Products key={s.id} s={s} ctx={ctx} />;
         }
       })}
     </>

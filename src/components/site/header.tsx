@@ -61,9 +61,14 @@ export function Header({
 
   const book = links.find((l) => l.isBook);
   const plain = links.filter((l) => !l.isBook);
-  const half = Math.ceil(plain.length / 2);
+  // More than six links don't fit either side of the logo on laptops: show the menu button below 2xl,
+  // and split the links by label length (the right side also holds the Book button) so both sides balance.
+  const many = plain.length > 6;
+  const half = many ? balancedSplit(plain, book ? book.label.length + 8 : 0) : Math.ceil(plain.length / 2);
   const left = plain.slice(0, half);
   const right = plain.slice(half);
+  const desktopOnly = many ? "hidden 2xl:block" : "hidden lg:block";
+  const mobileOnly = many ? "2xl:hidden" : "lg:hidden";
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/"));
 
@@ -73,7 +78,7 @@ export function Header({
         href={l.href}
         {...(l.external ? { target: "_blank", rel: "noopener" } : {})}
         aria-current={isActive(l.href) ? "page" : undefined}
-        className="link-underline py-2 text-[0.78rem] font-medium uppercase tracking-[0.18em] text-bone/85 transition-colors hover:text-bone aria-[current=page]:text-bone"
+        className="link-underline whitespace-nowrap py-2 text-[0.78rem] font-medium uppercase tracking-[0.18em] text-bone/85 transition-colors hover:text-bone aria-[current=page]:text-bone"
       >
         {l.label}
       </Link>
@@ -95,15 +100,15 @@ export function Header({
               ref={menuButton}
               type="button"
               onClick={() => setOpen(true)}
-              className="-ml-2 inline-flex h-11 w-11 items-center justify-center text-bone lg:hidden"
+              className={`-ml-2 inline-flex h-11 w-11 items-center justify-center text-bone ${mobileOnly}`}
               aria-label="Open menu"
               aria-expanded={open}
               aria-controls="mobile-menu"
             >
               <List size={26} weight="light" />
             </button>
-            <nav aria-label="Primary" className="hidden lg:block">
-              <ul className="flex items-center gap-8 xl:gap-10">{left.map(navLink)}</ul>
+            <nav aria-label="Primary" className={desktopOnly}>
+              <ul className={`flex items-center ${many ? "gap-6" : "gap-8 xl:gap-10"}`}>{left.map(navLink)}</ul>
             </nav>
           </div>
 
@@ -112,21 +117,21 @@ export function Header({
           </Link>
 
           {/* Right: desktop links + book / mobile call */}
-          <div className="flex items-center justify-end gap-8 xl:gap-10">
-            <nav aria-label="Primary, continued" className="hidden lg:block">
-              <ul className="flex items-center gap-8 xl:gap-10">{right.map(navLink)}</ul>
+          <div className={`flex items-center justify-end ${many ? "gap-6" : "gap-8 xl:gap-10"}`}>
+            <nav aria-label="Primary, continued" className={desktopOnly}>
+              <ul className={`flex items-center ${many ? "gap-6" : "gap-8 xl:gap-10"}`}>{right.map(navLink)}</ul>
             </nav>
             {book && (
               <Link
                 href={book.href}
                 {...(book.external ? { target: "_blank", rel: "noopener" } : {})}
-                className="btn btn-primary hidden min-h-[44px] px-5 lg:inline-flex"
+                className={`btn btn-primary hidden min-h-[44px] px-5 ${many ? "2xl:inline-flex" : "lg:inline-flex"}`}
               >
                 {book.label}
               </Link>
             )}
             {phoneHref && (
-              <a href={phoneHref} className="-mr-2 inline-flex h-11 w-11 items-center justify-center text-bone lg:hidden" aria-label="Call us">
+              <a href={phoneHref} className={`-mr-2 inline-flex h-11 w-11 items-center justify-center text-bone ${mobileOnly}`} aria-label="Call us">
                 <Phone size={22} weight="light" />
               </a>
             )}
@@ -141,7 +146,7 @@ export function Header({
         aria-modal="true"
         aria-label="Menu"
         hidden={!open}
-        className="fixed inset-0 z-[30] flex flex-col bg-ink-950 lg:hidden"
+        className={`fixed inset-0 z-[30] flex flex-col bg-ink-950 ${mobileOnly}`}
       >
         <div className="grid h-[72px] grid-cols-[1fr_auto_1fr] items-center px-4">
           <button
@@ -188,4 +193,14 @@ export function Header({
       </div>
     </>
   );
+}
+
+/** How many links go left of the logo so both sides carry similar text width (right side also has the Book button). */
+function balancedSplit(links: { label: string }[], rightExtra: number): number {
+  const w = (l: { label: string }) => l.label.length + 4;
+  const total = links.reduce((n, l) => n + w(l), 0) + rightExtra;
+  let left = 0;
+  let i = 0;
+  while (i < links.length - 1 && left + w(links[i]) / 2 <= total / 2) left += w(links[i++]);
+  return Math.max(1, i);
 }

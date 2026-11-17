@@ -241,6 +241,43 @@ const FORMS = [
     ackBody: "",
     retentionDays: 180,
   },
+  ...(["birthday", "christmas"] as const).map((kind) => ({
+    key: `${kind}_enquiry`,
+    name: kind === "birthday" ? "Birthday enquiry" : "Christmas enquiry",
+    fields: [
+      f({ name: "full_name", label: "Full Name", type: "text", required: true, maxLength: 120 }),
+      f({ name: "email", label: "Email", type: "email", required: true, maxLength: 254, half: true }),
+      f({ name: "phone", label: "Phone", type: "tel", required: true, maxLength: 20, half: true }),
+      f({ name: "preferred_date", label: "Preferred date", type: "date", required: true, half: true }),
+      f({ name: "guests", label: "Number of guests", type: "number", required: true, half: true }),
+      ...(kind === "christmas"
+        ? [
+            f({
+              name: "enquiry_type",
+              label: "What are you planning?",
+              type: "select",
+              required: true,
+              options: ["Festive dining", "Christmas party", "Group booking", "Gift vouchers", "Something else"],
+            }),
+          ]
+        : []),
+      f({
+        name: "requirements",
+        label: "Special requirements",
+        type: "textarea",
+        placeholder: kind === "birthday" ? "Dietary needs, allergies, a cake, decorations, accessibility…" : "Dietary needs, allergies, accessibility, preferred time…",
+        maxLength: 2000,
+      }),
+      f({ name: "contact_consent", label: "I agree to be contacted about my enquiry.", type: "checkbox", required: true }),
+    ],
+    submitLabel: "Send enquiry",
+    successMessage: "Thank you! We've received your enquiry and a member of our team will be in touch shortly.",
+    adminSubject: `New ${kind === "birthday" ? "Birthday" : "Christmas"} Enquiry: {{full_name}}`,
+    sendAcknowledgement: true,
+    ackSubject: "We have received your enquiry",
+    ackBody: `Hello {{full_name}},\n\nThank you for your ${kind === "birthday" ? "birthday" : "Christmas"} enquiry. We've received it and will be in touch shortly.\n\nKind regards,\n{{brandName}}`,
+    retentionDays: 365,
+  })),
 ];
 
 async function seedForms() {
@@ -269,7 +306,9 @@ async function seedMenu() {
     categories: { name: string; note?: string; items: SnapshotItem[] }[];
   };
   let items = 0;
-  for (const [ci, cat] of snapshot.categories.entries()) {
+  // The old site's "Special opening offer" category held only Fillet Friday, which has been discontinued.
+  const categories = snapshot.categories.filter((c) => c.name !== "SPECIAL OPENING OFFER");
+  for (const [ci, cat] of categories.entries()) {
     const [row] = await db
       .insert(t.menuCategories)
       .values({ name: cat.name, note: cat.note ?? "", sortOrder: ci * 10 })
@@ -277,8 +316,6 @@ async function seedMenu() {
     for (const [ii, raw] of cat.items.entries()) {
       const it = importMenuItem(raw);
       const featured = ["Premium A5+9 Wagyu Fillet Steak", "Premium A5+9 Wagyu Sirloin Steak", "Tomahawk Steak", "Porterhouse Steak", "Fillet Steak", "Hot Rock Gourmet Wagyu Burger"].includes(it.name);
-      const extraNote =
-        cat.name === "SPECIAL OPENING OFFER" ? "Listed under 'Special opening offer' on the old site. Confirm it still applies." : "";
       await db.insert(t.menuItems).values({
         categoryId: row.id,
         name: it.name,
@@ -288,12 +325,32 @@ async function seedMenu() {
         featured,
         imageId: MENU_PHOTOS[it.name] ? m(MENU_PHOTOS[it.name]) || null : null,
         sortOrder: ii * 10,
-        reviewNote: [it.reviewNote, extraNote].filter(Boolean).join(" "),
+        reviewNote: it.reviewNote,
       });
       items++;
     }
   }
-  console.log(`  menu: ${snapshot.categories.length} categories, ${items} items`);
+  console.log(`  menu: ${categories.length} categories, ${items} items`);
+}
+
+/** Merchandise showcase. Published so the draft Merchandise page previews them; photos, descriptions and prices await the owner. */
+async function seedProducts() {
+  const [{ n }] = await db.select({ n: count() }).from(t.products);
+  if (n > 0 && !force.has("products")) return;
+  if (n > 0) await db.delete(t.products);
+  const rows = [
+    { name: "HR Chopper", slug: "hr-chopper", imageIds: [m("2026/02/WhatsApp-Image-2026-02-07-at-10.09.54-PM-2.jpeg")].filter(Boolean) },
+    { name: "HR Mug", slug: "hr-mug", imageIds: [] as string[] },
+    { name: "HR Espresso Cup & Saucer", slug: "hr-espresso-cup-and-saucer", imageIds: [] as string[] },
+  ];
+  for (const [i, r] of rows.entries())
+    await db.insert(t.products).values({
+      ...r,
+      status: "published",
+      sortOrder: i * 10,
+      reviewNote: "Add a photo, description and the price to show.",
+    });
+  console.log(`  products: ${rows.length}`);
 }
 
 async function seedOffers() {
@@ -315,10 +372,10 @@ async function seedOffers() {
       title: "Tenderloin Tuesday's",
       tagline: "Tuesday just got tender!",
       body: "Our hand-selected Tenderloin is the most tender cut of all,\nsizzled exactly how you like it on your very own Hot Rock.\nTreat yourself this and EVERY Tuesday.\nBook Now and ask about our Tenderloin Tuesday offer",
-      priceText: "",
+      priceText: "£29.99",
       promoCode: "",
-      // No photo of its own (the old site reused Fillet Friday's); the site shows the brand placeholder.
-      imageId: null,
+      // Replaced Fillet Friday (discontinued) and reuses its promotional photo.
+      imageId: m("2026/02/fillet-fri-enh.jpg") || null,
       reviewNote: "",
     },
     {
@@ -329,15 +386,6 @@ async function seedOffers() {
       promoCode: "WAGYU",
       imageId: m("2026/02/wagyud.jpg") || null,
       reviewNote: "Tagline 'Every wondered' kept as on the old site (likely 'Ever wondered'). Confirm.",
-    },
-    {
-      title: "Fillet Friday's",
-      tagline: "Fillets are fillets right? WRONG!",
-      body: "A lot of time, care and love goes into the preparation of a Hot Rock Fillet.\nNot only is our Barrel Rolled Fillet the PREMIUM choice of steak cuts,\nit's also discounted for that Friday feeling\n9oz* of Steak bliss awaits you.\n\n*All weights are approximate",
-      priceText: "",
-      promoCode: "FILLETFRIDAY",
-      imageId: m("2026/02/fillet-fri-enh.jpg") || null,
-      reviewNote: "The menu lists 'Fillet Friday' at £29.99 as a special opening offer. Confirm whether to show a price here.",
     },
   ];
   for (const [i, r] of rows.entries()) await db.insert(t.offers).values({ ...r, sortOrder: i * 10, stage: "current" });
@@ -541,7 +589,7 @@ function pages(): PageSeed[] {
       system: false,
       seoTitle: "Daisy's Offers",
       seoDescription:
-        "Daisy isn't just a mascot — she's a legend. Meet Daisy and see our weekly Hot Rock offers: Mad Monday, Tenderloin Tuesday, Wagyu Wednesday and Fillet Friday.",
+        "Daisy isn't just a mascot — she's a legend. Meet Daisy and see our weekly Hot Rock offers: Mad Monday, Tenderloin Tuesday and Wagyu Wednesday.",
       reviewNote: "Fan-club prize draw says 'T + C's Apply' but no terms page exists. Publish the terms before launch.",
       sections: [
         {
@@ -747,6 +795,218 @@ function pages(): PageSeed[] {
         },
       ],
     },
+    ...campaignPages(),
+  ];
+}
+
+/** Placeholder text for details the owner hasn't supplied yet. Pages using it stay drafts until replaced. */
+const TBC = (what: string) => `[To be confirmed: ${what}]`;
+
+const placeholderCard = (title: string, what: string) => ({
+  id: id(),
+  title,
+  body: TBC(what),
+  priceText: "",
+  mediaId: "",
+  cta: cta(),
+});
+
+/** Birthday, Christmas, Merchandise and Franchise pages. All drafts: they need approved content before publishing. */
+function campaignPages() {
+  return [
+    {
+      slug: "birthdays",
+      title: "Birthdays",
+      status: "draft" as const,
+      system: false,
+      seoTitle: "Birthdays at Hot Rock",
+      seoDescription: "Celebrate your birthday at Hot Rock Hove: sizzling steaks on the rock, birthday packages and group bookings. Book or enquire today.",
+      reviewNote: "Draft for review. Replace every [To be confirmed] with approved package details and prices, then publish and show the Birthdays link in Navigation.",
+      sections: [
+        {
+          id: id(),
+          hidden: false,
+          type: "hero" as const,
+          eyebrow: "Birthdays at Hot Rock",
+          heading: "Celebrate your birthday on the rock",
+          body: "Sizzling steaks cooked exactly how you like them, right at your table. Bring the family, bring the friends.",
+          mediaId: m("2026/02/WhatsApp-Image-2026-02-22-at-8.10.56-PM-1.jpeg"),
+          videoId: "",
+          mediaStyle: "cover" as const,
+          primaryCta: cta("Book Now", "book"),
+          secondaryCta: cta("Enquire Now", "#form-birthday_enquiry"),
+        },
+        {
+          id: id(),
+          hidden: false,
+          type: "cards" as const,
+          eyebrow: "Birthday packages",
+          heading: "Choose your celebration",
+          body: "",
+          cards: [
+            placeholderCard("Birthday Package", "what's included, minimum guests and price per person"),
+            placeholderCard("Group Celebrations", "group sizes, set menu options and deposit terms"),
+            placeholderCard("Birthday Extras", "cakes, decorations, Rocktails and add-ons, with prices"),
+          ],
+        },
+        {
+          id: id(),
+          hidden: false,
+          type: "cta" as const,
+          heading: "A birthday treat from Daisy",
+          body: "Join Daisy's Fan Club and we'll send you a treat for your birthday.",
+          mediaId: "",
+          primaryCta: cta("Join the Fan Club", "/daisy"),
+          secondaryCta: cta(),
+        },
+        {
+          id: id(),
+          hidden: false,
+          type: "form" as const,
+          eyebrow: "Enquire Now",
+          heading: "Plan your birthday",
+          body: "Tell us about your celebration and we'll get back to you to confirm the details. For a standard table, use Book Now.",
+          formKey: "birthday_enquiry",
+          showContact: true,
+        },
+      ],
+    },
+    {
+      slug: "christmas",
+      title: "Christmas at HotRock",
+      status: "draft" as const,
+      system: false,
+      seoTitle: "Christmas at HotRock",
+      seoDescription: "Festive dining, Christmas packages, parties and group bookings at Hot Rock Hove. Book or enquire today.",
+      reviewNote:
+        "Draft for review. Replace every [To be confirmed] with approved festive menus, packages, prices and dates, then publish and show the Christmas link in Navigation. Gift voucher values (£30, £50) are from the menu spreadsheet; confirm how they're bought.",
+      sections: [
+        {
+          id: id(),
+          hidden: false,
+          type: "hero" as const,
+          eyebrow: "Christmas at HotRock",
+          heading: "This Christmas, gather round the rock",
+          body: "Festive dining, Christmas parties and group bookings, with every steak sizzling at your table.",
+          mediaId: m("2026/02/WhatsApp-Image-2026-02-07-at-10.09.55-PM.jpeg"),
+          videoId: "",
+          mediaStyle: "cover" as const,
+          primaryCta: cta("Book Now", "book"),
+          secondaryCta: cta("Enquire Now", "#form-christmas_enquiry"),
+        },
+        {
+          id: id(),
+          hidden: false,
+          type: "cards" as const,
+          eyebrow: "Festive packages",
+          heading: "Christmas at HotRock",
+          body: "",
+          cards: [
+            placeholderCard("Festive Dining", "festive menu, dates available and price per person"),
+            placeholderCard("Christmas Parties", "party packages, minimum numbers, deposits and price"),
+            placeholderCard("Group Bookings", "group sizes, set menus and booking terms"),
+            {
+              id: id(),
+              title: "Gift Vouchers",
+              body: `Buy someone you love a Hot Rock steak this Christmas.\n\n${TBC("how to buy vouchers")}`,
+              priceText: "£30 or £50",
+              mediaId: "",
+              cta: cta(),
+            },
+          ],
+        },
+        {
+          id: id(),
+          hidden: false,
+          type: "form" as const,
+          eyebrow: "Enquire Now",
+          heading: "Plan your festive get-together",
+          body: "Tell us what you're planning and we'll get back to you with availability and options.",
+          formKey: "christmas_enquiry",
+          showContact: true,
+        },
+        {
+          id: id(),
+          hidden: false,
+          type: "cta" as const,
+          heading: "Just need a table?",
+          body: "Book online in a few clicks.",
+          mediaId: "",
+          primaryCta: cta("Book Now", "book"),
+          secondaryCta: cta(),
+        },
+      ],
+    },
+    {
+      slug: "merchandise",
+      title: "HotRock Merchandise",
+      status: "draft" as const,
+      system: false,
+      seoTitle: "HotRock Merchandise",
+      seoDescription: "HotRock merchandise: the HR Chopper, HR Mug and HR Espresso Cup & Saucer.",
+      reviewNote: "Draft for review. Add product photos, descriptions and prices under Products, then publish.",
+      sections: [
+        {
+          id: id(),
+          hidden: false,
+          type: "hero" as const,
+          eyebrow: "HotRock Merchandise",
+          heading: "Take a piece of Hot Rock home",
+          body: "",
+          mediaId: m("2026/02/WhatsApp-Image-2026-02-07-at-10.09.54-PM-2.jpeg"),
+          videoId: "",
+          mediaStyle: "cover" as const,
+          primaryCta: cta(),
+          secondaryCta: cta(),
+        },
+        {
+          id: id(),
+          hidden: false,
+          type: "products" as const,
+          eyebrow: "",
+          heading: "The HotRock collection",
+          body: "Available from the restaurant. Ask a member of the team.",
+          cta: cta("Ask about this", "/contact"),
+        },
+      ],
+    },
+    {
+      slug: "franchise",
+      title: "Franchise",
+      status: "draft" as const,
+      system: false,
+      seoTitle: "Hot Rock Franchise Opportunities",
+      seoDescription: "Franchise opportunities with Hot Rock.",
+      reviewNote: "Structure only; content to follow. Do not publish until the franchise content is supplied and approved.",
+      sections: [
+        {
+          id: id(),
+          hidden: false,
+          type: "hero" as const,
+          eyebrow: "Franchise opportunities",
+          heading: "Bring Hot Rock to your town",
+          body: "Franchises available.",
+          mediaId: m("2026/02/WhatsApp-Image-2026-02-04-at-10.19.04-PM.jpeg"),
+          videoId: "",
+          mediaStyle: "cover" as const,
+          primaryCta: cta("Enquire Now", "#form-contact"),
+          secondaryCta: cta(),
+        },
+        { id: id(), hidden: false, type: "text" as const, eyebrow: "", heading: "Why Hot Rock", body: TBC("the Hot Rock concept and why it works"), align: "left" as const },
+        { id: id(), hidden: false, type: "text" as const, eyebrow: "", heading: "What we look for", body: TBC("ideal franchise partner, locations and investment"), align: "left" as const },
+        { id: id(), hidden: false, type: "text" as const, eyebrow: "", heading: "How it works", body: TBC("the steps from enquiry to opening"), align: "left" as const },
+        {
+          id: id(),
+          hidden: false,
+          type: "form" as const,
+          eyebrow: "",
+          heading: "Register your interest",
+          body: "Tell us about yourself and where you'd like to open.",
+          formKey: "contact",
+          showContact: false,
+        },
+      ],
+    },
   ];
 }
 
@@ -780,13 +1040,17 @@ async function seedNav() {
   const [{ n }] = await db.select({ n: count() }).from(t.navItems);
   if (n > 0 && !force.has("nav")) return;
   if (n > 0) await db.delete(t.navItems);
-  const header: [string, string][] = [
+  // [label, href, visible]. Campaign links stay hidden until their draft pages are approved and published.
+  const header: [string, string, boolean?][] = [
     ["Home", "/"],
     ["Our Menu", "/our-menus"],
     ["Daisy's Offers", "/daisy"],
+    ["Wagyu", "/wagyu"],
+    ["Birthdays", "/birthdays", false],
+    ["Christmas at HotRock", "/christmas", false],
     ["Gallery", "/gallery"],
     ["Contact", "/contact"],
-    ["Wagyu", "/wagyu"],
+    ["Franchise", "/franchise", false],
     ["Book Table", "book"],
   ];
   const footer: [string, string][] = [
@@ -796,7 +1060,7 @@ async function seedNav() {
     ["Gallery", "/gallery"],
     ["Privacy Policy", "/privacy-policy"],
   ];
-  for (const [i, [label, href]] of header.entries()) await db.insert(t.navItems).values({ location: "header", label, href, sortOrder: i * 10 });
+  for (const [i, [label, href, visible = true]] of header.entries()) await db.insert(t.navItems).values({ location: "header", label, href, visible, sortOrder: i * 10 });
   for (const [i, [label, href]] of footer.entries()) await db.insert(t.navItems).values({ location: "footer", label, href, sortOrder: i * 10 });
   console.log("  navigation");
 }
@@ -889,6 +1153,7 @@ async function main() {
   await seedForms();
   await seedMenu();
   await seedOffers();
+  await seedProducts();
   await seedPages();
   await seedNav();
   await seedRedirects();

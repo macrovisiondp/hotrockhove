@@ -29,6 +29,13 @@
       "when": 1792751827325,
       "tag": "0003_marketing",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794863193897,
+      "tag": "0004_products",
+      "breakpoints": true
     }
   ]
 }

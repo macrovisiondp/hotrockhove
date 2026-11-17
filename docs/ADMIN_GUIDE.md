@@ -25,6 +25,14 @@ Change your password under **My account** (bottom left).
 
 **Edit a page.** Pages → choose the page. Each block (hero, story, gallery…) opens when clicked. Use the arrows to reorder and the eye to hide a block. Press **Save changes**. Use **Preview** to check a draft. Published pages update at once.
 
+**Packages (birthday, Christmas…).** In a page, add a **Packages / cards** block. Each card has a title, text, an optional price line ("£45 per person"), photo and button. To make a button jump to a form on the same page, link it to `#form-` plus the form's key, e.g. `#form-birthday_enquiry`.
+
+**New enquiry form (owner/admin).** Forms → **Add a form** → give it a name (e.g. "Birthday enquiry"). Change its fields on the next screen (Number is useful for "Number of guests"), then put it on a page with a **Form** block.
+
+**Merchandise.** Products → add or edit a product (photos, description, the price shown). Only published products appear, on any page with a **Products** block. The "price in £" and SKU fields are kept ready for an online shop later and aren't shown yet.
+
+**Campaign pages and the menu bar.** Draft pages (Birthdays, Christmas at HotRock, Merchandise, Franchise) are only visible through **Preview**. When one is approved: publish it, then in Navigation tick its link's "Visible" box. With more than six links, the menu bar switches to the menu button on screens narrower than a large laptop.
+
 **Book Table button.** When the new booking system is ready, paste its web address in Connections → Booking system. Until then, the button opens the table-request form.
 
 **Connections (owner).** One page for the services the site uses: email (Resend), text messages (Twilio), spam protection (Cloudflare Turnstile), the booking link and Google Analytics. Paste the details, press **Save** and it takes effect straight away. Keys are stored encrypted and only the last 4 characters are ever shown.
