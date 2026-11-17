@@ -1,11 +1,12 @@
-import { desc } from "drizzle-orm";
+import { asc, desc } from "drizzle-orm";
 import { db, t } from "@/db";
 import { emailConfigIssues } from "@/lib/email/providers";
 import { env } from "@/lib/env";
 import { can } from "@/lib/rbac";
 import { requirePermission } from "@/lib/session";
 import { getSettingFresh, maskSecret } from "@/lib/settings";
-import { ActionForm, Select, TextArea, TextInput, Toggle } from "@/components/admin/form";
+import { ActionForm, Select, TextInput, Toggle } from "@/components/admin/form";
+import { RecipientsEditor } from "@/components/admin/recipients-editor";
 import { Badge, Card, Notice, PageHeader, formatDateTime } from "@/components/admin/ui";
 import { saveEmailAction, saveRecipientsAction, sendTestEmailAction } from "./actions";
 
@@ -15,9 +16,10 @@ export default async function EmailPage() {
   const user = await requirePermission("settings.view");
   const canEdit = can(user.role, "email.configure");
   const isOwner = can(user.role, "secrets.edit");
-  const [email, notifications, log] = await Promise.all([
+  const [email, notifications, forms, log] = await Promise.all([
     getSettingFresh("email"),
     getSettingFresh("notifications"),
+    db.select({ key: t.forms.key, name: t.forms.name }).from(t.forms).orderBy(asc(t.forms.name)),
     db.select().from(t.emailLog).orderBy(desc(t.emailLog.createdAt)).limit(30),
   ]);
   const issues = emailConfigIssues(email);
@@ -42,16 +44,12 @@ export default async function EmailPage() {
       </div>
 
       <div className="space-y-6">
-        <Card title="Notification recipients" description="Staff inboxes that receive new form submissions. One address per line. Individual forms can override this under Forms.">
+        <Card
+          title="Notification recipients"
+          description="Staff addresses emailed when someone sends a website form. Choose which emails each address gets: everything, or particular forms (for example birthday and Christmas enquiries to the events team). Every enquiry is also saved under Form submissions."
+        >
           <ActionForm action={saveRecipientsAction} disabled={!canEdit} compact>
-            <TextArea
-              name="recipients"
-              label="Recipients"
-              rows={3}
-              defaultValue={notifications.recipients.join("\n")}
-              placeholder="bookings@hotrockhove.com"
-              hint="The old site sent notifications to info@hotrockhove.com while showing hello@hotrockhove.com publicly. Confirm which inbox the team reads."
-            />
+            <RecipientsEditor initial={notifications.recipients} forms={forms.map((f) => ({ key: f.key, name: f.name }))} disabled={!canEdit} />
           </ActionForm>
         </Card>
 

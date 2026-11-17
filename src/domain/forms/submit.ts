@@ -5,11 +5,13 @@ import { db, t } from "@/db";
 import { audit, clientIp } from "@/lib/audit";
 import { hashIdentifier } from "@/lib/crypto";
 import { sendEmail } from "@/lib/email";
+import { getEmailBrand } from "@/lib/email/brand";
 import { layout } from "@/lib/email/templates";
+import { recipientsForForm } from "@/domain/notifications";
 import { RATE_LIMITS, rateLimit } from "@/lib/rate-limit";
 import { fillTemplate, getSettingFresh } from "@/lib/settings";
 import { verifyTurnstile } from "@/lib/turnstile";
-import { displayRows, parseFields, submissionValidator, submitterEmail, type FormField } from "./fields";
+import { DEFAULT_ACK_BODY, DEFAULT_ACK_SUBJECT, displayRows, firstNameOf, parseFields, submissionValidator, submitterEmail, type FormField } from "./fields";
 
 export const HONEYPOT_FIELD = "company_website";
 
@@ -100,22 +102,44 @@ export async function handleSubmission(formKey: string, fd: FormData): Promise<P
 
 type LoadedForm = NonNullable<Awaited<ReturnType<typeof getForm>>>;
 
+/** Dates as "Saturday 5 December 2026" in emails; other answers as entered. */
+function emailRows(fields: FormField[], data: Record<string, string | boolean>): [string, string][] {
+  const dateLabels = new Set(fields.filter((f) => f.type === "date").map((f) => f.label));
+  return displayRows(fields, data).map(([k, v]) => {
+    if (!dateLabels.has(k) || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return [k, v];
+    const d = new Date(`${v}T12:00:00Z`);
+    return [k, d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" })];
+  });
+}
+
 export async function notify(form: LoadedForm, submissionId: string, data: Record<string, string | boolean>) {
-  const [business, notifications] = await Promise.all([getSettingFresh("business"), getSettingFresh("notifications")]);
-  const vars: Record<string, string> = { brandName: business.name, formName: form.name };
+  const [notifications, emailSettings, brand] = await Promise.all([getSettingFresh("notifications"), getSettingFresh("email"), getEmailBrand()]);
+  const firstName = firstNameOf(data);
+  const vars: Record<string, string> = { brandName: brand.name, formName: form.name, firstName, greeting: firstName ? `Hello ${firstName},` : "Hello," };
   for (const [k, v] of Object.entries(data)) vars[k] = typeof v === "boolean" ? (v ? "Yes" : "No") : v;
-  const rows = displayRows(form.fields, data);
+  const rows = emailRows(form.fields, data);
   const submitter = submitterEmail(form.fields, data);
 
+  // 1. Staff: everyone subscribed to this form (or to all notifications), plus the form's extra addresses.
   if (form.notifyAdmin) {
-    const recipients = form.recipients.length ? form.recipients : notifications.recipients;
+    const recipients = recipientsForForm(notifications.recipients, form.key, form.recipients);
     if (recipients.length) {
+      const adminUrl = `${brand.siteUrl}/admin/submissions/${submissionId}`;
       const { html, text } = layout({
-        brandName: business.name,
-        heading: `New ${form.name} submission`,
-        paragraphs: ["A new submission was received on the website. Reply to this email to respond to the sender."],
+        brandName: brand.name,
+        brand,
+        eyebrow: "New enquiry",
+        heading: `New ${form.name}`,
+        paragraphs: [
+          submitter
+            ? "A new submission was received on the website. Reply to this email to answer the customer directly."
+            : "A new submission was received on the website.",
+          "It is also saved in the website admin under Form submissions, so it can't be lost if this email is missed.",
+        ],
+        rowsTitle: "Details",
         rows,
-        footer: "You're receiving this because your address is a notification recipient in the website admin.",
+        cta: { label: "Open in admin", url: adminUrl },
+        footer: "You're receiving this because your address is a notification recipient in the website admin (Email & notifications).",
       });
       await sendEmail(
         {
@@ -131,21 +155,23 @@ export async function notify(form: LoadedForm, submissionId: string, data: Recor
     }
   }
 
-  if (form.sendAcknowledgement && submitter && form.ackSubject && form.ackBody) {
+  // 2. The customer always gets a confirmation (the form's own wording, or the default).
+  if (submitter) {
+    const subject = fillTemplate(form.ackSubject || DEFAULT_ACK_SUBJECT, vars).slice(0, 200);
+    const body = fillTemplate(form.ackBody || DEFAULT_ACK_BODY, vars);
     const { html, text } = layout({
-      brandName: business.name,
-      heading: fillTemplate(form.ackSubject, vars),
-      paragraphs: fillTemplate(form.ackBody, vars).split(/\n{2,}/),
-      footer: [business.name, business.phone, business.email].filter(Boolean).join(" · "),
+      brandName: brand.name,
+      brand,
+      eyebrow: form.name,
+      heading: subject,
+      paragraphs: body.split(/\n{2,}/),
+      rowsTitle: "Your details",
+      rows,
+      footer: "You're receiving this because you contacted us through our website.",
     });
     await sendEmail(
-      {
-        to: [submitter],
-        subject: fillTemplate(form.ackSubject, vars).slice(0, 200),
-        html,
-        text,
-        idempotencyKey: `submission:${submissionId}:ack`,
-      },
+      // Customer replies reach the team: the configured reply-to, otherwise the business email (never no-reply@).
+      { to: [submitter], subject, html, text, replyTo: emailSettings.replyTo || brand.email || undefined, idempotencyKey: `submission:${submissionId}:ack` },
       { template: `${form.key}.ack` },
     );
   }

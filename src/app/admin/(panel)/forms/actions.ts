@@ -73,8 +73,6 @@ export async function saveFormAction(_prev: ActionState, fd: FormData): Promise<
       const i = fields.error.issues[0];
       return failure(`Field ${typeof i.path[0] === "number" ? i.path[0] + 1 : ""}: ${i.message}`, { fields: i.message });
     }
-    if (!fields.data.some((f) => f.type === "email") && bool(fd, "sendAcknowledgement"))
-      return failure("Acknowledgement emails need an Email field in the form.", { sendAcknowledgement: "Add an Email field first" });
 
     const retention = str(fd, "retentionDays");
     const parsed = formSchema.safeParse({
@@ -85,18 +83,18 @@ export async function saveFormAction(_prev: ActionState, fd: FormData): Promise<
       recipients: lines(fd, "recipients").map((r) => r.toLowerCase()),
       notifyAdmin: bool(fd, "notifyAdmin"),
       adminSubject: str(fd, "adminSubject"),
-      sendAcknowledgement: bool(fd, "sendAcknowledgement"),
+      // Customers always get a confirmation now (empty wording = the standard message).
+      sendAcknowledgement: true,
       ackSubject: str(fd, "ackSubject"),
       ackBody: str(fd, "ackBody"),
       retentionDays: retention ? Number(retention) : null,
     });
     if (!parsed.success) return zodFailure(parsed.error);
-    if (parsed.data.sendAcknowledgement && (!parsed.data.ackSubject || !parsed.data.ackBody))
-      return failure("Write the acknowledgement subject and message, or switch acknowledgements off.", { ackSubject: "Required" });
 
     await db.update(t.forms).set({ ...parsed.data, fields: fields.data }).where(eq(t.forms.key, key));
     invalidate("pages", "popups");
     await audit("form.update", { actorUserId: user.id, entityType: "form", entityId: key, metadata: { enabled: parsed.data.enabled, fields: fields.data.length } });
+    if (!fields.data.some((f) => f.type === "email")) return success("Form saved. It has no Email field, so customers won't get a confirmation email.");
     return success(parsed.data.enabled ? "Form saved." : "Form saved and switched off: visitors see a 'not available' message.");
   });
 }

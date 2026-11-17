@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { can } from "@/lib/rbac";
 import { requirePermission } from "@/lib/session";
 import { getSettingFresh, maskSecret } from "@/lib/settings";
 import { env } from "@/lib/env";
 import { twilioReady } from "@/lib/sms/twilio";
 import { turnstileKeys } from "@/lib/turnstile";
-import { ActionForm, ConfirmButton, TextArea, TextInput } from "@/components/admin/form";
+import { ActionForm, ConfirmButton, TextInput } from "@/components/admin/form";
 import { Badge, Card, PageHeader } from "@/components/admin/ui";
 import { sendTestEmailAction } from "../email/actions";
 import {
@@ -63,20 +64,21 @@ export default async function ConnectionsPage() {
               <TextInput name="fromAddress" label="Send emails from" type="email" defaultValue={email.fromAddress} placeholder="no-reply@hotrockhove.com" hint="An address on your Resend-verified domain." />
               <TextInput name="fromName" label="Sender name" defaultValue={email.fromName} placeholder="Hot Rock Hove" />
             </div>
-            <TextArea
-              name="recipients"
-              label="Send enquiries to"
-              defaultValue={notifications.recipients.join("\n")}
-              rows={2}
-              placeholder="hello@hotrockhove.com"
-              hint="Where new contact, fan-club and table-request messages are emailed. One address per line."
-            />
+            <div>
+              <p className="mb-1 text-sm font-medium text-[#3a3733]">Enquiries are emailed to</p>
+              <p className="text-sm text-[#3a3733]">
+                {notifications.recipients.length ? notifications.recipients.map((r) => r.email).join(", ") : "Nobody yet."}{" "}
+                <Link href="/admin/email" className="underline">
+                  Choose who gets which emails
+                </Link>
+              </p>
+            </div>
           </ActionForm>
           {emailOn && (
             <div className="mt-5 flex flex-wrap items-end gap-6 border-t border-[#f0ede8] pt-5">
               <div className="min-w-[260px] flex-1">
                 <ActionForm action={sendTestEmailAction} submitLabel="Send a test email" showCancel={false} compact>
-                  <TextInput name="to" label="Send a test email to" type="email" defaultValue={notifications.recipients[0] ?? ""} />
+                  <TextInput name="to" label="Send a test email to" type="email" defaultValue={notifications.recipients[0]?.email ?? ""} />
                 </ActionForm>
               </div>
               {isOwner && <ConfirmButton action={disconnectEmailAction} label="Disconnect" confirmLabel="Yes, disconnect" question="Stop sending emails and remove the API key?" className="admin-btn admin-btn-secondary" />}

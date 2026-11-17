@@ -4,6 +4,7 @@ import { Resend } from "resend";
 import { db, t } from "@/db";
 import { hashIdentifier } from "@/lib/crypto";
 import { buildProvider, EmailNotConfiguredError } from "@/lib/email/providers";
+import { getEmailBrand } from "@/lib/email/brand";
 import { layout } from "@/lib/email/templates";
 import { env } from "@/lib/env";
 import { formatAddress, getSettingFresh, revealSecret } from "@/lib/settings";
@@ -258,10 +259,11 @@ export async function smsAudience(): Promise<string[]> {
 type Campaign = typeof t.marketingCampaigns.$inferSelect;
 
 export async function renderCampaignEmail(c: Pick<Campaign, "subject" | "body" | "ctaLabel" | "ctaUrl">, email: string) {
-  const business = await getSettingFresh("business");
+  const [business, brand] = await Promise.all([getSettingFresh("business"), getEmailBrand()]);
   const address = formatAddress(business);
   return layout({
     brandName: business.name,
+    brand,
     heading: c.subject,
     paragraphs: c.body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean),
     cta: c.ctaLabel && c.ctaUrl ? { label: c.ctaLabel, url: c.ctaUrl } : undefined,

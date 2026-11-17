@@ -39,6 +39,10 @@ Change your password under **My account** (bottom left).
 
 **Pop-ups.** Pop-ups → choose one. Set where it shows, when (delay, scroll or leaving the page), how often, and start and end dates. Keep them rare.
 
+**Who gets enquiry emails.** Email & notifications → Notification recipients. Add any address, give it a label, and tick what it receives: **All notifications** (every form, including forms added later) or particular forms (e.g. Birthday and Christmas enquiries for the events team). hello@hotrockhove.com is the main admin address. A form can also have extra addresses of its own under Forms → that form. Each staff email has an **Open in admin** button, and replying goes straight to the customer.
+
+**Customer confirmations.** Everyone who sends a form gets a confirmation email in the Hot Rock style (logo header) with a copy of what they sent. Change the wording under Forms → the form → Confirmation to the customer; leave it empty for the standard message. Customer replies go to the Reply-to address (Email & notifications), or to the business email if that's empty.
+
 **Read enquiries.** Form submissions. New ones are bold; opening one marks it read. "Reply by email" opens your email app. Use Delete for erasure requests. Submissions are deleted automatically after the retention period set on each form.
 
 **Newsletter.** People are only "Subscribed" after clicking the link in their confirmation email. Confirmed subscribers are included automatically in Marketing emails; legacy addresses (no consent record) never are.

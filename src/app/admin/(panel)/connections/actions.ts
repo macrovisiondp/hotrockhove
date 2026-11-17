@@ -1,7 +1,7 @@
 "use server";
 
 import { audit } from "@/lib/audit";
-import { failure, guarded, lines, str, success, zodFailure, type ActionState } from "@/lib/actions";
+import { failure, guarded, str, success, zodFailure, type ActionState } from "@/lib/actions";
 import { assertPermission } from "@/lib/session";
 import { encryptSecret } from "@/lib/crypto";
 import { getSettingFresh, saveSetting, validateSetting } from "@/lib/settings";
@@ -28,10 +28,6 @@ export async function saveEmailConnectionAction(_prev: ActionState, fd: FormData
     if (!(await ownerFor(Boolean(newKey)))) return failure("Only the owner can change the API key.");
     if (newKey && !/^re_[A-Za-z0-9_]{10,}$/.test(newKey)) return failure("That doesn't look like a Resend API key (it starts with re_).", { resendApiKey: "Check the key" });
 
-    const recipients = lines(fd, "recipients").map((r) => r.toLowerCase());
-    const notifications = validateSetting("notifications", { recipients });
-    if (!notifications.success) return failure("One of the enquiry addresses isn't a valid email address.", { recipients: "One address per line" });
-
     const resendApiKey = newKey ? encryptSecret(newKey) : current.resendApiKey;
     const fromAddress = str(fd, "fromAddress").toLowerCase();
     const ready = Boolean(resendApiKey && fromAddress);
@@ -49,12 +45,11 @@ export async function saveEmailConnectionAction(_prev: ActionState, fd: FormData
     if (!parsed.success) return zodFailure(parsed.error);
 
     await saveSetting("email", parsed.data, user.id);
-    await saveSetting("notifications", notifications.data, user.id);
     await audit(newKey ? "secret.update" : "settings.update", {
       actorUserId: user.id,
       entityType: "settings",
       entityId: "email",
-      metadata: { keyChanged: Boolean(newKey), sending: ready, recipients: recipients.length },
+      metadata: { keyChanged: Boolean(newKey), sending: ready },
     });
     return success(
       ready

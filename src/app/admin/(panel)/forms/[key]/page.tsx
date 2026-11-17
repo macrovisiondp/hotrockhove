@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { count, eq } from "drizzle-orm";
 import { db, t } from "@/db";
-import { parseFields } from "@/domain/forms/fields";
+import { DEFAULT_ACK_BODY, DEFAULT_ACK_SUBJECT, parseFields } from "@/domain/forms/fields";
 import { can } from "@/lib/rbac";
 import { requirePermission } from "@/lib/session";
 import { ActionForm, TextArea, TextInput, Toggle } from "@/components/admin/form";
@@ -49,21 +49,39 @@ export default async function EditForm({ params }: PageProps<"/admin/forms/[key]
 
         <Card title="Staff notification">
           <Toggle name="notifyAdmin" label="Email staff when this form is sent" defaultChecked={form.notifyAdmin} />
+          <p className="mt-3 text-sm text-[#5f5a52]">
+            Sent to everyone ticked for this form (or for all notifications) in{" "}
+            <Link href="/admin/email" className="underline">
+              Email &amp; notifications
+            </Link>
+            .
+          </p>
           <TextArea
             name="recipients"
-            label="Send to (optional override)"
+            label="Extra recipients for this form only (optional)"
             rows={2}
             defaultValue={form.recipients.join("\n")}
             wrapClass="mt-4"
-            hint="Leave empty to use the recipients in Email & notifications. One address per line."
+            hint="Also emailed, in addition to the list above. One address per line."
           />
           <TextInput name="adminSubject" label="Subject" defaultValue={form.adminSubject} maxLength={200} wrapClass="mt-4" hint="Use {{field_name}} to include an answer, e.g. {{name}}." />
         </Card>
 
-        <Card title="Acknowledgement to the visitor" description="An automatic email confirming we received their message.">
-          <Toggle name="sendAcknowledgement" label="Send an acknowledgement" defaultChecked={form.sendAcknowledgement} />
-          <TextInput name="ackSubject" label="Subject" defaultValue={form.ackSubject} maxLength={200} wrapClass="mt-4" />
-          <TextArea name="ackBody" label="Message" defaultValue={form.ackBody} rows={6} maxLength={5000} wrapClass="mt-4" hint="Plain text. {{brandName}} and {{field_name}} placeholders are filled in." />
+        <Card
+          title="Confirmation to the customer"
+          description="Everyone who sends this form gets a branded confirmation email with a copy of their details (the form needs an Email field). Leave the wording empty to use the standard message."
+        >
+          <TextInput name="ackSubject" label="Subject" defaultValue={form.ackSubject} placeholder={DEFAULT_ACK_SUBJECT} maxLength={200} />
+          <TextArea
+            name="ackBody"
+            label="Message"
+            defaultValue={form.ackBody}
+            placeholder={DEFAULT_ACK_BODY}
+            rows={8}
+            maxLength={5000}
+            wrapClass="mt-4"
+            hint="Plain text; a blank line starts a new paragraph. Placeholders: {{greeting}} (“Hello Sam,”), {{firstName}}, {{brandName}}, {{formName}} and any {{field_name}}."
+          />
         </Card>
 
         <Card title="Data retention">

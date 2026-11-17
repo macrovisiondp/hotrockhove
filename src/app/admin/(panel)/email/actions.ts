@@ -2,8 +2,9 @@
 
 import { z } from "zod";
 import { audit } from "@/lib/audit";
-import { bool, failure, guarded, int, lines, str, success, zodFailure, type ActionState } from "@/lib/actions";
+import { bool, failure, guarded, int, str, success, zodFailure, type ActionState } from "@/lib/actions";
 import { sendEmail } from "@/lib/email";
+import { getEmailBrand } from "@/lib/email/brand";
 import { layout } from "@/lib/email/templates";
 import { RATE_LIMITS, rateLimit } from "@/lib/rate-limit";
 import { assertPermission } from "@/lib/session";
@@ -12,12 +13,22 @@ import { getSettingFresh, mergeSecret, saveSetting, validateSetting } from "@/li
 export async function saveRecipientsAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   return guarded(async () => {
     const user = await assertPermission("email.configure");
-    const recipients = lines(fd, "recipients").map((r) => r.toLowerCase());
-    const parsed = validateSetting("notifications", { recipients });
-    if (!parsed.success) return failure("One of the addresses isn't a valid email address.", { recipients: "Check each address (one per line)." });
+    let raw: unknown;
+    try {
+      raw = JSON.parse(str(fd, "recipients") || "[]");
+    } catch {
+      return failure("The recipient list couldn't be read. Reload the page and try again.");
+    }
+    const parsed = validateSetting("notifications", { recipients: raw });
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      const row = typeof issue.path[1] === "number" ? `Recipient ${issue.path[1] + 1}: ` : "";
+      return failure(`${row}${issue.message}`, { recipients: `${row}${issue.message}` });
+    }
     await saveSetting("notifications", parsed.data, user.id);
-    await audit("settings.update", { actorUserId: user.id, entityType: "settings", entityId: "notifications", metadata: { count: recipients.length } });
-    return success(recipients.length ? `Notifications will go to ${recipients.join(", ")}.` : "Saved. No recipients: staff won't be notified of new submissions.");
+    const emails = parsed.data.recipients.map((r) => r.email);
+    await audit("settings.update", { actorUserId: user.id, entityType: "settings", entityId: "notifications", metadata: { count: emails.length } });
+    return success(emails.length ? `Saved. Notifications go to ${emails.join(", ")} as ticked.` : "Saved. No recipients: staff won't be emailed about new submissions.");
   });
 }
 
@@ -84,9 +95,11 @@ export async function sendTestEmailAction(_prev: ActionState, fd: FormData): Pro
     if (!parsed.success) return zodFailure(parsed.error);
     if (!(await rateLimit(RATE_LIMITS.testEmailPerUser, user.id)).allowed) return failure("Too many test emails. Wait a few minutes.");
 
-    const [email, business] = await Promise.all([getSettingFresh("email"), getSettingFresh("business")]);
+    const [email, business, brand] = await Promise.all([getSettingFresh("email"), getSettingFresh("business"), getEmailBrand()]);
     const { html, text } = layout({
       brandName: business.name,
+      brand,
+      eyebrow: "Website admin",
       heading: "Test email",
       paragraphs: [
         `This is a test from the ${business.name} website admin, sent by ${user.name}.`,

@@ -4,6 +4,7 @@ import { revalidateTag, unstable_cache } from "next/cache";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db, t } from "@/db";
+import { notificationsSchema, type NotificationSettings } from "@/domain/notifications";
 import { decryptSecret, encryptSecret, isEncrypted } from "./crypto";
 
 /* -------------------------------------------------------------------------- */
@@ -78,10 +79,8 @@ export const brandSchema = z.object({
   accentColour: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Use a hex colour such as #ba9774"),
 });
 
-export const notificationsSchema = z.object({
-  /** Staff inboxes for form notifications. Empty = notifications are not sent (dashboard warns). */
-  recipients: z.array(z.string().trim().toLowerCase().email()).max(10),
-});
+/** Staff inboxes for form notifications, each with the types of email it receives. See src/domain/notifications.ts. */
+export { notificationsSchema };
 
 export const emailSchema = z.object({
   provider: z.enum(["resend", "smtp", "none"]),
@@ -236,7 +235,7 @@ const SCHEMAS = {
 
 export type BusinessSettings = z.infer<typeof businessSchema>;
 export type BrandSettings = z.infer<typeof brandSchema>;
-export type NotificationSettings = z.infer<typeof notificationsSchema>;
+export type { NotificationSettings };
 export type EmailSettings = z.infer<typeof emailSchema>;
 export type SeoSettings = z.infer<typeof seoSchema>;
 export type ConsentSettings = z.infer<typeof consentSchema>;

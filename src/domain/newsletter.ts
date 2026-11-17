@@ -7,6 +7,7 @@ import { db, t } from "@/db";
 import { audit, clientIp } from "@/lib/audit";
 import { hashIdentifier } from "@/lib/crypto";
 import { sendEmail } from "@/lib/email";
+import { getEmailBrand } from "@/lib/email/brand";
 import { layout } from "@/lib/email/templates";
 import { env } from "@/lib/env";
 import { RATE_LIMITS, rateLimit } from "@/lib/rate-limit";
@@ -87,10 +88,12 @@ export async function subscribe(fd: FormData, source: string): Promise<PublicFor
 }
 
 async function sendConfirmation(id: string, email: string, token: string) {
-  const business = await getSettingFresh("business");
+  const [business, brand] = await Promise.all([getSettingFresh("business"), getEmailBrand()]);
   const url = `${env().APP_URL}/newsletter/confirm?token=${encodeURIComponent(token)}`;
   const { html, text } = layout({
     brandName: business.name,
+    brand,
+    eyebrow: "Newsletter",
     heading: "Please confirm your subscription",
     paragraphs: [
       `You (or someone using your address) asked to receive emails from ${business.name}.`,

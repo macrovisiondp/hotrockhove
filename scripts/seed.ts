@@ -199,7 +199,7 @@ const FORMS = [
     submitLabel: "Submit",
     successMessage: "Thank you for joining Daisy's Fan Club!",
     adminSubject: "New Daisy Pop Up Form Submission: {{full_name}}",
-    sendAcknowledgement: false,
+    sendAcknowledgement: true, // Confirmations always go out; empty wording uses the standard message.
     ackSubject: "",
     ackBody: "",
     retentionDays: 730,
@@ -236,7 +236,7 @@ const FORMS = [
     successMessage:
       "Thanks for choosing Hot Rock Steaks. Your table request has been successfully submitted. A member of our team will reach out shortly to confirm your reservation. Got any changes or special requests? Feel free to contact us anytime. See you soon for an amazing steak experience!",
     adminSubject: "New submission from Book Table",
-    sendAcknowledgement: false,
+    sendAcknowledgement: true, // Confirmations always go out; empty wording uses the standard message.
     ackSubject: "",
     ackBody: "",
     retentionDays: 180,

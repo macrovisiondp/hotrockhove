@@ -28,6 +28,23 @@ export const fieldsSchema = z
   .max(30)
   .refine((fs) => new Set(fs.map((f) => f.name)).size === fs.length, "Field names must be unique");
 
+/**
+ * Confirmation email to the person who sent a form, used when the form has no
+ * wording of its own. {{greeting}} is "Hello Sam," (or "Hello," without a name).
+ */
+export const DEFAULT_ACK_SUBJECT = "Thank you, we've received your message";
+export const DEFAULT_ACK_BODY =
+  "{{greeting}}\n\nThank you for contacting {{brandName}}. We've received your details and a member of our team will be in touch shortly.\n\nA copy of what you sent is below. If anything needs changing, just reply to this email.\n\nKind regards,\nThe {{brandName}} team";
+
+/** First name from a full-name or name field, for greetings. */
+export function firstNameOf(data: Record<string, string | boolean>): string {
+  for (const key of ["first_name", "full_name", "name"]) {
+    const v = data[key];
+    if (typeof v === "string" && v.trim()) return v.trim().split(/\s+/)[0].slice(0, 40);
+  }
+  return "";
+}
+
 /** "Birthday enquiry" → "birthday_enquiry": the stable key used by page sections and submissions. */
 export function formKeyFromName(name: string): string {
   return name
