@@ -22,6 +22,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; perm: Per
       { href: "/admin/menu", label: "Menu", perm: "content.view" },
       { href: "/admin/offers", label: "Offers", perm: "content.view" },
       { href: "/admin/products", label: "Products", perm: "content.view" },
+      { href: "/admin/qr", label: "QR codes", perm: "content.view" },
       { href: "/admin/reviews", label: "Reviews", perm: "content.view" },
       { href: "/admin/media", label: "Media", perm: "content.view" },
       { href: "/admin/navigation", label: "Navigation", perm: "content.view" },

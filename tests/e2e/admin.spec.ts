@@ -186,3 +186,22 @@ test("media storage settings explain the S3 setup; videos accept a poster", asyn
   await page.waitForURL(/\/admin\/media\/[0-9a-f-]{36}$/);
   await expect(page.getByRole("heading", { name: "Poster image" })).toBeVisible();
 });
+
+test("QR codes: a menu item's code links straight to that item on the menu", async ({ page }) => {
+  await page.goto("/admin/qr");
+  await expect(page.getByRole("heading", { name: "QR codes" })).toBeVisible();
+  await page.getByLabel("Menu item").check();
+  const select = page.locator("#qr-target");
+  const label = (await select.locator("option").first().textContent())!.trim();
+  await expect(page.getByRole("img", { name: `QR code for ${label}` })).toBeVisible();
+  const link = (await page.locator("code").first().textContent())!.trim();
+  expect(link).toMatch(/\/[a-z-]+#item-[0-9a-f-]{36}$/);
+  // The SVG download works.
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download SVG" }).click();
+  expect((await download).suggestedFilename()).toMatch(/^qr-[a-z0-9-]+\.svg$/);
+  // The link opens the menu with that item on the page.
+  const { pathname, hash } = new URL(link);
+  await page.goto(`${pathname}${hash}`);
+  await expect(page.locator(hash)).toBeVisible();
+});

@@ -1,3 +1,4 @@
+import { anchorFor } from "@/domain/qr";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MapPin } from "@phosphor-icons/react/dist/ssr";
@@ -327,13 +328,15 @@ function FullMenu({ s, ctx, first }: { s: SectionOf<"menu">; ctx: SectionContext
                   </div>
                   <div className="grid gap-x-14 gap-y-9 md:grid-cols-2">
                     {c.items.map((i) => (
-                      <PriceRow
-                        key={i.id}
-                        name={i.name}
-                        price={i.priceText}
-                        description={i.description}
-                        image={i.imageId ? ctx.media.get(i.imageId) : undefined}
-                      />
+                      // Anchor for QR codes and links straight to one item (admin → QR codes).
+                      <div key={i.id} id={anchorFor.menuItem(i.id)} className="scroll-mt-[150px]">
+                        <PriceRow
+                          name={i.name}
+                          price={i.priceText}
+                          description={i.description}
+                          image={i.imageId ? ctx.media.get(i.imageId) : undefined}
+                        />
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -361,7 +364,7 @@ function Offers({ s, ctx }: { s: SectionOf<"offers">; ctx: SectionContext }) {
         {current.map((o) => {
           const img = o.imageId ? ctx.media.get(o.imageId) : undefined;
           return (
-            <article key={o.id} className="flex gap-5 bg-ink-950 p-6 sm:gap-7 lg:p-8">
+            <article key={o.id} id={anchorFor.offer(o.id)} className="flex scroll-mt-28 gap-5 bg-ink-950 p-6 sm:gap-7 lg:p-8">
               {/* Small square thumbnail; offers without a photo get the brand mark instead. */}
               <div className="relative aspect-square w-24 shrink-0 self-start overflow-hidden bg-ink-900 sm:w-36 lg:w-40">
                 {img ? (
@@ -398,7 +401,7 @@ function Offers({ s, ctx }: { s: SectionOf<"offers">; ctx: SectionContext }) {
           <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-mute">Coming soon</h3>
           <ul className="mt-5 flex flex-wrap gap-3">
             {upcoming.map((o) => (
-              <li key={o.id} className="border border-ink-700 px-4 py-2 text-stone">
+              <li key={o.id} id={anchorFor.offer(o.id)} className="scroll-mt-28 border border-ink-700 px-4 py-2 text-stone">
                 {o.title}
               </li>
             ))}
@@ -808,7 +811,7 @@ function Products({ s, ctx }: { s: SectionOf<"products">; ctx: SectionContext })
         {ctx.products.map((p) => {
           const img = p.imageIds.map((id) => ctx.media.get(id)).find(Boolean);
           return (
-            <li key={p.id} id={`product-${p.slug}`} className="flex flex-col">
+            <li key={p.id} id={anchorFor.product(p.slug)} className="flex scroll-mt-28 flex-col">
               <div className="relative aspect-square overflow-hidden bg-ink-900">
                 {img ? <MediaImage media={img} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" /> : <PhotoPlaceholder />}
               </div>
