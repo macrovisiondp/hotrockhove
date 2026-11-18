@@ -434,17 +434,21 @@ const PRIVACY = `This notice explains what personal information Hot Rock Hove ("
 **What we collect and why**
 Contact form: your name (optional), email address and message, so we can reply to you.
 Table requests: your name, phone number, email address, the date, time and size of your booking, the occasion and any special requests, so we can arrange your table and contact you about it.
+
+Birthday and Christmas enquiries: your name, email address, phone number, preferred date, number of guests, what you're planning and any special requirements, so we can reply with availability and options and arrange your booking. Special requirements may include dietary or allergy information; we use it only to prepare for your visit.
+
+When you send any of our forms we email you a confirmation with a copy of the details you sent.
 Daisy's Fan Club: your name, email address, phone number and the day and month of your birthday, so we can enter you into fan-club prize draws and send you offers and a birthday treat. We only do this with your consent, which you can withdraw at any time.
 Newsletter: your email address and a record of your consent, so we can send you offers and news. We ask you to confirm by email first, and every email has an unsubscribe link.
 
 **Lawful basis**
-We rely on your consent for the fan club and newsletter, on taking steps at your request for table requests, and on our legitimate interest in answering enquiries for the contact form.
+We rely on your consent for the fan club and newsletter, on taking steps at your request for table requests and birthday and Christmas enquiries, and on our legitimate interest in answering enquiries for the contact form. Where you tell us about allergies or dietary needs, we use that information only with your explicit consent, given when you include it, to cater for you safely.
 
 **Who processes your data for us**
-Our website is hosted by Vercel, our database by Neon, emails are sent through Resend, images and videos are stored by Cloudinary, and Cloudflare Turnstile helps protect our forms from spam. These providers act on our instructions. Some of them may process data outside the UK under appropriate safeguards.
+Our website is hosted by Vercel, our database by Neon, emails are sent through Resend, text messages through Twilio, images and videos are stored by Cloudinary, and Cloudflare Turnstile helps protect our forms from spam. These providers act on our instructions. Some of them may process data outside the UK under appropriate safeguards.
 
 **How long we keep it**
-Enquiries are kept for up to 12 months, table requests for up to 6 months, and fan-club details for up to 2 years or until you ask us to remove them. Newsletter subscriptions are kept until you unsubscribe.
+Enquiries (including birthday and Christmas enquiries) are kept for up to 12 months, table requests for up to 6 months, and fan-club details for up to 2 years or until you ask us to remove them. Newsletter subscriptions are kept until you unsubscribe.
 
 **Cookies**
 We use an essential cookie to remember your cookie choice. With your permission we also load optional third-party content, such as our Google reviews widget, and may measure visits. You can change your choice at any time using "Cookie preferences" at the bottom of every page.
