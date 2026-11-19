@@ -151,9 +151,10 @@ export type PublicMenuCategory = { id: string; name: string; note: string; items
 /** "£10.99", "330ml £3.00 · 750ml £4.50"; falls back to the exact source text when a price couldn't be read. */
 export function formatPrices(prices: MenuPrice[], sourcePriceText: string): string {
   if (prices.length === 0 || prices.some((p) => p.amountPence === null)) return sourcePriceText;
-  return prices
-    .map((p) => `${p.label ? `${p.label} ` : ""}£${(p.amountPence! / 100).toFixed(2)}`)
-    .join(" · ");
+  const money = (p: MenuPrice) => `£${(p.amountPence! / 100).toFixed(2)}`;
+  // Unlabelled sizes (e.g. "£6.50 / £24.95"): the measures are given in the category note, like a printed menu.
+  if (prices.length > 1 && prices.every((p) => !p.label)) return prices.map(money).join(" / ");
+  return prices.map((p) => `${p.label ? `${p.label} ` : ""}${money(p)}`).join(" · ");
 }
 
 export const getMenu = unstable_cache(

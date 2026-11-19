@@ -70,6 +70,11 @@ test("redirect matching: exact, trailing slash, case and prefix rules", () => {
   assert.equal(matchRedirect(rules, "/"), null);
 });
 
+test("menu prices display: unlabelled sizes read like a printed menu", () => {
+  assert.equal(formatPrices([{ label: null, amountPence: 650 }, { label: null, amountPence: 2495 }], ""), "£6.50 / £24.95");
+  assert.equal(formatPrices([{ label: null, amountPence: 425 }, { label: null, amountPence: 775 }], ""), "£4.25 / £7.75");
+});
+
 test("menu prices display: exact source text when unreadable", () => {
   assert.equal(formatPrices([{ label: null, amountPence: 1099 }], "£10.99"), "£10.99");
   assert.equal(formatPrices([{ label: null, amountPence: null }], "£5:99"), "£5:99");

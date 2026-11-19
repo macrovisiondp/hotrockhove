@@ -73,7 +73,7 @@ export default async function MenuItemPage({ params, searchParams }: PageProps<"
           <div className="space-y-3">
             {priceRows.map((p, i) => (
               <div key={i} className="grid gap-3 md:grid-cols-[1fr_160px]">
-                <TextInput name={`price.${i}.label`} label={i === 0 ? "Size label (optional)" : `Size label ${i + 1}`} defaultValue={p?.label ?? ""} placeholder={i === 0 ? "" : "e.g. 750ml"} />
+                <TextInput name={`price.${i}.label`} label={i === 0 ? "Size label (optional)" : `Size label ${i + 1}`} hint={i === 0 ? "With several prices, label all of them (330ml, 750ml) or none to show “£6.50 / £24.95”." : undefined} defaultValue={p?.label ?? ""} placeholder={i === 0 ? "" : "e.g. 750ml"} />
                 <TextInput
                   name={`price.${i}.amount`}
                   label={i === 0 ? "Price (£)" : `Price ${i + 1} (£)`}

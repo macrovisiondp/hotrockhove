@@ -109,7 +109,9 @@ export async function saveItemAction(_prev: ActionState, fd: FormData): Promise<
     }
     const keepSourcePrice = bool(fd, "keepSourcePrice");
     if (prices.length === 0 && !keepSourcePrice) errors["price.0.amount"] = "Enter a price.";
-    if (prices.length > 1 && prices.some((p) => !p.label)) errors["price.0.label"] = "Label each size when there's more than one price (e.g. 330ml).";
+    // Several prices: label all of them ("330ml £3.00 · 750ml £4.50") or none ("£6.50 / £24.95", sizes in the category note).
+    if (prices.length > 1 && prices.some((p) => !p.label) && prices.some((p) => p.label))
+      errors["price.0.label"] = "Label every size, or leave all labels empty to show the prices as '£6.50 / £24.95'.";
     if (Object.keys(errors).length) return failure("Please correct the highlighted fields.", errors);
 
     const imageId = str(fd, "imageId");
